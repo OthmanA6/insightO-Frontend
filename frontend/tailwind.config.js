@@ -30,14 +30,31 @@ export default {
         // ── Surfaces (dark mode cards / panels) ─────────────────
         'surface-dark':    '#0f172a',
         'surface-highlight': '#1e293b',
+        // ── HR Console ──────────────────────────────────────────
+        'hr-primary': '#a855f7',
+        'hr-primary-glow': '#c084fc',
+        'accent-cyan': '#06b6d4',
+        'accent-magenta': '#db2777',
+        'background-dark': '#050508',
+        'surface-dark-hr': 'rgba(20, 20, 25, 0.6)',
+        'surface-light': 'rgba(255, 255, 255, 0.05)',
+        'border-neon': 'rgba(168, 85, 247, 0.5)',
+        'text-main': '#f0f0f5',
+        'text-muted': '#94a3b8',
+        success: '#22d3ee',
+        warning: '#f472b6',
       },
       boxShadow: {
         'primary-sm': '0 1px 3px 0 rgba(79,70,229,.4)',
         'primary':    '0 4px 14px 0 rgba(79,70,229,.35)',
         'primary-lg': '0 8px 24px 0 rgba(79,70,229,.4)',
+        'neon-card': '0 0 10px rgba(168, 85, 247, 0.15), inset 0 0 1px rgba(168, 85, 247, 0.2)',
+        'neon-cyan': '0 0 10px rgba(6, 182, 212, 0.3)',
+        'neon-magenta': '0 0 10px rgba(219, 39, 119, 0.3)',
       },
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #4f46e5 0%, #a855f7 100%)',
+        'glass-gradient': 'linear-gradient(145deg, rgba(30, 30, 40, 0.7) 0%, rgba(10, 10, 15, 0.8) 100%)',
       },
       keyframes: {
         'fade-in': {

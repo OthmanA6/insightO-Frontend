@@ -34,7 +34,10 @@ import {
   X,
   Copy,
   LayoutGrid,
-  Bot
+  Bot,
+  Download,
+  ArrowRight,
+  Check
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -47,7 +50,7 @@ import { Label } from "@/shared/components/ui/label"
 import { Switch } from "@/shared/components/ui/switch"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Input } from "@/shared/components/ui/input"
-
+import { Modal } from "@/shared/components/ui/Modal"
 
 import type { Question, QuestionType } from "../types/form.types"
 import { QuestionCard } from "../components/QuestionCard"
@@ -488,6 +491,106 @@ export default function FormBuilderPage() {
               </div>
             </motion.div>
           </div>
+        )}
+
+        {isShareModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-4xl rounded-2xl bg-[#1e1b2e] shadow-2xl flex flex-col md:flex-row overflow-hidden"
+            >
+              <button onClick={() => setIsShareModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white z-20">
+                <X className="h-5 w-5" />
+              </button>
+              
+              <div className="w-full md:w-1/2 p-8 border-r border-white/5">
+                <h3 className="text-2xl font-bold text-white mb-2">Share & Distribute</h3>
+                <p className="text-slate-400 text-sm mb-8">Get this form in front of your team.</p>
+                <div className="mb-6">
+                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Direct Link</label>
+                  <div className="flex items-center bg-[#0a0a0f] border border-white/10 rounded-lg p-1">
+                    <input type="text" readOnly value="https://insighto.ai/f/rev-q1" className="bg-transparent text-sm text-slate-300 w-full px-3 outline-none" />
+                    <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-md transition-colors">Copy</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="w-full md:w-1/2 p-8 bg-[#0a0a0f] flex flex-col items-center justify-center relative">
+                <div className="bg-[#1e1b2e] border border-white/10 rounded-2xl w-64 shadow-2xl flex flex-col items-center text-center relative overflow-hidden mb-6 group">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-indigo-600"></div>
+                  <div className="flex items-center gap-2 mt-6 mb-2">
+                    <LayoutGrid className="text-indigo-500 h-6 w-6" />
+                    <span className="font-black text-white text-lg tracking-tight">insightO</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-300 mb-5 px-4 leading-tight">{formTitle}</h4>
+                  <div className="bg-white p-3 rounded-xl shadow-inner mb-4">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://insighto.ai/f/rev-q1-2026&color=0f111a" alt="QR Code" className="w-36 h-36" />
+                  </div>
+                  <div className="w-full bg-white/5 py-3 border-t border-white/5">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Scan to start evaluation</p>
+                  </div>
+                </div>
+                <button className="flex items-center gap-2 px-6 py-2.5 bg-[#2d2a42] hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-colors shadow-lg">
+                  <Download className="h-4 w-4" /> Download Custom QR
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {isPreviewModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0f] text-white"
+          >
+            <div className="flex justify-between items-center px-8 py-6 shrink-0 z-20 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-white/5">
+              <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+                <LayoutGrid className="text-indigo-500 h-6 w-6" /> insightO
+              </div>
+              <button onClick={() => setIsPreviewModalOpen(false)} className="px-5 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors flex items-center gap-2">
+                Exit Preview <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="absolute top-[80px] left-0 w-full h-1 bg-white/5 z-20">
+              <div className="h-full bg-indigo-600 w-1/3 transition-all"></div>
+            </div>
+            
+            <div className="flex-1 flex items-center justify-center p-8 relative overflow-y-auto">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 blur-[150px] rounded-full pointer-events-none"></div>
+              <div className="max-w-3xl w-full z-10">
+                <div className="flex items-center gap-3 text-indigo-500 font-bold mb-6 text-sm">
+                  <ArrowRight className="h-4 w-4" /> <span>Question 1 of {questions.length > 0 ? questions.length : 1}</span>
+                </div>
+                
+                <h2 className="text-3xl md:text-5xl font-bold mb-10 leading-tight">
+                  {questions.length > 0 ? questions[0].title : "How would you rate the manager's communication skills?"} 
+                  {(questions.length > 0 ? questions[0].isRequired : true) && <span className="text-red-500 ml-2">*</span>}
+                </h2>
+                
+                <div className="flex flex-col gap-4">
+                  {['A', 'B', 'C'].map((letter, i) => (
+                    <label key={letter} className="group flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition-all hover:border-indigo-500 hover:bg-indigo-500/10">
+                      <div className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors group-hover:border-indigo-500 group-hover:text-indigo-500 group-hover:bg-indigo-500/20">
+                        {letter}
+                      </div>
+                      <span className="text-lg font-medium">Option {i + 1}</span>
+                      <input type="radio" name="preview_rate" className="hidden" />
+                    </label>
+                  ))}
+                </div>
+                
+                <div className="mt-12 flex items-center gap-6">
+                  <button className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-lg transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+                    Continue <Check className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

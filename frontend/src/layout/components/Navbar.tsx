@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import { Search, Bell, User, Settings, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/shared/components/ui/input"
@@ -12,6 +13,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { buttonVariants } from "@/shared/components/ui/button"
+import { ThemeToggle } from "@/shared/components/ui/ThemeToggle"
 
 export function Navbar() {
   return (
@@ -30,6 +32,8 @@ export function Navbar() {
       {/* Right side: Notifications & User Profile */}
       <div className="flex items-center gap-4">
         
+        <ThemeToggle />
+
         {/* Notification Bell */}
         <button className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "relative h-9 w-9 p-0 rounded-full")}>
           <Bell className="h-5 w-5 text-muted-foreground" />
@@ -48,13 +52,17 @@ export function Navbar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link to="/dashboard/profile" className="w-full flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link to="/dashboard/settings" className="w-full flex items-center">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">

@@ -1,6 +1,6 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, FileText, BarChart3, Settings } from "lucide-react"
+import { LayoutDashboard, FileText, BarChart3, Settings, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/shared/components/ui/button"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
@@ -11,6 +11,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Forms & Surveys", href: "/dashboard/forms-surveys", icon: FileText },
+    { name: "Users", href: "/dashboard/users", icon: Users },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]

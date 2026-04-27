@@ -7,6 +7,9 @@ import { MainLayout } from './layout/MainLayout'
 import DashboardPlaceholder from '@/features/Auth/pages/DashboardPlaceholder'
 import FormsSurveysPage from '@/features/Forms/pages/FormsSurveysPage'
 import FormBuilderPage from '@/features/FormBuilder/pages/FormBuilderPage'
+import UserManagementPage from '@/features/UserManagement/pages/UserManagementPage'
+import ProfilePage from '@/features/Settings/pages/ProfilePage'
+import SettingsPage from '@/features/Settings/pages/SettingsPage'
 
 
 // import { Button } from '@/shared/components/ui/button'
@@ -31,8 +34,10 @@ function App() {
           <Route index element={<DashboardPlaceholder />} />
           <Route path="forms-surveys" element={<FormsSurveysPage />} />
           <Route path="builder" element={<Navigate to="/builder" replace />} />
+          <Route path="users" element={<UserManagementPage />} />
           <Route path="analytics" element={<div className="p-6">Analytics coming soon.</div>} />
-          <Route path="settings" element={<div className="p-6">Settings coming soon.</div>} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
