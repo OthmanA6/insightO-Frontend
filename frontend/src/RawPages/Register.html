@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Enterprise Onboarding | insightO</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4f46e5",
+                        "primary-hover": "#4338ca",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#020617",
+                        "surface-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .brand-pattern {
+            background-image: 
+                linear-gradient(rgba(79, 70, 229, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+        }
+
+        /* Form Step Transitions */
+        .step-container {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .step-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* OTP Input Styling */
+        .otp-input {
+            letter-spacing: 0.5em;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
+    
+    <button id="theme-toggle" class="absolute top-6 right-6 z-50 flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400 ring-2 ring-indigo-500/20 dark:ring-indigo-500/30 transition-all hover:bg-indigo-100 dark:hover:bg-slate-700">
+        <span id="theme-icon" class="material-symbols-outlined text-[20px]">light_mode</span>
+    </button>
+
+    <div class="flex min-h-screen w-full overflow-hidden">
+        
+        <div class="hidden lg:flex lg:w-1/2 relative bg-[#020617] border-r border-slate-800/50 overflow-hidden items-center justify-center p-20">
+            <div class="absolute inset-0 brand-pattern z-0 pointer-events-none"></div>
+            <div class="absolute top-0 left-0 w-full h-full opacity-40 z-0 pointer-events-none">
+                <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-600/30 rounded-full blur-[120px] animate-pulse"></div>
+                <div class="absolute bottom-[-10%] right-[-10%] w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[150px]"></div>
+            </div>
+
+            <div class="relative z-10 max-w-xl">
+                <div class="flex items-center gap-3 mb-12">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+                        <span class="material-symbols-outlined text-white text-3xl">insights</span>
+                    </div>
+                    <h2 class="text-white text-3xl font-bold tracking-tight">insightO</h2>
+                </div>
+                
+                <h1 id="dynamic-heading" class="text-white text-5xl font-black leading-tight tracking-tight mb-8 transition-all">
+                    Empower your workforce with AI-driven insights
+                </h1>
+                <p class="text-slate-400 text-xl leading-relaxed mb-12">
+                    Join the world's leading HR executives in transforming organizational performance through data-backed intelligence.
+                </p>
+                
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 group cursor-default">
+                        <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover:bg-indigo-500/30 transition-colors">
+                            <span class="material-symbols-outlined text-indigo-400 text-xl">verified_user</span>
+                        </div>
+                        <span class="text-slate-300 font-medium">Enterprise-grade security & encryption</span>
+                    </div>
+                    <div class="flex items-center gap-4 group cursor-default">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center border border-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+                            <span class="material-symbols-outlined text-purple-400 text-xl">psychology</span>
+                        </div>
+                        <span class="text-slate-300 font-medium">Custom AI models trained on your culture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 overflow-y-auto bg-white dark:bg-background-dark relative">
+            <div class="w-full max-w-lg relative z-10">
+                
+                <div class="mb-8 lg:hidden">
+                    <div class="flex items-center gap-2">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+                            <span class="material-symbols-outlined text-white text-2xl">insights</span>
+                        </div>
+                        <h2 class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">insightO</h2>
+                    </div>
+                </div>
+
+                <div class="mb-10" id="stepper">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col items-center relative z-10">
+                            <div id="ind-1" class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm border-2 border-primary transition-all">1</div>
+                            <span class="text-[10px] font-bold mt-2 text-primary uppercase tracking-wider">Account</span>
+                        </div>
+                        <div class="flex-1 h-1 mx-2 bg-slate-200 dark:bg-slate-800 rounded-full relative">
+                            <div id="line-1" class="absolute top-0 left-0 h-full bg-primary rounded-full w-0 transition-all duration-500"></div>
+                        </div>
+                        <div class="flex flex-col items-center relative z-10">
+                            <div id="ind-2" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-400 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition-all">2</div>
+                            <span id="text-2" class="text-[10px] font-bold mt-2 text-slate-400 uppercase tracking-wider transition-all">Verify</span>
+                        </div>
+                        <div class="flex-1 h-1 mx-2 bg-slate-200 dark:bg-slate-800 rounded-full relative">
+                            <div id="line-2" class="absolute top-0 left-0 h-full bg-primary rounded-full w-0 transition-all duration-500"></div>
+                        </div>
+                        <div class="flex flex-col items-center relative z-10">
+                            <div id="ind-3" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-400 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-sm transition-all">3</div>
+                            <span id="text-3" class="text-[10px] font-bold mt-2 text-slate-400 uppercase tracking-wider transition-all">Setup AI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="onboarding-form" onsubmit="return false;">
+                    
+                    <div id="step-1" class="step-container active">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Create Enterprise Account</h2>
+                            <p class="text-slate-500 dark:text-slate-400">Let's start with your organization details.</p>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Company Name</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">corporate_fare</span>
+                                    </div>
+                                    <input required class="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm" placeholder="Enter organization name" type="text"/>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Work Email Address</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">mail</span>
+                                    </div>
+                                    <input id="email-input" required class="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm" placeholder="owner@company.com" type="email"/>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Create Password</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+                                    </div>
+                                    <input required class="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm" placeholder="••••••••" type="password"/>
+                                </div>
+                            </div>
+
+                            <button onclick="nextStep(2)" type="button" class="w-full py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 mt-6">
+                                Continue to Verification
+                                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                            </button>
+                            
+                            <p class="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
+                                Already have an account? <a class="text-primary font-bold hover:underline" href="#">Sign in</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="step-2" class="step-container">
+                        <div class="mb-8">
+                            <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
+                                <span class="material-symbols-outlined text-2xl">mark_email_read</span>
+                            </div>
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Check your inbox</h2>
+                            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">We've sent a 6-digit secure code to <br><strong id="display-email" class="text-slate-900 dark:text-white">your email</strong>.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Security Code</label>
+                                <input type="text" maxlength="6" class="otp-input w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-4 px-4 text-2xl font-bold outline-none transition-all text-slate-900 dark:text-white shadow-sm" placeholder="------"/>
+                            </div>
+
+                            <div class="flex items-center justify-between px-1">
+                                <div class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    Code expires in <span id="timer" class="font-bold text-slate-900 dark:text-white font-mono">01:00</span>
+                                </div>
+                                <button type="button" id="resend-btn" disabled class="text-sm font-bold text-slate-400 dark:text-slate-600 cursor-not-allowed transition-colors">
+                                    Resend Code
+                                </button>
+                            </div>
+
+                            <div class="flex gap-3 mt-8">
+                                <button onclick="prevStep(1)" type="button" class="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-all">
+                                    Back
+                                </button>
+                                <button onclick="nextStep(3)" type="button" class="flex-1 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
+                                    Verify & Continue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="step-3" class="step-container">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Setup AI Parameters</h2>
+                            <p class="text-slate-500 dark:text-slate-400">Define how the RAG model evaluates your team.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="space-y-3">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Evaluation Frameworks & Tags</label>
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">sell</span>
+                                    </div>
+                                    <input class="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm" placeholder="e.g. OKRs, 360 Feedback, Agile" type="text"/>
+                                </div>
+                                <div class="flex flex-wrap gap-2 pt-1">
+                                    <span class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-400 text-xs font-semibold hover:border-primary hover:text-primary cursor-pointer transition-colors">+ Productivity</span>
+                                    <span class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-400 text-xs font-semibold hover:border-primary hover:text-primary cursor-pointer transition-colors">+ Leadership</span>
+                                    <span class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-400 text-xs font-semibold hover:border-primary hover:text-primary cursor-pointer transition-colors">+ Peer Reviews</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-2">
+                                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-500 text-[18px]">psychology</span>
+                                    Company Context & AI Instructions
+                                </label>
+                                <textarea rows="5" class="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-xl py-4 px-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm resize-none" placeholder="Describe your company structure, evaluation rules, and what the AI should focus on or strictly avoid during analysis..."></textarea>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 ml-1">This context trains your dedicated RAG model.</p>
+                            </div>
+
+                            <div class="flex gap-3 mt-8">
+                                <button onclick="prevStep(2)" type="button" class="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-all">
+                                    Back
+                                </button>
+                                <button onclick="finishSetup()" type="button" class="flex-1 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
+                                    Complete Setup
+                                    <span class="material-symbols-outlined text-lg">done_all</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="step-success" class="step-container text-center py-10">
+                        <div class="w-24 h-24 mx-auto rounded-full bg-green-100 dark:bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-5xl">task_alt</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Setup Complete!</h2>
+                        <p class="text-slate-600 dark:text-slate-400 mb-8">Your enterprise environment and AI model are successfully configured.</p>
+                        
+                        <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold animate-pulse">
+                            <span class="material-symbols-outlined text-lg animate-spin">sync</span>
+                            Redirecting to Dashboard...
+                        </div>
+                    </div>
+
+                </form>
+
+                <div class="pt-8 border-t border-slate-200 dark:border-slate-800/80 mt-8" id="sec-footer">
+                    <div class="flex items-center justify-center gap-8 opacity-60">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">lock</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">SOC2 TYPE II</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">gpp_good</span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">GDPR Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Theme Toggle ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const htmlElement = document.documentElement;
+
+            let isDarkMode = htmlElement.classList.contains('dark');
+            themeIcon.textContent = isDarkMode ? 'light_mode' : 'dark_mode';
+
+            themeToggleBtn.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                if (isDarkMode) {
+                    htmlElement.classList.add('dark');
+                    themeIcon.textContent = 'light_mode';
+                } else {
+                    htmlElement.classList.remove('dark');
+                    themeIcon.textContent = 'dark_mode';
+                }
+            });
+        });
+
+        // --- Multi-Step Wizard Logic ---
+        let timerInterval;
+
+        function updateStepperUI(step) {
+            // Colors
+            const activeBg = 'bg-primary';
+            const activeText = 'text-white';
+            const activeBorder = 'border-primary';
+            
+            const inactiveBg = 'bg-slate-100 dark:bg-surface-dark';
+            const inactiveText = 'text-slate-400';
+            const inactiveBorder = 'border-slate-200 dark:border-slate-700';
+
+            // Step 2 logic
+            if(step >= 2) {
+                document.getElementById('ind-2').className = `w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${activeBg} ${activeText} ${activeBorder} border-2`;
+                document.getElementById('text-2').className = 'text-[10px] font-bold mt-2 text-primary uppercase tracking-wider transition-all';
+                document.getElementById('line-1').style.width = '100%';
+            } else {
+                document.getElementById('ind-2').className = `w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${inactiveBg} ${inactiveText} ${inactiveBorder} border-2`;
+                document.getElementById('text-2').className = 'text-[10px] font-bold mt-2 text-slate-400 uppercase tracking-wider transition-all';
+                document.getElementById('line-1').style.width = '0%';
+            }
+
+            // Step 3 logic
+            if(step >= 3) {
+                document.getElementById('ind-3').className = `w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${activeBg} ${activeText} ${activeBorder} border-2`;
+                document.getElementById('text-3').className = 'text-[10px] font-bold mt-2 text-primary uppercase tracking-wider transition-all';
+                document.getElementById('line-2').style.width = '100%';
+            } else {
+                document.getElementById('ind-3').className = `w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${inactiveBg} ${inactiveText} ${inactiveBorder} border-2`;
+                document.getElementById('text-3').className = 'text-[10px] font-bold mt-2 text-slate-400 uppercase tracking-wider transition-all';
+                document.getElementById('line-2').style.width = '0%';
+            }
+        }
+
+        function nextStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            // Show target step
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            updateStepperUI(step);
+
+            // Specific Step Actions
+            if(step === 2) {
+                // Get email value and show it
+                const email = document.getElementById('email-input').value || "owner@company.com";
+                document.getElementById('display-email').textContent = email;
+                
+                // Change Left Heading to match context
+                document.getElementById('dynamic-heading').innerHTML = "Security is our top priority.";
+                
+                // Start OTP Timer
+                startTimer();
+            }
+
+            if(step === 3) {
+                document.getElementById('dynamic-heading').innerHTML = "Train your AI to think like your best manager.";
+            }
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            updateStepperUI(step);
+
+            if(step === 1) {
+                document.getElementById('dynamic-heading').innerHTML = "Empower your workforce with AI-driven insights";
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            let timeLeft = 60; // 60 seconds
+            const timerDisplay = document.getElementById('timer');
+            const resendBtn = document.getElementById('resend-btn');
+            
+            // Reset UI
+            resendBtn.disabled = true;
+            resendBtn.className = "text-sm font-bold text-slate-400 dark:text-slate-600 cursor-not-allowed transition-colors";
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let seconds = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+                timerDisplay.textContent = `00:${seconds}`;
+
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "00:00";
+                    // Enable Resend Button
+                    resendBtn.disabled = false;
+                    resendBtn.className = "text-sm font-bold text-primary hover:text-primary-hover cursor-pointer transition-colors";
+                    // Add click event to restart timer (simulation)
+                    resendBtn.onclick = startTimer; 
+                }
+            }, 1000);
+        }
+
+        function finishSetup() {
+            // Hide Stepper and Footer
+            document.getElementById('stepper').style.display = 'none';
+            document.getElementById('sec-footer').style.display = 'none';
+            
+            // Show Success
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-success').classList.add('active');
+            document.getElementById('dynamic-heading').innerHTML = "You are all set to transform performance.";
+
+            // Simulate redirect after 3 seconds
+            setTimeout(() => {
+                alert("Redirecting to Dashboard...");
+                // window.location.href = "/dashboard.html"; 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

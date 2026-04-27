@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>insightO - Enterprise AI Performance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4f46e5", "primary-hover": "#4338ca", "background-light": "#f8fafc", "background-dark": "#0f172a", "surface-dark": "#1e293b", "surface-highlight": "#334155", "accent": "#6366f1",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-x-hidden antialiased">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-4 lg:px-12">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+                    <span class="material-symbols-outlined text-white text-2xl">insights</span>
+                </div>
+                <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">insightO</h2>
+            </div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                    href="#">Product</a>
+                <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                    href="#">Solutions</a>
+                <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                    href="#">Resources</a>
+                <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                    href="./Pricing.html">Pricing</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-3 mr-1">
+                    <button id="theme-toggle" aria-label="Switch Theme"
+                        class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400 ring-2 ring-indigo-500/20 dark:ring-indigo-500/30 transition-all hover:bg-indigo-100 dark:hover:bg-slate-700">
+                        <span id="theme-icon" class="material-symbols-outlined text-[20px]">light_mode</span>
+                    </button>
+                    <button id="lang-toggle"
+                        class="flex h-9 items-center justify-center rounded-lg px-3 text-sm font-bold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-colors">
+                        العربية
+                    </button>
+                </div>
+                <button
+                    class="hidden md:flex h-10 items-center justify-center rounded-lg px-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    Log In
+                </button>
+                <button onclick="window.location.href='./Register.html'"
+                    class="flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-primary-hover transition-all transform hover:-translate-y-0.5">
+                    Get Started
+                </button>
+            </div>
+        </header>
+        <main class="flex-1">
+            <section class="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32 lg:pt-32">
+                <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                    <div class="absolute inset-0 block dark:hidden bg-background-light"></div>
+
+                    <div class="absolute inset-0 hidden dark:block" style="background-image:
+        radial-gradient(circle at 50% 100%, rgba(79, 70, 229, 0.7) 0%, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.5) 0%, transparent 65%),
+        radial-gradient(circle at 50% 100%, rgba(129, 140, 248, 0.3) 0%, transparent 75%);">
+                    </div>
+
+                    <div class="absolute inset-0 block dark:hidden opacity-60"
+                        style="background-image: linear-gradient(45deg, transparent 49%, #cbd5e1 49%, #cbd5e1 51%, transparent 51%), linear-gradient(-45deg, transparent 49%, #cbd5e1 49%, #cbd5e1 51%, transparent 51%); background-size: 40px 40px; -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%); mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%);">
+                    </div>
+
+                    <div class="absolute inset-0 hidden dark:block opacity-25"
+                        style="background-image: linear-gradient(45deg, transparent 49%, #4f46e5 49%, #4f46e5 51%, transparent 51%), linear-gradient(-45deg, transparent 49%, #4f46e5 49%, #4f46e5 51%, transparent 51%); background-size: 40px 40px; -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%); mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%);">
+                    </div>
+                </div>
+                <div class="container mx-auto px-4 relative z-10 flex flex-col items-center text-center">
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-1.5 mb-8 backdrop-blur-sm">
+                        <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                        <span
+                            class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">New</span>
+                        <span class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1"></span>
+                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">AI-Assisted Evaluation
+                            2.0</span>
+                        <span class="material-symbols-outlined text-sm text-slate-400">arrow_forward</span>
+                    </div>
+                    <h1
+                        class="max-w-4xl text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.1]">
+                        Performance Clarity,<br />
+                        <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Powered
+                            by Data.</span><br />
+                        Driven by Humans.
+                    </h1>
+                    <p class="max-w-2xl text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
+                        Unlock the true potential of your workforce with objective, data-driven insights. Our platform
+                        synthesizes structured tasks, feedback, and AI analysis into a single source of truth.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 w-full justify-center sm:w-auto">
+                        <button
+                            class="h-12 px-8 rounded-xl bg-primary text-white font-semibold text-base shadow-xl shadow-indigo-500/25 hover:bg-primary-hover transition-all flex items-center justify-center gap-2">
+                            Start Free Trial
+                            <span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+                        </button>
+                        <button
+                            class="h-12 px-8 rounded-xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold text-base hover:bg-slate-50 dark:hover:bg-surface-highlight transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-[20px]">play_circle</span>
+                            Book a Demo
+                        </button>
+                    </div>
+                    <div
+                        class="mt-16 relative w-full max-w-5xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-2 shadow-2xl shadow-indigo-500/10">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-b from-transparent to-background-light dark:to-background-dark opacity-20 pointer-events-none rounded-2xl">
+                        </div>
+                        <div
+                            class="aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-50 dark:bg-[#161e32] relative border border-slate-200 dark:border-slate-700/50 flex flex-col">
+                            <div
+                                class="h-14 border-b border-slate-200 dark:border-slate-700/50 bg-white dark:bg-[#1e293b] flex items-center justify-between px-6">
+                                <div class="flex items-center gap-6">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-lg">grid_view</span>
+                                        </div>
+                                        <span class="font-semibold text-slate-900 dark:text-white">Admin
+                                            Dashboard</span>
+                                    </div>
+                                    <nav
+                                        class="hidden md:flex items-center gap-4 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                        <a class="hover:text-indigo-500 transition-colors" href="#">Overview</a>
+                                        <a class="hover:text-indigo-500 transition-colors" href="#">Team</a>
+                                        <a class="hover:text-indigo-500 transition-colors" href="#">Reports</a>
+                                    </nav>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                        <span
+                                            class="material-symbols-outlined text-slate-400 text-sm">calendar_month</span>
+                                        <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Q3
+                                            2023</span>
+                                    </div>
+                                    <div
+                                        class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-indigo-500/20">
+                                        JS</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 p-6 overflow-hidden grid grid-cols-12 grid-rows-6 gap-6 text-left">
+                                <div
+                                    class="col-span-12 md:col-span-3 row-span-4 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm relative overflow-hidden group">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Org Health
+                                            Score</h3>
+                                        <span class="material-symbols-outlined text-slate-400 text-lg">more_horiz</span>
+                                    </div>
+                                    <div class="relative h-40 w-40 mx-auto mt-4">
+                                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                            <circle class="text-slate-100 dark:text-slate-700/30" cx="50" cy="50"
+                                                fill="transparent" r="40" stroke="currentColor" stroke-width="8">
+                                            </circle>
+                                            <circle class="text-indigo-500" cx="50" cy="50" fill="transparent" r="40"
+                                                stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="60"
+                                                stroke-linecap="round" stroke-width="8"></circle>
+                                        </svg>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span class="text-3xl font-bold text-slate-900 dark:text-white">82%</span>
+                                            <span class="text-xs text-green-500 font-medium flex items-center mt-1">
+                                                <span
+                                                    class="material-symbols-outlined text-xs mr-0.5">arrow_upward</span>
+                                                +4.2%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center">
+                                        <p class="text-xs text-slate-400">Top 15% of industry benchmark</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="col-span-12 md:col-span-6 row-span-4 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <div>
+                                            <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                                                Performance by Department</h3>
+                                            <p class="text-xs text-slate-400 mt-1">Average rating across core
+                                                competencies</p>
+                                        </div>
+                                        <button class="text-xs text-indigo-500 font-medium hover:text-indigo-400">View
+                                            Details</button>
+                                    </div>
+                                    <div class="h-48 flex items-end justify-between gap-4 px-2">
+                                        <div class="w-full flex flex-col items-center gap-2 group cursor-pointer">
+                                            <div
+                                                class="w-full bg-slate-100 dark:bg-slate-700/30 rounded-t-sm h-32 relative overflow-hidden">
+                                                <div
+                                                    class="absolute bottom-0 w-full bg-indigo-500 h-[75%] rounded-t-sm group-hover:bg-indigo-400 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[10px] font-medium text-slate-400 uppercase">Eng</span>
+                                        </div>
+                                        <div class="w-full flex flex-col items-center gap-2 group cursor-pointer">
+                                            <div
+                                                class="w-full bg-slate-100 dark:bg-slate-700/30 rounded-t-sm h-32 relative overflow-hidden">
+                                                <div
+                                                    class="absolute bottom-0 w-full bg-indigo-500 h-[88%] rounded-t-sm group-hover:bg-indigo-400 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[10px] font-medium text-slate-400 uppercase">Prod</span>
+                                        </div>
+                                        <div class="w-full flex flex-col items-center gap-2 group cursor-pointer">
+                                            <div
+                                                class="w-full bg-slate-100 dark:bg-slate-700/30 rounded-t-sm h-32 relative overflow-hidden">
+                                                <div
+                                                    class="absolute bottom-0 w-full bg-purple-500 h-[62%] rounded-t-sm group-hover:bg-purple-400 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[10px] font-medium text-slate-400 uppercase">Sales</span>
+                                        </div>
+                                        <div class="w-full flex flex-col items-center gap-2 group cursor-pointer">
+                                            <div
+                                                class="w-full bg-slate-100 dark:bg-slate-700/30 rounded-t-sm h-32 relative overflow-hidden">
+                                                <div
+                                                    class="absolute bottom-0 w-full bg-indigo-500 h-[92%] rounded-t-sm group-hover:bg-indigo-400 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[10px] font-medium text-slate-400 uppercase">Mktg</span>
+                                        </div>
+                                        <div class="w-full flex flex-col items-center gap-2 group cursor-pointer">
+                                            <div
+                                                class="w-full bg-slate-100 dark:bg-slate-700/30 rounded-t-sm h-32 relative overflow-hidden">
+                                                <div
+                                                    class="absolute bottom-0 w-full bg-indigo-500 h-[80%] rounded-t-sm group-hover:bg-indigo-400 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[10px] font-medium text-slate-400 uppercase">Ops</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="col-span-12 md:col-span-3 row-span-4 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 p-5 shadow-sm overflow-hidden flex flex-col">
+                                    <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">Attention
+                                        Needed</h3>
+                                    <div class="space-y-3 flex-1 overflow-y-auto pr-1">
+                                        <div
+                                            class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                            <div
+                                                class="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
+                                                <span class="material-symbols-outlined text-sm">priority_high</span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p
+                                                    class="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                                                    Evaluation Overdue</p>
+                                                <p class="text-[10px] text-slate-500 truncate">3 Managers pending</p>
+                                            </div>
+                                            <span
+                                                class="material-symbols-outlined text-slate-300 text-sm group-hover:text-indigo-500">chevron_right</span>
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                            <div
+                                                class="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+                                                <span class="material-symbols-outlined text-sm">trending_down</span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p
+                                                    class="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                                                    Sales Feedback Dip</p>
+                                                <p class="text-[10px] text-slate-500 truncate">-12% vs last month</p>
+                                            </div>
+                                            <span
+                                                class="material-symbols-outlined text-slate-300 text-sm group-hover:text-indigo-500">chevron_right</span>
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                            <div
+                                                class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                                <span class="material-symbols-outlined text-sm">person_add</span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p
+                                                    class="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                                                    New Hires Onboarding</p>
+                                                <p class="text-[10px] text-slate-500 truncate">5 pending reviews</p>
+                                            </div>
+                                            <span
+                                                class="material-symbols-outlined text-slate-300 text-sm group-hover:text-indigo-500">chevron_right</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="col-span-12 row-span-2 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 p-4 shadow-sm flex items-center gap-4">
+                                    <div
+                                        class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
+                                        <span class="material-symbols-outlined text-white text-xl">auto_awesome</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4
+                                            class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                            AI Insight Generated
+                                            <span
+                                                class="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">NEW</span>
+                                        </h4>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Based on recent peer
+                                            reviews, the Engineering team has shown a significant improvement in <span
+                                                class="text-indigo-500 font-medium">Cross-functional
+                                                Collaboration</span>.</p>
+                                    </div>
+                                    <button
+                                        class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                        View Analysis
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+<section class="py-24 relative bg-slate-50 dark:bg-[#0b1121]">
+    <style>
+        /* --- Professional Soft Glow on Hover --- */
+        .card-glow {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-glow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.1), 0 0 20px -5px rgba(79, 70, 229, 0.05);
+        }
+        .dark .card-glow:hover {
+            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.25), 0 0 20px -5px rgba(79, 70, 229, 0.15);
+        }
+
+        /* --- Card 1: Sequential Checklist Animation --- */
+        @keyframes checkCircle {
+            0%, 10% { background-color: transparent; border-color: #94a3b8; }
+            20%, 90% { background-color: #4f46e5; border-color: #4f46e5; }
+            100% { background-color: transparent; border-color: #94a3b8; }
+        }
+        .dark .chk-anim { border-color: #475569; }
+
+        @keyframes checkMark {
+            0%, 10% { opacity: 0; transform: scale(0.2); }
+            20%, 90% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.2); }
+        }
+
+        @keyframes progressLine {
+            0%, 10% { width: 0%; }
+            30%, 90% { width: var(--target-width); }
+            100% { width: 0%; }
+        }
+
+        .chk-1 { animation: checkCircle 8s infinite; }
+        .mrk-1 { animation: checkMark 8s infinite; }
+        .bar-1 { animation: progressLine 8s infinite; --target-width: 100%; }
+
+        .chk-2 { animation: checkCircle 8s infinite 2.5s; }
+        .mrk-2 { animation: checkMark 8s infinite 2.5s; }
+        .bar-2 { animation: progressLine 8s infinite 2.5s; --target-width: 100%; }
+
+        .chk-3 { animation: checkCircle 8s infinite 5s; }
+        .mrk-3 { animation: checkMark 8s infinite 5s; }
+        .bar-3 { animation: progressLine 8s infinite 5s; --target-width: 100%; }
+
+        /* --- Card 2: Powerful Analytics (Area Chart & Scanner) Animation --- */
+        @keyframes scanMove {
+            0%, 100% { left: 10%; }
+            50% { left: 85%; }
+        }
+        .scan-anim { 
+            animation: scanMove 7s ease-in-out infinite; 
+        }
+        
+        @keyframes pathBreathe {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.92); }
+        }
+        .area-pulse-1 { animation: pathBreathe 4s ease-in-out infinite; transform-origin: bottom; }
+        .area-pulse-2 { animation: pathBreathe 5s ease-in-out infinite 1s; transform-origin: bottom; }
+
+      /* --- SECTION: Security (Concentric Rings) --- */
+        .security-ring { 
+            position: absolute; 
+            border-radius: 50%; 
+            top: 50%; 
+            left: 50%;
+        }
+        @keyframes ringPulse { 
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; } 
+            100% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } 
+        }
+        
+        .sec-ring-1 { width: 1000px; height: 1000px; animation: ringPulse 6s infinite alternate ease-in-out; }
+        .sec-ring-2 { width: 750px; height: 750px; animation: ringPulse 6s infinite alternate ease-in-out 0.5s; }
+        .sec-ring-3 { width: 500px; height: 500px; animation: ringPulse 6s infinite alternate ease-in-out 1s; }
+        .sec-ring-4 { width: 250px; height: 250px; animation: ringPulse 6s infinite alternate ease-in-out 1.5s; }  
+    </style>
+
+    <div class="container mx-auto px-4 md:px-8">
+        <div class="mb-16 md:text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Enterprise-Grade Evaluation Tools</h2>
+            <p class="text-lg text-slate-600 dark:text-slate-400">A comprehensive suite designed to remove bias and highlight true performance trends through multi-dimensional analysis.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            
+            <div class="card-glow group [background:linear-gradient(theme(colors.white),theme(colors.white))_padding-box,linear-gradient(45deg,theme(colors.slate.200),theme(colors.slate.200),theme(colors.slate.200))_border-box] dark:[background:linear-gradient(theme(colors.slate.900),theme(colors.slate.900))_padding-box,linear-gradient(45deg,theme(colors.slate.800),theme(colors.indigo.500/.5),theme(colors.slate.800))_border-box] relative before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] before:opacity-[0.04] rounded-2xl border border-transparent flex flex-col p-8">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-colors duration-500 rounded-2xl pointer-events-none"></div>
+                <div class="relative flex flex-col flex-grow z-10">
+                    <div class="mb-8">
+                        <div class="font-mono text-xs font-semibold text-indigo-500 mb-2 uppercase tracking-wider">Foundation</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-2">Structured Tasks</div>
+                        <p class="text-sm text-slate-600 dark:text-slate-500">Clear, actionable checklists ensuring every step is tracked, measured, and compliant with standards.</p>
+                    </div>
+                    
+                    <div class="relative mt-auto group-hover:-translate-y-2 transition-transform duration-500 ease-in-out">
+                        <div class="h-[180px] w-full bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col justify-between shadow-inner">
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="chk-anim chk-1 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                                    <span class="material-symbols-outlined text-white text-[14px] font-bold mrk-1">check</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between mb-1"><span class="font-mono text-[10px] text-slate-500 dark:text-slate-400">Q1_OBJECTIVES</span></div>
+                                    <div class="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full bar-1"></div></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="chk-anim chk-2 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                                    <span class="material-symbols-outlined text-white text-[14px] font-bold mrk-2">check</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between mb-1"><span class="font-mono text-[10px] text-slate-500 dark:text-slate-400">TEAM_SYNC</span></div>
+                                    <div class="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full bar-2"></div></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="chk-anim chk-3 h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                                    <span class="material-symbols-outlined text-white text-[14px] font-bold mrk-3">check</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between mb-1"><span class="font-mono text-[10px] text-slate-500 dark:text-slate-400">FINAL_REVIEW</span></div>
+                                    <div class="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full w-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full bar-3"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glow group [background:linear-gradient(theme(colors.white),theme(colors.white))_padding-box,linear-gradient(45deg,theme(colors.slate.200),theme(colors.slate.200),theme(colors.slate.200))_border-box] dark:[background:linear-gradient(theme(colors.slate.900),theme(colors.slate.900))_padding-box,linear-gradient(45deg,theme(colors.slate.800),theme(colors.purple.500/.5),theme(colors.slate.800))_border-box] relative before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] before:opacity-[0.04] rounded-2xl border border-transparent flex flex-col p-8">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-colors duration-500 rounded-2xl pointer-events-none"></div>
+                <div class="relative flex flex-col flex-grow z-10">
+                    <div class="mb-8">
+                        <div class="font-mono text-xs font-semibold text-purple-500 mb-2 uppercase tracking-wider">Evaluation</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-2">Multi-Source Feedback</div>
+                        <p class="text-sm text-slate-600 dark:text-slate-500">Holistic views from peers, managers, and self-evaluation synthesized into dynamic analytics.</p>
+                    </div>
+                    
+                    <div class="relative mt-auto group-hover:-translate-y-2 transition-transform duration-500 ease-in-out">
+                        <div class="h-[180px] w-full bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col relative overflow-hidden shadow-inner">
+                            
+                            <div class="flex gap-4 mb-2 z-10 relative">
+                                <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_5px_#4f46e5]"></div><span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">PEERS</span></div>
+                                <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_5px_#a855f7]"></div><span class="text-[10px] font-mono text-slate-500 dark:text-slate-400">MANAGERS</span></div>
+                            </div>
+
+                            <div class="absolute inset-0 mt-10">
+                                <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 200 100">
+                                    <defs>
+                                        <linearGradient id="grad-indigo" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.3" />
+                                            <stop offset="100%" stop-color="#4f46e5" stop-opacity="0" />
+                                        </linearGradient>
+                                        <linearGradient id="grad-purple" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#a855f7" stop-opacity="0.3" />
+                                            <stop offset="100%" stop-color="#a855f7" stop-opacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                    
+                                    <path d="M0,25 H200 M0,50 H200 M0,75 H200" stroke="currentColor" stroke-dasharray="2,4" class="text-slate-300 dark:text-slate-700" stroke-width="0.5" fill="none"/>
+                                    
+                                    <g class="area-pulse-2">
+                                        <path d="M0,100 L0,70 C50,85 70,30 120,45 C160,55 180,25 200,15 L200,100 Z" fill="url(#grad-purple)"/>
+                                        <path d="M0,70 C50,85 70,30 120,45 C160,55 180,25 200,15" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+                                    </g>
+
+                                    <g class="area-pulse-1">
+                                        <path d="M0,100 L0,50 C40,40 60,75 100,45 C140,15 160,50 200,35 L200,100 Z" fill="url(#grad-indigo)"/>
+                                        <path d="M0,50 C40,40 60,75 100,45 C140,15 160,50 200,35" fill="none" stroke="#4f46e5" stroke-width="1.5"/>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <div class="absolute top-10 bottom-0 w-px bg-slate-300 dark:bg-slate-500 scan-anim z-20 pointer-events-none">
+                                <div class="absolute top-[35px] -left-[4px] h-2 w-2 rounded-full border-2 border-white dark:border-slate-800 bg-indigo-500 shadow-[0_0_8px_rgba(79,70,229,0.8)]"></div>
+                                <div class="absolute top-[60px] -left-[4px] h-2 w-2 rounded-full border-2 border-white dark:border-slate-800 bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></div>
+                                
+                                <div class="absolute top-[5px] left-3 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 text-[9px] font-bold px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                                    Score: 8.9
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glow group [background:linear-gradient(theme(colors.white),theme(colors.white))_padding-box,linear-gradient(45deg,theme(colors.slate.200),theme(colors.slate.200),theme(colors.slate.200))_border-box] dark:[background:linear-gradient(theme(colors.slate.900),theme(colors.slate.900))_padding-box,linear-gradient(45deg,theme(colors.slate.800),theme(colors.blue.500/.5),theme(colors.slate.800))_border-box] relative before:absolute before:inset-0 before:bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] before:opacity-[0.04] rounded-2xl border border-transparent flex flex-col p-8 lg:col-span-1 md:col-span-2 md:col-start-1 lg:col-auto">
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-colors duration-500 rounded-2xl pointer-events-none"></div>
+                <div class="relative flex flex-col flex-grow z-10">
+                    <div class="mb-8">
+                        <div class="font-mono text-xs font-semibold text-blue-500 mb-2 uppercase tracking-wider">Intelligence</div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-2">Objective AI Analysis</div>
+                        <p class="text-sm text-slate-600 dark:text-slate-500">AI-driven insights that remove bias and highlight true performance trends effortlessly.</p>
+                    </div>
+                    <div class="relative mt-auto group-hover:-translate-y-2 transition-transform duration-500 ease-in-out">
+                        <div class="h-[180px] w-full bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center relative overflow-hidden shadow-inner">
+                            <div class="absolute w-24 h-24 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="h-3 w-3 rounded-full bg-blue-500 dark:bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
+                                <div class="mt-2 text-xs font-mono text-blue-600 dark:text-blue-400 font-bold tracking-widest">ANALYZING...</div>
+                            </div>
+                            <svg class="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" preserveAspectRatio="none" viewBox="0 0 100 50">
+                                <path class="text-blue-500" d="M0,50 Q25,25 50,25 T100,50" fill="none" stroke="currentColor" stroke-width="0.5"></path>
+                                <path class="text-blue-500" d="M0,50 Q25,35 50,35 T100,50" fill="none" stroke="currentColor" stroke-width="0.5"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+            <section class="py-24 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800">
+                <div class="container mx-auto px-4 md:px-8">
+                    <div class="flex flex-col lg:flex-row gap-16 items-start">
+                        <div class="lg:w-1/3 sticky top-24">
+                            <h4 class="text-indigo-500 font-bold uppercase tracking-widest text-sm mb-2">The Process
+                            </h4>
+                            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">The insightO
+                                Framework</h2>
+                            <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-8">
+                                Our framework transforms scattered data points into a cohesive narrative of employee
+                                growth and organizational health.
+                            </p>
+                            <button
+                                class="flex items-center gap-2 text-indigo-500 font-semibold hover:text-indigo-600 transition-colors group">
+                                Explore Methodology
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </button>
+                        </div>
+                        <div class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div
+                                class="p-6 rounded-2xl bg-slate-50 dark:bg-surface-dark border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-colors">
+                                <div class="text-5xl font-black text-slate-200 dark:text-slate-700/50 mb-4">01</div>
+                                <h3
+                                    class="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-500">database</span>
+                                    Data Ingestion
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                                    Seamlessly connect with your existing tools (Slack, Jira, Salesforce) to gather raw
+                                    performance data without manual entry.
+                                </p>
+                            </div>
+                            <div
+                                class="p-6 rounded-2xl bg-slate-50 dark:bg-surface-dark border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-colors">
+                                <div class="text-5xl font-black text-slate-200 dark:text-slate-700/50 mb-4">02</div>
+                                <h3
+                                    class="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-500">model_training</span>
+                                    Contextual Analysis
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                                    Our AI models understand the 'why' behind the metrics, differentiating between
+                                    market factors and individual contribution.
+                                </p>
+                            </div>
+                            <div
+                                class="p-6 rounded-2xl bg-slate-50 dark:bg-surface-dark border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-colors">
+                                <div class="text-5xl font-black text-slate-200 dark:text-slate-700/50 mb-4">03</div>
+                                <h3
+                                    class="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-500">group</span>
+                                    Calibration
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                                    Human-in-the-loop validation ensures fairness. Managers review AI suggestions and
+                                    adjust based on soft skills nuances.
+                                </p>
+                            </div>
+                            <div
+                                class="p-6 rounded-2xl bg-slate-50 dark:bg-surface-dark border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-colors">
+                                <div class="text-5xl font-black text-slate-200 dark:text-slate-700/50 mb-4">04</div>
+                                <h3
+                                    class="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-indigo-500">trending_up</span>
+                                    Actionable Growth
+                                </h3>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm">
+                                    Generate personalized development plans and OKRs automatically populated into your
+                                    HRIS of choice.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="relative py-24 md:py-32 overflow-hidden bg-white dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-300">
+                
+                <div class="absolute top-1/2 right-0 w-0 h-0 pointer-events-none z-0">
+                    <div class="security-ring sec-ring-1 border-[40px] border-indigo-50/50 dark:border-indigo-500/5 shadow-[inset_0_0_60px_rgba(79,70,229,0.05)] dark:shadow-[inset_0_0_60px_rgba(79,70,229,0.1)]"></div>
+                    <div class="security-ring sec-ring-2 border-[40px] border-indigo-100/50 dark:border-indigo-500/10 shadow-[inset_0_0_60px_rgba(79,70,229,0.1)] dark:shadow-[inset_0_0_60px_rgba(79,70,229,0.2)]"></div>
+                    <div class="security-ring sec-ring-3 border-[40px] border-purple-100/50 dark:border-purple-500/15 shadow-[inset_0_0_60px_rgba(168,85,247,0.15)] dark:shadow-[inset_0_0_60px_rgba(168,85,247,0.3)]"></div>
+                    <div class="security-ring sec-ring-4 bg-gradient-to-tr from-indigo-200 to-purple-200 dark:from-indigo-600/40 dark:to-purple-600/40 blur-2xl"></div>
+                </div>
+
+                <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none mix-blend-overlay" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+
+                <div class="container relative z-10 mx-auto px-4 md:px-8">
+                    <div class="max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 mb-8 backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-sm text-indigo-500">lock</span>
+                            <span class="font-mono text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">Security First</span>
+                        </div>
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight">
+                            Enterprise-Grade Security.<br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400">Uncompromising Privacy.</span>
+                        </h2>
+                        <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-xl">
+                            Your organizational data is protected by world-class encryption and strict role-based access controls. We prioritize anonymity to foster honest, bias-free feedback without compromising trust.
+                        </p>
+                        
+                        <div class="mt-16 pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-wrap items-center gap-8 md:gap-12">
+                            <div class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                                <div class="w-10 h-10 rounded-full border-2 border-slate-400 dark:border-slate-500 flex items-center justify-center font-bold text-[10px] text-slate-600 dark:text-slate-400 leading-tight text-center">SOC 2<br>TYPE II</div>
+                                <div class="text-xs font-bold text-slate-700 dark:text-slate-300 leading-tight uppercase tracking-wider">SOC 2<br><span class="text-slate-500 font-medium">Certified</span></div>
+                            </div>
+                            <div class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                                <span class="material-symbols-outlined text-4xl text-slate-600 dark:text-slate-400">verified_user</span>
+                                <div class="text-xs font-bold text-slate-700 dark:text-slate-300 leading-tight uppercase tracking-wider">GDPR<br><span class="text-slate-500 font-medium">Ready</span></div>
+                            </div>
+                            <div class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                                <div class="w-10 h-10 border-2 border-slate-400 dark:border-slate-500 flex items-center justify-center font-black text-xs text-slate-600 dark:text-slate-400 tracking-tighter">ISO</div>
+                                <div class="text-xs font-bold text-slate-700 dark:text-slate-300 leading-tight uppercase tracking-wider">ISO 27001<br><span class="text-slate-500 font-medium">Compliant</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="py-20 relative overflow-hidden">
+                <div class="absolute inset-0 bg-primary opacity-5 dark:opacity-10"></div>
+                <div class="absolute inset-0"
+                    style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 32px 32px; opacity: 0.1;">
+                </div>
+                <div class="container mx-auto px-4 relative z-10 text-center">
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Ready to upgrade your
+                        evaluations?</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto">
+                        Join 500+ forward-thinking companies using insightO to build high-performance cultures.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            class="h-14 px-8 rounded-full bg-primary text-white font-bold text-lg shadow-xl shadow-indigo-600/30 hover:bg-primary-hover transition-all hover:scale-105">
+                            Get Started Now
+                        </button>
+                        <button
+                            class="h-14 px-8 rounded-full bg-white dark:bg-transparent border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                            Talk to Sales
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="bg-slate-50 dark:bg-black border-t border-slate-200 dark:border-slate-800 pt-16 pb-8">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between gap-12 mb-12">
+                    <div class="max-w-xs">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-indigo-500 text-3xl">insights</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">insightO</span>
+                        </div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">
+                            Empowering organizations with data-driven performance management. Fair, transparent, and
+                            growth-oriented.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-12 md:gap-24">
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white mb-4">Platform</h4>
+                            <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                                <li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Integrations</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Security</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white mb-4">Company</h4>
+                            <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                                <li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
+                    <p>© 2023 insightO Inc. All rights reserved.</p>
+                    <div class="flex gap-6">
+                        <a class="hover:text-slate-800 dark:hover:text-slate-300" href="#">Privacy Policy</a>
+                        <a class="hover:text-slate-800 dark:hover:text-slate-300" href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- Theme Toggle Logic ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const htmlElement = document.documentElement;
+
+            // Check initial state
+            let isDarkMode = htmlElement.classList.contains('dark');
+            themeIcon.textContent = isDarkMode ? 'light_mode' : 'dark_mode';
+
+            themeToggleBtn.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                if (isDarkMode) {
+                    htmlElement.classList.add('dark');
+                    themeIcon.textContent = 'light_mode';
+                } else {
+                    htmlElement.classList.remove('dark');
+                    themeIcon.textContent = 'dark_mode';
+                }
+            });
+
+            // --- Language Toggle Logic ---
+            const langToggleBtn = document.getElementById('lang-toggle');
+            let currentLang = 'en';
+
+            langToggleBtn.addEventListener('click', () => {
+                if (currentLang === 'en') {
+                    htmlElement.setAttribute('lang', 'ar');
+                    htmlElement.setAttribute('dir', 'rtl');
+                    langToggleBtn.textContent = 'English';
+                    currentLang = 'ar';
+                } else {
+                    htmlElement.setAttribute('lang', 'en');
+                    htmlElement.setAttribute('dir', 'ltr');
+                    langToggleBtn.textContent = 'العربية';
+                    currentLang = 'en';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

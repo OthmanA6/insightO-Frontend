@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Forms & Surveys - insightO</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4f46e5", "primary-dark": "#3730a3", "primary-light": "#818cf8",
+                        "background-light": "#f6f6f8", "background-dark": "#0f111a",
+                        "surface-dark": "#1e1b2e", "surface-highlight": "#2d2a42",
+                    },
+                    fontFamily: { sans: ["Inter", "sans-serif"], },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f111a; }
+        ::-webkit-scrollbar-thumb { background: #2d2a42; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+    
+    <aside class="flex w-72 flex-col border-r border-white/5 bg-background-dark py-6 pl-6 pr-2 transition-all">
+        <div class="flex items-center gap-3 px-2 mb-8">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-white">dataset</span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-lg font-bold tracking-tight text-white">insightO</h1>
+                <p class="text-xs font-medium text-slate-400">Enterprise AI</p>
+            </div>
+        </div>
+        <nav class="flex flex-1 flex-col gap-1 overflow-y-auto pr-2">
+            <a class="group flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-colors hover:bg-surface-highlight hover:text-white" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-sm font-medium">Overview</span>
+            </a>
+            <a class="group flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-colors hover:bg-surface-highlight hover:text-white" href="#">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-sm font-medium">Users</span>
+            </a>
+            <a class="group flex items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-primary-light transition-colors hover:bg-primary/20" href="forms.html">
+                <span class="material-symbols-outlined filled">dynamic_form</span>
+                <span class="text-sm font-semibold">Forms & Surveys</span>
+            </a>
+            <div class="my-2 border-t border-white/5 mx-4"></div>
+            <a class="group flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-colors hover:bg-surface-highlight hover:text-white" href="#">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span class="text-sm font-medium">Analytics</span>
+            </a>
+        </nav>
+        <div class="mt-auto flex flex-col gap-2 pt-4">
+            <div class="flex items-center gap-3 rounded-2xl bg-surface-highlight p-3 mt-2 border border-white/5">
+                <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-700"><img src="https://ui-avatars.com/api/?name=Alex+M&background=4f46e5&color=fff" alt="User"></div>
+                <div class="flex flex-col"><p class="text-sm font-bold text-white">Alex M.</p><p class="text-xs text-slate-400">Super Admin</p></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-background-dark">
+        <header class="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-white/5 bg-background-dark/80 px-8 backdrop-blur-md">
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-white">Forms & Surveys</h2>
+                <p class="text-sm text-slate-400">Manage internal evaluations and external feedback.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="create-form.html" class="flex h-10 items-center justify-center gap-2 rounded-xl bg-surface-dark border border-white/10 px-4 text-sm font-semibold text-white transition-all hover:bg-surface-highlight hover:border-white/20">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    Blank Form
+                </a>
+                <a href="create-form.html?ai=true" class="group relative flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-5 text-sm font-bold text-white transition-all hover:from-purple-400 hover:to-indigo-400 shadow-[0_0_20px_-5px_rgba(168,85,247,0.5)] transform hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-[18px] animate-pulse">auto_awesome</span>
+                    Create with AI
+                </a>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-20">
+            <div class="mx-auto flex max-w-[1600px] flex-col gap-6">
+                
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-dark p-2 rounded-xl border border-white/5">
+                    <div class="flex gap-1 bg-background-dark p-1 rounded-lg border border-white/5">
+                        <button class="px-4 py-1.5 text-sm font-semibold bg-surface-highlight text-white rounded-md shadow-sm">All Forms</button>
+                        <button class="px-4 py-1.5 text-sm font-medium text-slate-400 hover:text-white transition-colors rounded-md">Internal (Employees)</button>
+                        <button class="px-4 py-1.5 text-sm font-medium text-slate-400 hover:text-white transition-colors rounded-md">External (Public)</button>
+                    </div>
+                    <div class="relative flex h-9 w-64 items-center overflow-hidden rounded-lg bg-background-dark border border-white/5 focus-within:border-primary/50 transition-all">
+                        <div class="flex h-full w-10 items-center justify-center text-slate-400"><span class="material-symbols-outlined text-[18px]">search</span></div>
+                        <input class="h-full w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none" placeholder="Search forms..." type="text"/>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-white/5 bg-surface-dark overflow-hidden">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-surface-highlight/50 text-xs uppercase text-slate-400 border-b border-white/5">
+                            <tr>
+                                <th class="px-6 py-4 font-semibold">Form Name</th>
+                                <th class="px-6 py-4 font-semibold">Type</th>
+                                <th class="px-6 py-4 font-semibold">Status</th>
+                                <th class="px-6 py-4 font-semibold">Responses</th>
+                                <th class="px-6 py-4 font-semibold">Last Updated</th>
+                                <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="hover:bg-surface-highlight/30 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400"><span class="material-symbols-outlined">groups</span></div>
+                                        <div>
+                                            <div class="font-bold text-white text-base">Q1 Manager 360 Review</div>
+                                            <div class="text-xs text-slate-500">Created by HR Dept</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span class="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20"><span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>Internal</span></td>
+                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-semibold text-green-400">Active</span></td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-white text-base">142</span>
+                                        <span class="text-xs text-slate-500">/ 150</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">2 hours ago</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-primary-light hover:text-white font-semibold mr-3 transition-colors">Results</button>
+                                    <button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-surface-highlight/30 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400"><span class="material-symbols-outlined">campaign</span></div>
+                                        <div>
+                                            <div class="font-bold text-white text-base">Annual Tech Summit Feedback</div>
+                                            <div class="text-xs text-slate-500">Created by Marketing</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span class="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-1 text-xs font-semibold text-purple-400 border border-purple-500/20"><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>External</span></td>
+                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-semibold text-green-400">Active</span></td>
+                                <td class="px-6 py-4"><span class="font-bold text-white text-base">856</span></td>
+                                <td class="px-6 py-4 text-slate-400">Yesterday</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-primary-light hover:text-white font-semibold mr-3 transition-colors">Results</button>
+                                    <button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-surface-highlight/30 transition-colors opacity-75">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-500/10 text-slate-400"><span class="material-symbols-outlined">assignment</span></div>
+                                        <div>
+                                            <div class="font-bold text-white text-base">New Employee Onboarding Survey</div>
+                                            <div class="text-xs text-slate-500">Created by HR Dept</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span class="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20"><span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>Internal</span></td>
+                                <td class="px-6 py-4"><span class="inline-flex rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-semibold text-slate-400">Closed</span></td>
+                                <td class="px-6 py-4"><span class="font-bold text-white text-base">45</span></td>
+                                <td class="px-6 py-4 text-slate-400">Oct 12, 2025</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-primary-light hover:text-white font-semibold mr-3 transition-colors">Results</button>
+                                    <button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

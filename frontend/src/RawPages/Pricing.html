@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Pricing - insightO Enterprise AI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4f46e5", "primary-hover": "#4338ca", "background-light": "#f8fafc", "background-dark": "#020617", "surface-dark": "#0f172a", "surface-highlight": "#1e293b", "accent": "#6366f1",
+                    },
+                    fontFamily: { "display": ["Inter", "sans-serif"] }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Navbar Fixes */
+        header {
+            z-index: 50 !important;
+        }
+
+        /* Pricing Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4f46e5;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #4f46e5;
+        }
+
+        /* --- ENTERPRISE CARD STYLES --- */
+
+        /* Square Grid Pattern */
+        .enterprise-pattern {
+            background-image:
+                linear-gradient(rgba(79, 70, 229, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.2) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 60%);
+        }
+
+        /* Responsive Gradient Backgrounds for Card */
+        .enterprise-card-bg {
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.8), rgba(255, 255, 255, 1));
+            border-color: rgba(79, 70, 229, 0.4);
+        }
+
+        .dark .enterprise-card-bg {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(129, 140, 248, 0.1));
+            border-color: rgba(79, 70, 229, 0.8);
+        }
+
+        /* Responsive Glow */
+        .enterprise-glow {
+            box-shadow: 0 20px 50px -10px rgba(79, 70, 229, 0.25), inset 0 0 20px -5px rgba(79, 70, 229, 0.15);
+        }
+
+        .dark .enterprise-glow {
+            box-shadow: 0 0 80px -15px rgba(79, 70, 229, 0.6), inset 0 0 30px -5px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Smooth scale on hover */
+        .price-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pro {
+            transition: box-shadow 1s cubic-bezier(0.075, 0.82, 0.165, 1), transform 1s cubic-bezier(0.075, 0.82, 0.165, 1) !important;
+        }
+
+        .pro:hover {
+            box-shadow: 0px 0px 150px rgba(79, 70, 229, 0.6) !important;
+        }
+
+        /* --- GLOBAL BACKGROUND FIX (Light & Dark) --- */
+        body {
+            background-color: #f8fafc;
+            /* Clean Light Mode Background */
+            background-image: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.15), transparent 60%);
+            background-attachment: fixed;
+        }
+
+        .dark body {
+            background-color: #020617;
+            /* Deep Dark Mode Background */
+            background-image: radial-gradient(circle at 50% -20%, #312e81, #020617 60%);
+        }
+    </style>
+</head>
+
+<body
+    class="text-slate-900 dark:text-slate-100 font-display overflow-x-hidden antialiased min-h-screen flex flex-col transition-colors duration-300">
+
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-4 lg:px-12 transition-colors duration-300">
+        <div class="flex items-center gap-3">
+            <div
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+                <span class="material-symbols-outlined text-white text-2xl">insights</span>
+            </div>
+            <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">insightO</h2>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-8">
+            <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                href="#">Features</a>
+            <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                href="#">Benefits</a>
+            <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                href="#">Customers</a>
+            <a class="text-sm font-medium text-slate-900 font-semibold dark:text-white transition-colors"
+                href="#">Pricing</a>
+            <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300 dark:hover:text-white transition-colors"
+                href="#">Changelog</a>
+        </nav>
+
+        <div class="flex items-center gap-3">
+            <div
+                class="flex items-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-3 mr-1 relative z-50">
+                <button id="theme-toggle" aria-label="Switch Theme"
+                    class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400 ring-2 ring-indigo-500/20 dark:ring-indigo-500/30 transition-all hover:bg-indigo-100 dark:hover:bg-slate-700">
+                    <span id="theme-icon" class="material-symbols-outlined text-[20px]">light_mode</span>
+                </button>
+            </div>
+            <button
+                class="hidden md:flex h-10 items-center justify-center rounded-lg px-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Log In
+            </button>
+            <button
+                class="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 hover:bg-primary-hover transition-all">
+                Get Started
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col justify-center py-20 relative">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-indigo-600/5 dark:bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none z-0">
+        </div>
+
+        <div class="container mx-auto px-4 md:px-6 relative z-10 max-w-6xl">
+
+            <div class="text-center mb-16">
+                <div
+                    class="inline-flex items-center justify-center px-3 py-1 mb-6 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <span
+                        class="text-xs font-semibold text-slate-600 dark:text-slate-300 tracking-wide uppercase">Pricing</span>
+                </div>
+                <h1
+                    class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight leading-tight transition-colors">
+                    Choose the Perfect Plan<br>
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">for
+                        Your Business</span>
+                </h1>
+                <p class="text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-10 transition-colors">
+                    Built for teams that demand clarity. Upgrade your evaluation process with AI-driven insights.
+                </p>
+
+                <div class="flex items-center justify-center gap-4">
+                    <div
+                        class="inline-flex items-center p-1.5 rounded-full bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 transition-colors">
+                        <button
+                            class="px-6 py-2 rounded-full text-sm font-semibold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm transition-all">
+                            Monthly
+                        </button>
+                        <button
+                            class="px-6 py-2 rounded-full text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                            Annually <span
+                                class="text-[10px] bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full font-bold">Save
+                                15%</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+
+                <div
+                    class="price-card flex flex-col p-8 md:p-10 rounded-3xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm relative z-10 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">Pro</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 h-10 mb-4 transition-colors">Advanced tools
+                            for growing teams and mid-sized organizations.</p>
+                        <div class="flex items-end gap-1 mb-2">
+                            <span
+                                class="text-5xl font-extrabold text-slate-900 dark:text-white transition-colors">$19</span>
+                            <span class="text-sm text-slate-500 font-medium mb-1">per user/month</span>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-full py-3.5 px-4 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors mb-2 border border-slate-200 dark:border-slate-700">
+                        Start Free Trial
+                    </button>
+                    <p class="text-center text-xs text-slate-500 mb-8">Billed monthly. Cancel anytime.</p>
+
+                    <div class="flex-1 border-t border-slate-200 dark:border-slate-800 pt-6 transition-colors">
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white mb-4 transition-colors">Pro Plan
+                            includes:</p>
+                        <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400 transition-colors">
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-500 text-lg shrink-0">check</span>Collaborate
+                                with up to 50 employees</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-500 text-lg shrink-0">check</span>Core
+                                task management & checklists</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-500 text-lg shrink-0">check</span>Multi-source
+                                anonymous feedback</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-500 text-lg shrink-0">check</span>Basic
+                                AI Analysis & Insights</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-500 text-lg shrink-0">check</span>Email
+                                support</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    class="price-card pro flex flex-col p-8 md:p-10 rounded-3xl enterprise-card-bg border-2 enterprise-glow relative z-20 shadow-xl overflow-hidden transition-colors">
+
+                    <div class="absolute inset-0 rounded-3xl enterprise-pattern z-0 pointer-events-none"></div>
+
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-b-lg z-20 shadow-md">
+                        Most Popular
+                    </div>
+
+                    <div class="relative z-10 mb-6 mt-2">
+                        <h3
+                            class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
+                            Enterprise</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 h-10 mb-4 transition-colors">Complete
+                            evaluation suite & custom AI models for large scale enterprises.</p>
+                        <div class="flex items-end gap-1 mb-2">
+                            <span
+                                class="text-5xl font-extrabold text-slate-900 dark:text-white transition-colors">$49</span>
+                            <span
+                                class="text-sm text-indigo-700 dark:text-indigo-400 font-bold mb-1 transition-colors">per
+                                user/month</span>
+                        </div>
+                    </div>
+
+                    <button
+                        class="relative z-10 w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold hover:from-indigo-600 hover:to-purple-700 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all transform hover:-translate-y-0.5 mb-2 border border-indigo-500/50">
+                        Contact Sales
+                    </button>
+                    <p
+                        class="relative z-10 text-center text-xs text-slate-500 dark:text-slate-400 mb-8 transition-colors">
+                        Volume discounts available.</p>
+
+                    <div
+                        class="relative z-10 flex-1 border-t border-indigo-300 dark:border-indigo-500/20 pt-6 transition-colors">
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white mb-4 transition-colors">All Pro
+                            features, plus:</p>
+                        <ul class="space-y-4 text-sm text-slate-800 dark:text-slate-200 transition-colors">
+                            <li class="flex items-start gap-3 font-semibold text-indigo-700 dark:text-indigo-300">
+                                <span
+                                    class="material-symbols-outlined text-indigo-600 dark:text-indigo-500 text-lg shrink-0">check_circle</span>
+                                Objective AI Analysis (Advanced)
+                            </li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-600 dark:text-indigo-500 text-lg shrink-0">check</span>Unlimited
+                                employees & departments</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-600 dark:text-indigo-500 text-lg shrink-0">check</span>Custom
+                                HRIS workflows & automations</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-600 dark:text-indigo-500 text-lg shrink-0">check</span>Premium
+                                integrations (Workday, Jira)</li>
+                            <li class="flex items-start gap-3"><span
+                                    class="material-symbols-outlined text-indigo-600 dark:text-indigo-500 text-lg shrink-0">check</span>24/7
+                                Priority support & Dedicated AM</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const htmlElement = document.documentElement;
+
+            let isDarkMode = htmlElement.classList.contains('dark');
+            themeIcon.textContent = isDarkMode ? 'light_mode' : 'dark_mode';
+
+            themeToggleBtn.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                if (isDarkMode) {
+                    htmlElement.classList.add('dark');
+                    themeIcon.textContent = 'light_mode';
+                } else {
+                    htmlElement.classList.remove('dark');
+                    themeIcon.textContent = 'dark_mode';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

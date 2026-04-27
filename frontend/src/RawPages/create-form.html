@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pro Form Builder - insightO</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4f46e5", "primary-dark": "#3730a3", "primary-light": "#818cf8",
+                        "background-light": "#f6f6f8", "background-dark": "#0f111a",
+                        "surface-dark": "#1e1b2e", "surface-highlight": "#2d2a42",
+                    },
+                    fontFamily: { sans: ["Inter", "sans-serif"], },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2d2a42; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        
+        .question-card { border-color: rgba(255,255,255,0.05); transition: all 0.2s ease; }
+        .question-card.active {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 1px #4f46e5, 0 10px 30px -10px rgba(79, 70, 229, 0.15);
+            background: linear-gradient(to bottom right, #1e1b2e, #161423);
+        }
+        
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { transform: scale(0.95) translateY(10px); transition: all 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+        .typeform-option:hover { border-color: #4f46e5; background-color: rgba(79, 70, 229, 0.1); }
+        .typeform-option:hover .letter-box { border-color: #4f46e5; color: #4f46e5; background-color: rgba(79, 70, 229, 0.2); }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 antialiased overflow-hidden flex flex-col h-screen">
+
+    <header class="shrink-0 flex h-14 w-full items-center justify-between border-b border-white/5 bg-background-dark px-4 lg:px-6 z-20 relative">
+        <div class="flex items-center gap-4">
+            <a href="forms.html" class="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-surface-highlight text-slate-400 transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div class="h-6 w-px bg-white/10"></div>
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">dynamic_form</span>
+                <input type="text" id="form-main-title" value="Q1 Manager 360 Review" class="bg-transparent text-sm font-bold text-white border-none focus:ring-0 w-48 md:w-64 p-0 focus:outline-none">
+                <span class="inline-flex items-center rounded bg-surface-highlight px-2 py-0.5 text-[10px] font-medium text-slate-300" id="save-status">Saved</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button onclick="openModal('ai-modal')" class="flex h-8 items-center gap-2 rounded bg-purple-500/10 border border-purple-500/30 px-3 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-white">
+                <span class="material-symbols-outlined text-[16px]">auto_awesome</span> Generate via AI
+            </button>
+            <div class="h-4 w-px bg-white/10 mx-1"></div>
+            <button onclick="openModal('share-modal')" class="h-8 px-3 rounded hover:bg-surface-highlight text-slate-300 text-xs font-semibold transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">share</span> Share
+            </button>
+            <button onclick="updatePreviewTitle(); openModal('preview-modal')" class="h-8 px-3 rounded hover:bg-surface-highlight text-slate-300 text-xs font-semibold transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">visibility</span> Preview
+            </button>
+            <button onclick="openModal('publish-modal')" class="h-8 px-4 rounded bg-primary hover:bg-primary-hover text-white text-xs font-bold shadow-md transition-all">
+                Publish Form
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden bg-[#0a0a0f]">
+        
+        <aside class="w-64 shrink-0 border-r border-white/5 bg-surface-dark flex flex-col hidden md:flex z-10">
+            <div class="p-4 border-b border-white/5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Form Library</h3>
+                <p class="text-[10px] text-slate-500 mt-1">Click to add to canvas</p>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <div>
+                    <h4 class="text-[10px] font-semibold text-slate-500 mb-3">Standard Fields</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="addBlock('Short Text', 'short_text')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">short_text</span>
+                            <span class="text-[10px] font-medium text-center">Short Text</span>
+                        </button>
+                        <button onclick="addBlock('Paragraph', 'notes')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">notes</span>
+                            <span class="text-[10px] font-medium text-center">Paragraph</span>
+                        </button>
+                        <button onclick="addBlock('Multiple Choice', 'radio_button_checked')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">radio_button_checked</span>
+                            <span class="text-[10px] font-medium text-center">Multi Choice</span>
+                        </button>
+                        <button onclick="addBlock('Rating Scale', 'linear_scale')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">linear_scale</span>
+                            <span class="text-[10px] font-medium text-center">Rating Scale</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-[10px] font-semibold text-slate-500 mb-3">Advanced Fields</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="addBlock('File Upload', 'cloud_upload')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">cloud_upload</span>
+                            <span class="text-[10px] font-medium text-center">File Upload</span>
+                        </button>
+                        <button onclick="addBlock('Dropdown', 'arrow_drop_down_circle')" class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">arrow_drop_down_circle</span>
+                            <span class="text-[10px] font-medium text-center">Dropdown</span>
+                        </button>
+                        <button onclick="addBlock('Date', 'calendar_today')" class="col-span-2 flex flex-row items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-background-dark hover:border-primary/50 hover:bg-primary/5 transition-all text-slate-300">
+                            <span class="material-symbols-outlined text-[20px] text-slate-400">calendar_today</span>
+                            <span class="text-[10px] font-medium text-center">Date Picker</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-[10px] font-semibold text-purple-400 mb-3 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">psychology</span> AI-Powered Blocks</h4>
+                    <div class="space-y-2">
+                        <button onclick="addBlock('Sentiment Textbox', 'sentiment_satisfied', true)" class="w-full flex items-center gap-3 p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all text-left group">
+                            <span class="material-symbols-outlined text-[20px] text-purple-400 group-hover:animate-pulse">sentiment_satisfied</span>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-200">AI Sentiment Input</p>
+                                <p class="text-[9px] text-slate-500">Auto-analyzes tone & mood</p>
+                            </div>
+                        </button>
+                        <button onclick="addBlock('AI Skill Matrix', 'hub', true)" class="w-full flex items-center gap-3 p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all text-left group">
+                            <span class="material-symbols-outlined text-[20px] text-purple-400 group-hover:animate-pulse">hub</span>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-200">Skill Matrix</p>
+                                <p class="text-[9px] text-slate-500">Multi-dimensional rating</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="flex-1 flex flex-col relative overflow-y-auto scroll-smooth" id="canvas-container">
+            <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+            
+            <div class="w-full max-w-2xl mx-auto py-10 px-4 relative z-10 flex flex-col gap-4 pb-32" id="form-blocks-container">
+                
+                <div id="title-block" class="question-card rounded-2xl bg-surface-dark p-8 shadow-lg cursor-pointer" onclick="selectCard(this, 'Form Title', false)">
+                    <input type="text" id="canvas-title" onkeyup="document.getElementById('form-main-title').value = this.value" class="w-full bg-transparent text-3xl font-bold text-white border-none focus:ring-0 p-0 mb-2 placeholder-slate-600 outline-none" value="Q1 Manager 360 Review">
+                    <textarea class="w-full bg-transparent text-sm text-slate-400 border-none focus:ring-0 p-0 resize-none outline-none" rows="2" placeholder="Describe the purpose of this evaluation...">Please provide honest feedback regarding your direct manager's performance this quarter. Your responses are strictly anonymous.</textarea>
+                </div>
+
+                <div class="question-card active rounded-2xl bg-surface-dark p-6 shadow-lg cursor-pointer relative group" onclick="selectCard(this, 'Rating Scale', false, 'Communication')">
+                    <div class="absolute -left-10 top-1/2 -translate-y-1/2 text-slate-600 opacity-0 group-hover:opacity-100 hover:text-white cursor-grab"><span class="material-symbols-outlined">drag_indicator</span></div>
+                    <div class="flex items-start gap-4 mb-4">
+                        <input type="text" class="flex-1 w-full bg-surface-highlight/30 text-base font-semibold text-white border border-transparent focus:border-primary rounded-lg px-3 py-2 outline-none transition-all" value="How would you rate the manager's communication skills?">
+                        <div class="flex items-center gap-2 bg-background-dark border border-white/10 rounded-lg px-3 py-2 cursor-pointer pointer-events-none shrink-0">
+                            <span class="material-symbols-outlined text-slate-400 text-[18px]">linear_scale</span>
+                            <span class="text-sm font-medium text-slate-300 hidden sm:block">Rating Scale</span>
+                        </div>
+                    </div>
+                    <div class="bg-background-dark rounded-xl p-4 border border-white/5">
+                        <div class="flex items-center justify-between text-xs text-slate-500 mb-3"><span>1 (Poor)</span><span>5 (Excellent)</span></div>
+                        <div class="flex justify-between gap-2">
+                            <div class="h-10 flex-1 rounded-lg border border-white/10 bg-surface-dark flex items-center justify-center text-sm font-medium text-slate-400">1</div>
+                            <div class="h-10 flex-1 rounded-lg border border-white/10 bg-surface-dark flex items-center justify-center text-sm font-medium text-slate-400">2</div>
+                            <div class="h-10 flex-1 rounded-lg border border-white/10 bg-surface-dark flex items-center justify-center text-sm font-medium text-slate-400">3</div>
+                            <div class="h-10 flex-1 rounded-lg border border-white/10 bg-surface-dark flex items-center justify-center text-sm font-medium text-slate-400">4</div>
+                            <div class="h-10 flex-1 rounded-lg border border-primary/50 bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">5</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="w-full max-w-2xl mx-auto px-4 relative z-10 pb-32 group cursor-pointer" onclick="addBlock('Short Text', 'short_text')">
+                <div class="flex items-center w-full py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="flex-1 h-px bg-primary/30"></div>
+                    <div class="w-8 h-8 rounded-full bg-surface-dark border border-primary text-primary flex items-center justify-center mx-3 shadow-[0_0_15px_rgba(79,70,229,0.3)] transform group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                    </div>
+                    <div class="flex-1 h-px bg-primary/30"></div>
+                </div>
+                <p class="text-center text-[10px] font-medium text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity mt-1">Click to add default question</p>
+            </div>
+        </section>
+
+        <aside class="w-80 shrink-0 border-l border-white/5 bg-surface-dark flex flex-col hidden lg:flex z-10">
+            <div class="p-4 border-b border-white/5 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Properties Panel</h3>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-5 space-y-6" id="properties-panel">
+                </div>
+        </aside>
+
+    </main>
+</div>
+
+<div id="ai-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
+    <div class="modal-content relative w-full max-w-2xl rounded-2xl border border-purple-500/30 bg-gradient-to-br from-[#1e172e] to-[#171324] p-8 shadow-[0_0_50px_-10px_rgba(168,85,247,0.3)] overflow-hidden m-4">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+        <button onclick="closeModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white z-20"><span class="material-symbols-outlined">close</span></button>
+        
+        <div class="flex flex-col relative z-10">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 shadow-lg">
+                    <span class="material-symbols-outlined text-white text-[20px]">auto_awesome</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">Generate Form with AI</h3>
+                    <p class="text-xs text-slate-400">Describe your goal, and AI will structure the perfect evaluation.</p>
+                </div>
+            </div>
+            
+            <textarea id="ai-prompt" rows="4" class="w-full bg-black/30 border border-purple-500/30 focus:border-purple-400 rounded-xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none resize-none mb-4" placeholder="e.g. Create a 360-degree performance review for software engineers focusing on code quality, teamwork, and leadership..."></textarea>
+            
+            <div class="flex flex-wrap gap-2 mb-6">
+                <span onclick="document.getElementById('ai-prompt').value += ' Productivity Focus'" class="text-[11px] bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-300 cursor-pointer hover:bg-white/10 transition-colors">+ Productivity Focus</span>
+                <span onclick="document.getElementById('ai-prompt').value += ' Anonymous'" class="text-[11px] bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-300 cursor-pointer hover:bg-white/10 transition-colors">+ Anonymous</span>
+                <span onclick="document.getElementById('ai-prompt').value += ' Department: Sales'" class="text-[11px] bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-300 cursor-pointer hover:bg-white/10 transition-colors">+ Dept: Sales</span>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-2">
+                <button onclick="closeModals()" class="px-5 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Cancel</button>
+                <button onclick="generateAIForm()" id="generate-btn" class="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 px-6 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition-all transform hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-[18px]">bolt</span> Generate Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="preview-modal" class="modal-overlay fixed inset-0 z-50 flex flex-col bg-background-dark text-white">
+    <div class="flex justify-between items-center px-8 py-6 shrink-0 z-20 bg-background-dark/80 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <span class="material-symbols-outlined text-primary">dataset</span> insightO
+        </div>
+        <button onclick="closeModals()" class="px-5 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors flex items-center gap-2">
+            Exit Preview <span class="material-symbols-outlined text-[16px]">close</span>
+        </button>
+    </div>
+    <div class="absolute top-20 left-0 w-full h-1 bg-white/5 z-20"><div class="h-full bg-primary w-1/3 transition-all"></div></div>
+    
+    <div class="flex-1 flex items-center justify-center p-8 relative overflow-y-auto">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="max-w-3xl w-full z-10">
+            <div class="flex items-center gap-3 text-primary font-bold mb-6 text-sm">
+                <span class="material-symbols-outlined">arrow_forward</span> <span>Question 1 of 3</span>
+            </div>
+            <h2 class="text-3xl md:text-5xl font-bold mb-10 leading-tight">How would you rate the manager's communication skills? <span class="text-red-500">*</span></h2>
+            <div class="flex flex-col gap-4">
+                <label class="typeform-option flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition-all">
+                    <div class="letter-box w-8 h-8 rounded border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors">A</div>
+                    <span class="text-lg font-medium">1 - Needs significant improvement</span><input type="radio" name="preview_rate" class="hidden">
+                </label>
+                <label class="typeform-option flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition-all">
+                    <div class="letter-box w-8 h-8 rounded border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors">B</div>
+                    <span class="text-lg font-medium">2 - Below average</span><input type="radio" name="preview_rate" class="hidden">
+                </label>
+                <label class="typeform-option flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition-all">
+                    <div class="letter-box w-8 h-8 rounded border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors">C</div>
+                    <span class="text-lg font-medium">5 - Exceptional and clear</span><input type="radio" name="preview_rate" class="hidden">
+                </label>
+            </div>
+            <div class="mt-12 flex items-center gap-6">
+                <button class="px-8 py-3.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+                    Continue <span class="material-symbols-outlined text-[20px]">check</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="share-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-4xl rounded-2xl bg-surface-dark shadow-2xl flex flex-col md:flex-row overflow-hidden m-4">
+        <button onclick="closeModals()" class="absolute top-4 right-4 text-slate-400 hover:text-white z-20"><span class="material-symbols-outlined">close</span></button>
+        <div class="w-full md:w-1/2 p-8 border-r border-white/5">
+            <h3 class="text-2xl font-bold text-white mb-2">Share & Distribute</h3>
+            <p class="text-slate-400 text-sm mb-8">Get this form in front of your team.</p>
+            <div class="mb-6">
+                <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Direct Link</label>
+                <div class="flex items-center bg-background-dark border border-white/10 rounded-lg p-1">
+                    <input type="text" id="form-link" value="https://insighto.ai/f/rev-q1" readonly class="bg-transparent text-sm text-slate-300 w-full px-3 outline-none">
+                    <button onclick="copyLink()" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-md transition-colors">Copy</button>
+                </div>
+            </div>
+        </div>
+        <div class="w-full md:w-1/2 p-8 bg-background-dark flex flex-col items-center justify-center relative">
+            <div id="qr-export-frame" class="bg-surface-dark border border-white/10 rounded-2xl w-64 shadow-2xl flex flex-col items-center text-center relative overflow-hidden mb-6 group">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-primary"></div>
+                <div class="flex items-center gap-2 mt-6 mb-2">
+                    <span class="material-symbols-outlined text-primary text-2xl">dataset</span>
+                    <span class="font-black text-white text-lg tracking-tight">insightO</span>
+                </div>
+                <h4 class="text-xs font-bold text-slate-300 mb-5 px-4 leading-tight" id="qr-display-title">Q1 Manager 360 Review</h4>
+                <div class="bg-white p-3 rounded-xl shadow-inner mb-4">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://insighto.ai/f/rev-q1-2026&color=0f111a" alt="QR Code" class="w-36 h-36">
+                </div>
+                <div class="w-full bg-white/5 py-3 border-t border-white/5">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Scan to start evaluation</p>
+                </div>
+            </div>
+            <button onclick="alert('Downloading high-res PNG...')" class="flex items-center gap-2 px-6 py-2.5 bg-surface-highlight hover:bg-primary text-white text-sm font-bold rounded-xl transition-colors shadow-lg">
+                <span class="material-symbols-outlined text-[18px]">download</span> Download Custom QR
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="publish-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div class="modal-content relative w-full max-w-md rounded-3xl border border-green-500/30 bg-surface-dark p-8 shadow-[0_0_50px_-10px_rgba(34,197,94,0.2)] text-center">
+        <div class="w-20 h-20 mx-auto bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-4xl text-green-400">rocket_launch</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">Form Published!</h2>
+        <p class="text-slate-400 text-sm mb-6">Your evaluation form is now live and ready to collect responses.</p>
+        <button onclick="closeModals()" class="w-full py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors">Return to Editor</button>
+    </div>
+</div>
+
+<script>
+    let activeCardElement = null;
+
+    window.onload = () => {
+        const firstQ = document.querySelectorAll('.question-card')[1]; 
+        selectCard(firstQ, 'Rating Scale', false, 'Communication');
+    };
+
+    function openModal(id) { 
+        document.getElementById(id).classList.add('active'); 
+        if(id === 'ai-modal') setTimeout(() => document.getElementById('ai-prompt').focus(), 100);
+    }
+    
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); }
+    
+    function copyLink() {
+        const linkInput = document.getElementById('form-link');
+        linkInput.select(); document.execCommand('copy');
+        alert('Link copied to clipboard!');
+    }
+
+    function updatePreviewTitle() {
+        const title = document.getElementById('canvas-title').value;
+        document.getElementById('qr-display-title').textContent = title;
+    }
+
+    function selectCard(cardElement, typeName, isAI = false, aiTag = 'General') {
+        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+        cardElement.classList.add('active');
+        activeCardElement = cardElement;
+
+        const propsPanel = document.getElementById('properties-panel');
+        
+        if (typeName === 'Form Title') {
+            propsPanel.innerHTML = `
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-1">Form Settings</h4>
+                    <p class="text-xs text-slate-400 mb-6">Global settings for this evaluation.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between bg-background-dark p-3 rounded-lg border border-white/5">
+                            <span class="text-sm font-medium text-slate-300">Collect Emails</span>
+                            <div class="w-9 h-5 bg-primary rounded-full relative cursor-pointer"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
+                        </div>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        let html = `
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">Block Type</label>
+                    <div class="bg-background-dark border border-white/10 text-white text-sm rounded-lg py-2.5 px-3 flex items-center justify-between">
+                        <span class="font-medium">${typeName}</span><span class="material-symbols-outlined text-slate-500 text-[18px]">lock</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between bg-background-dark p-3 rounded-lg border border-white/5 mt-4">
+                    <span class="text-sm font-medium text-slate-300">Required Field</span>
+                    <div class="w-9 h-5 bg-primary rounded-full relative cursor-pointer"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
+                </div>
+            </div>
+            <div class="h-px w-full bg-white/5 my-6"></div>
+        `;
+
+        if (isAI || typeName === 'Rating Scale' || typeName === 'Paragraph') {
+            html += `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-[16px] text-purple-400">psychology</span>
+                        <label class="text-[11px] font-semibold text-purple-400 uppercase tracking-wider block">AI Analysis Targeting</label>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 block mb-1">Competency Tag</label>
+                        <input type="text" class="w-full bg-background-dark border border-white/10 text-white text-sm rounded-lg py-2 px-3 outline-none focus:border-purple-500" value="${aiTag}">
+                    </div>
+                </div>
+                <div class="h-px w-full bg-white/5 my-6"></div>
+            `;
+        }
+
+        html += `
+            <button onclick="deleteActiveCard()" class="w-full py-3 rounded-xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/20 text-red-400 text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">delete</span> Delete Question
+            </button>
+        `;
+
+        propsPanel.innerHTML = html;
+    }
+
+    function deleteActiveCard() {
+        if(activeCardElement && activeCardElement.id !== 'title-block') {
+            activeCardElement.style.opacity = '0';
+            activeCardElement.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                activeCardElement.remove();
+                activeCardElement = null;
+                document.getElementById('properties-panel').innerHTML = `
+                    <div class="text-center text-slate-500 text-sm mt-10">
+                        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">touch_app</span>
+                        <p>Select a block in the canvas to view and edit its properties here.</p>
+                    </div>`;
+            }, 200);
+        } else if (activeCardElement && activeCardElement.id === 'title-block') {
+            alert("The Form Title block cannot be deleted.");
+        }
+    }
+
+    function addBlock(typeName, icon, isAI = false) {
+        const container = document.getElementById('form-blocks-container');
+        
+        let innerContent = '';
+        if (typeName === 'Short Text' || typeName === 'Paragraph' || typeName === 'Sentiment Textbox') {
+            innerContent = `<div class="bg-background-dark rounded-xl p-4 border border-white/5"><p class="text-sm text-slate-600">Respondent answer goes here...</p></div>`;
+        } else if (typeName === 'Multiple Choice') {
+            innerContent = `<div class="bg-background-dark rounded-xl p-4 border border-white/5 space-y-2"><div class="flex items-center gap-3"><div class="w-4 h-4 rounded-full border-2 border-slate-600"></div><input type="text" value="Option 1" class="bg-transparent text-sm text-white border-none p-0 outline-none"></div><div class="text-sm text-primary cursor-pointer mt-2 pl-7">+ Add option</div></div>`;
+        } else if (typeName === 'File Upload') {
+            innerContent = `<div class="bg-background-dark rounded-xl p-8 border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 gap-2"><span class="material-symbols-outlined text-3xl">cloud_upload</span><span class="text-sm">Click or drag file to upload</span><span class="text-xs text-slate-600">Supports PDF, DOCX, PNG</span></div>`;
+        } else if (typeName === 'Dropdown') {
+            innerContent = `<div class="bg-background-dark rounded-xl p-4 border border-white/5"><div class="flex items-center justify-between border border-white/10 bg-surface-dark rounded-lg px-4 py-3 text-slate-400"><span class="text-sm">Select an option</span><span class="material-symbols-outlined">expand_more</span></div></div>`;
+        } else if (typeName === 'Date') {
+            innerContent = `<div class="bg-background-dark rounded-xl p-4 border border-white/5 w-64"><div class="flex items-center justify-between border border-white/10 bg-surface-dark rounded-lg px-4 py-3 text-slate-400"><span class="text-sm">MM / DD / YYYY</span><span class="material-symbols-outlined">calendar_today</span></div></div>`;
+        } else {
+            innerContent = `<div class="bg-background-dark rounded-xl p-4 border border-white/5 text-center text-xs text-slate-500">Scale preview</div>`;
+        }
+
+        const borderClass = isAI ? 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'border-white/5';
+        const aiBadge = isAI ? `<span class="bg-purple-500/20 text-purple-400 text-[10px] px-2 py-0.5 rounded ml-2 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">auto_awesome</span> AI Block</span>` : '';
+
+        const newCard = document.createElement('div');
+        newCard.className = `question-card rounded-2xl border ${borderClass} bg-surface-dark p-6 shadow-lg cursor-pointer relative group mt-4`;
+        newCard.innerHTML = `
+            <div class="absolute -left-10 top-1/2 -translate-y-1/2 text-slate-600 opacity-0 group-hover:opacity-100 hover:text-white cursor-grab"><span class="material-symbols-outlined">drag_indicator</span></div>
+            <div class="flex items-start gap-4 mb-4">
+                <input type="text" class="flex-1 w-full bg-surface-highlight/30 text-base font-semibold text-white border border-transparent focus:border-primary rounded-lg px-3 py-2 outline-none transition-all" value="New ${typeName}">
+                <div class="flex items-center gap-2 bg-background-dark border border-white/10 rounded-lg px-3 py-2 cursor-pointer pointer-events-none shrink-0">
+                    <span class="material-symbols-outlined text-slate-400 text-[18px]">${icon}</span>
+                    <span class="text-sm font-medium text-slate-300 hidden sm:block">${typeName}</span>
+                </div>
+            </div>
+            ${aiBadge}
+            <div class="mt-4">${innerContent}</div>
+        `;
+        
+        newCard.onclick = function() { selectCard(this, typeName, isAI, 'General'); };
+        document.getElementById('form-blocks-container').appendChild(newCard);
+        
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectCard(newCard, typeName, isAI, 'General');
+    }
+
+    function generateAIForm() {
+        const btn = document.getElementById('generate-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> Generating...';
+        btn.classList.add('opacity-80', 'cursor-wait');
+        
+        setTimeout(() => {
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span> Done!';
+            btn.classList.remove('from-purple-500', 'to-indigo-500');
+            btn.classList.add('bg-green-500');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('bg-green-500');
+                btn.classList.add('from-purple-500', 'to-indigo-500', 'opacity-100');
+                closeModals();
+            }, 1000);
+        }, 1500);
+    }
+</script>
+</body>
+</html>
