@@ -256,6 +256,7 @@ export default function FormsSurveysPage() {
                       <td className="px-6 py-4 text-right">
                         <button
                           type="button"
+                          onClick={() => navigate("/dashboard/forms-results")}
                           className="mr-3 font-semibold text-primary hover:text-slate-900 dark:text-primary dark:hover:text-white transition-colors"
                         >
                           Results

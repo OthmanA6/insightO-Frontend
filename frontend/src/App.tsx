@@ -7,6 +7,7 @@ import { MainLayout } from './layout/MainLayout'
 import DashboardPlaceholder from '@/features/Auth/pages/DashboardPlaceholder'
 import FormsSurveysPage from '@/features/Forms/pages/FormsSurveysPage'
 import FormBuilderPage from '@/features/FormBuilder/pages/FormBuilderPage'
+import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
 
 
 // import { Button } from '@/shared/components/ui/button'
@@ -33,6 +34,7 @@ function App() {
           <Route path="builder" element={<Navigate to="/builder" replace />} />
           <Route path="analytics" element={<div className="p-6">Analytics coming soon.</div>} />
           <Route path="settings" element={<div className="p-6">Settings coming soon.</div>} />
+          <Route path="forms-results" element={<FormsResultsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
