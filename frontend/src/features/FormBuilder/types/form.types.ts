@@ -1,56 +1,50 @@
 // ─── Form Builder Types ────────────────────────────────────────────────────────
-// Ready to connect to a MERN stack (Node.js/MongoDB)
+// Mirrored with Backend API Documentation v1.0
 
 export type QuestionType =
   | "short_text"
-  | "paragraph"
+  | "long_text"
+  | "linear_scale"
   | "multiple_choice"
-  | "rating"
-  | "ai_sentiment"
-  | "skill_matrix"
-  | "date"
-  | "file_upload"
-  | "dropdown"
+  | "file";
 
-export type QuestionOption = {
-  id: string
-  label: string
-}
-
-export type CompetencyTag = {
-  id: string
-  name: string
-  color: string
-}
+export type QuestionOption = string; // API expects array of strings for multiple_choice
 
 export type Question = {
-  id: string
-  type: QuestionType
-  title: string
-  description?: string
-  options: QuestionOption[]
-  isSelected: boolean
-  isRequired: boolean
-  ratingMax?: number
-  competencyTags?: CompetencyTag[]
-  allowMultiple?: boolean
-}
+  id?: string;
+  label: string; // API uses 'label'
+  type: QuestionType;
+  required: boolean; // API uses 'required'
+  order: number;
+  options?: QuestionOption[]; // For multiple_choice
+  scale?: { min: number; max: number }; // For linear_scale
+  file_config?: { allowed_types: string[]; max_size: number }; // For file
+  ai_tag?: string; // Optional utility
+};
 
-export type FormMeta = {
-  id: string
-  title: string
-  description: string
-  createdAt: string
-  updatedAt: string
-}
+export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT";
 
-export type FormBuilderState = {
-  meta: FormMeta
-  questions: Question[]
-}
+export type FormSettings = {
+  title: string;
+  description: string;
+  evaluator_roles: FormRole[];
+  subject_role: FormRole;
+  is_anonymous: boolean;
+  is_active: boolean;
+  department_id: string;
+};
 
-export type SaveFormPayload = {
-  title: string
-  description: string
-  questions: Omit<Question, "isSelected">[]
-}
+export type Form = FormSettings & {
+  id: string;
+  questions: Question[];
+  creator_id?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type CreateFormPayload = FormSettings;
+export type CreateQuestionPayload = Question;

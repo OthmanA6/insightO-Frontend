@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { Search, Bell, User, Settings, LogOut } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 import { Input } from "@/shared/components/ui/input"
 import {
   DropdownMenu,

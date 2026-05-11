@@ -6,7 +6,7 @@ import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { loginSchema, type LoginFormData } from '../schemas/auth.schema';
-import { loginUser, clearError } from '../slices/authSlice';
+import { loginUser, clearError } from '../store/authSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 export default function LoginForm() {

@@ -30,8 +30,8 @@ import {
   setPendingOtpState,
   clearPendingOtpState,
   setAuthenticatedSession,
-} from '../slices/authSlice';
-import * as authService from '../api/authService';
+} from '../store/authSlice';
+import * as authService from '../api/authApi';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { USER_ROLES, type RegisterPayload } from '../types';
 import type { AxiosError } from 'axios';

@@ -1,4 +1,4 @@
-import api from '@/shared/api/axiosApi';
+import api from '@/shared/api/axiosInstance';
 import type { AxiosError } from 'axios';
 import type {
   LoginPayload,

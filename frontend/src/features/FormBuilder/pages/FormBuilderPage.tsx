@@ -27,51 +27,53 @@ import {
   AlignLeft,
   Star,
   Upload,
-  ChevronDown,
-  Calendar,
   Zap,
   Lock,
   X,
-  Copy,
   LayoutGrid,
-  Bot,
   Download,
   ArrowRight,
   Check
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 
 import { Button } from "@/shared/components/ui/button"
-import { Checkbox } from "@/shared/components/ui/checkbox"
-import { Separator } from "@/shared/components/ui/separator"
-import { Badge } from "@/shared/components/ui/badge"
 import { Label } from "@/shared/components/ui/label"
 import { Switch } from "@/shared/components/ui/switch"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Input } from "@/shared/components/ui/input"
-import { Modal } from "@/shared/components/ui/Modal"
+import { toast } from "sonner"
 
-import type { Question, QuestionType } from "../types/form.types"
+import type { Question, QuestionType, FormRole } from "../types/form.types"
 import { QuestionCard } from "../components/QuestionCard"
 
 const INITIAL_QUESTIONS: Question[] = [
   {
     id: "q1",
-    type: "rating",
-    title: "How would you rate the manager's communication skills?",
-    options: [],
-    isSelected: false,
-    isRequired: true,
+    type: "linear_scale",
+    label: "How would you rate the manager's communication skills?",
+    required: true,
+    order: 1,
+    scale: { min: 1, max: 5 }
   }
 ]
 
 export default function FormBuilderPage() {
   const navigate = useNavigate()
+  
+  // ─── Form Settings State (Mirrors API) ───
+  const [formTitle, setFormTitle] = useState("Q1 Manager 360 Review")
+  const [formDescription, setFormDescription] = useState("Please provide honest feedback regarding your direct manager's performance this quarter.")
+  const [evaluatorRoles, setEvaluatorRoles] = useState<FormRole[]>(["STUDENT"])
+  const [subjectRole, setSubjectRole] = useState<FormRole>("INSTRUCTOR")
+  const [isAnonymous, setIsAnonymous] = useState(false)
+  const [isActive, setIsActive] = useState(true)
+  const [departmentId, setDepartmentId] = useState("")
+
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS)
   const [activeId, setActiveId] = useState<string | null>("q1")
-  const [formTitle, setFormTitle] = useState("Q1 Manager 360 Review")
-  const [formDescription, setFormDescription] = useState("Please provide honest feedback regarding your direct manager's performance this quarter. Your responses are strictly anonymous.")
+  
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
@@ -99,7 +101,9 @@ export default function FormBuilderPage() {
       setQuestions((items) => {
         const oldIndex = items.findIndex((i) => i.id === active.id)
         const newIndex = items.findIndex((i) => i.id === over.id)
-        return arrayMove(items, oldIndex, newIndex)
+        const moved = arrayMove(items, oldIndex, newIndex)
+        // Sync orders
+        return moved.map((q, idx) => ({ ...q, order: idx + 1 }))
       })
     }
   }
@@ -109,12 +113,12 @@ export default function FormBuilderPage() {
     const newQuestion: Question = {
       id: newId,
       type,
-      title: `New ${type.replace("_", " ")}`,
-      options: type === "multiple_choice" ? [
-        { id: "o1", label: "Option 1" }
-      ] : [],
-      isSelected: false,
-      isRequired: false,
+      label: `New question label`,
+      required: false,
+      order: questions.length + 1,
+      options: type === "multiple_choice" ? ["Option 1"] : undefined,
+      scale: type === "linear_scale" ? { min: 1, max: 5 } : undefined,
+      file_config: type === "file" ? { allowed_types: ["application/pdf"], max_size: 5242880 } : undefined
     }
     setQuestions(prev => [...prev, newQuestion])
     setActiveId(newId)
@@ -123,10 +127,10 @@ export default function FormBuilderPage() {
         const el = document.getElementById(newId)
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 100)
-  }, [])
+  }, [questions.length])
 
   const deleteQuestion = useCallback((id: string) => {
-    setQuestions(prev => prev.filter(q => q.id !== id))
+    setQuestions(prev => prev.filter(q => q.id !== id).map((q, idx) => ({ ...q, order: idx + 1 })))
     if (activeId === id) setActiveId(null)
   }, [activeId])
 
@@ -135,6 +139,27 @@ export default function FormBuilderPage() {
     setSaveStatus("Saving...")
     setTimeout(() => setSaveStatus("Saved"), 1000)
   }, [])
+
+  const handlePublish = () => {
+    // Validation Mirroring
+    if (formTitle.length < 5 || formTitle.length > 100) {
+      toast.error("Form title must be between 5 and 100 characters")
+      return
+    }
+
+    const invalidQuestions = questions.filter(q => q.label.length < 3 || q.label.length > 200)
+    if (invalidQuestions.length > 0) {
+      toast.error("All question labels must be between 3 and 200 characters")
+      return
+    }
+
+    if (!departmentId) {
+      toast.error("Department ID is required")
+      return
+    }
+
+    setIsPublishModalOpen(true)
+  }
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden">
@@ -156,7 +181,10 @@ export default function FormBuilderPage() {
               type="text" 
               value={formTitle} 
               onChange={(e) => setFormTitle(e.target.value)}
-              className="bg-transparent text-sm font-bold text-white border-none focus:ring-0 w-48 md:w-64 p-0 focus:outline-none"
+              className={cn(
+                "bg-transparent text-sm font-bold text-white border-none focus:ring-0 w-48 md:w-64 p-0 focus:outline-none",
+                (formTitle.length < 5 || formTitle.length > 100) && "text-red-500"
+              )}
             />
             <span className="inline-flex items-center rounded bg-[#2d2a42] px-2 py-0.5 text-[10px] font-medium text-slate-300">
               {saveStatus}
@@ -169,7 +197,7 @@ export default function FormBuilderPage() {
             onClick={() => setIsAIModalOpen(true)}
             className="h-8 flex items-center gap-2 rounded bg-purple-500/10 border border-purple-500/30 px-3 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-white"
           >
-            <Zap className="h-3.5 w-3.5" /> Generate via AI
+            <Zap className="h-3.5 w-3.5" /> AI Sync
           </Button>
           <div className="h-4 w-px bg-white/10 mx-1"></div>
           <Button 
@@ -187,7 +215,7 @@ export default function FormBuilderPage() {
             <Eye className="h-3.5 w-3.5" /> Preview
           </Button>
           <Button 
-            onClick={() => setIsPublishModalOpen(true)}
+            onClick={handlePublish}
             className="h-8 px-4 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition-all"
           >
             Publish Form
@@ -199,18 +227,19 @@ export default function FormBuilderPage() {
         {/* Left Sidebar - Library */}
         <aside className="w-64 shrink-0 border-r border-white/5 bg-[#1e1b2e] flex flex-col hidden md:flex z-10">
           <div className="p-4 border-b border-white/5">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Form Library</h3>
-            <p className="text-[10px] text-slate-500 mt-1">Click to add to canvas</p>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Field Library</h3>
+            <p className="text-[10px] text-slate-500 mt-1">Mirrored with Backend API</p>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
             <div>
-              <h4 className="text-[10px] font-semibold text-slate-500 mb-3">Standard Fields</h4>
+              <h4 className="text-[10px] font-semibold text-slate-500 mb-3">API Compliant Fields</h4>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { type: 'short_text', label: 'Short Text', icon: Type },
-                  { type: 'paragraph', label: 'Paragraph', icon: AlignLeft },
+                  { type: 'long_text', label: 'Long Text', icon: AlignLeft },
                   { type: 'multiple_choice', label: 'Multi Choice', icon: CheckSquare },
-                  { type: 'rating', label: 'Rating Scale', icon: Star },
+                  { type: 'linear_scale', label: 'Linear Scale', icon: Star },
+                  { type: 'file', label: 'File Upload', icon: Upload },
                 ].map((field) => (
                   <button 
                     key={field.type}
@@ -219,56 +248,6 @@ export default function FormBuilderPage() {
                   >
                     <field.icon className="h-5 w-5 text-slate-400 group-hover:text-indigo-400" />
                     <span className="text-[10px] font-medium text-center">{field.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-[10px] font-semibold text-slate-500 mb-3">Advanced Fields</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { type: 'file_upload', label: 'File Upload', icon: Upload },
-                  { type: 'dropdown', label: 'Dropdown', icon: ChevronDown },
-                ].map((field) => (
-                  <button 
-                    key={field.type}
-                    onClick={() => addQuestion(field.type as QuestionType)}
-                    className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-[#0f111a] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-slate-300 group"
-                  >
-                    <field.icon className="h-5 w-5 text-slate-400 group-hover:text-indigo-400" />
-                    <span className="text-[10px] font-medium text-center">{field.label}</span>
-                  </button>
-                ))}
-                <button 
-                  onClick={() => addQuestion('date')}
-                  className="col-span-2 flex flex-row items-center justify-center gap-2 p-3 rounded-xl border border-white/5 bg-[#0f111a] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-slate-300 group"
-                >
-                  <Calendar className="h-5 w-5 text-slate-400 group-hover:text-indigo-400" />
-                  <span className="text-[10px] font-medium text-center">Date Picker</span>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-[10px] font-semibold text-purple-400 mb-3 flex items-center gap-1">
-                <Bot className="h-3.5 w-3.5" /> AI-Powered Blocks
-              </h4>
-              <div className="space-y-2">
-                {[
-                  { type: 'ai_sentiment', label: 'AI Sentiment Input', desc: 'Auto-analyzes tone & mood', icon: Bot },
-                  { type: 'skill_matrix', label: 'Skill Matrix', desc: 'Multi-dimensional rating', icon: LayoutGrid },
-                ].map((field) => (
-                  <button 
-                    key={field.type}
-                    onClick={() => addQuestion(field.type as QuestionType)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all text-left group"
-                  >
-                    <field.icon className="h-5 w-5 text-purple-400 group-hover:animate-pulse" />
-                    <div>
-                      <p className="text-[11px] font-bold text-slate-200">{field.label}</p>
-                      <p className="text-[9px] text-slate-500">{field.desc}</p>
-                    </div>
                   </button>
                 ))}
               </div>
@@ -278,7 +257,6 @@ export default function FormBuilderPage() {
 
         {/* Main Canvas */}
         <section className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar" id="canvas-container">
-          {/* Grid Background */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
           
           <div className="w-full max-w-2xl mx-auto py-10 px-4 relative z-10 flex flex-col gap-4 pb-32">
@@ -312,7 +290,7 @@ export default function FormBuilderPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext 
-                items={questions.map(q => q.id)}
+                items={questions.map(q => q.id!)}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="flex flex-col gap-4">
@@ -329,12 +307,12 @@ export default function FormBuilderPage() {
                         <QuestionCard
                           question={question}
                           isActive={activeId === question.id}
-                          isSelected={false} // Selection removed for copy-UI focus
+                          isSelected={false}
                           onSelect={() => {}}
                           onActivate={setActiveId}
                           onDelete={deleteQuestion}
                           onUpdate={updateQuestion}
-                          onOpenProperties={() => setActiveId(question.id)}
+                          onOpenProperties={() => setActiveId(question.id!)}
                         />
                       </motion.div>
                     ))}
@@ -343,19 +321,18 @@ export default function FormBuilderPage() {
               </SortableContext>
             </DndContext>
 
-            {/* Add New Hover Area */}
+            {/* Add New Area */}
             <div 
               className="w-full py-2 group cursor-pointer mt-4" 
               onClick={() => addQuestion('short_text')}
             >
               <div className="flex items-center w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="flex-1 h-px bg-indigo-500/30"></div>
-                <div className="w-8 h-8 rounded-full bg-[#1e1b2e] border border-indigo-500 text-indigo-500 flex items-center justify-center mx-3 shadow-[0_0_15px_rgba(79,70,229,0.3)] transform group-hover:scale-110 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-[#1e1b2e] border border-indigo-500 text-indigo-500 flex items-center justify-center mx-3">
                   <Plus className="h-5 w-5" />
                 </div>
                 <div className="flex-1 h-px bg-indigo-500/30"></div>
               </div>
-              <p className="text-center text-[10px] font-medium text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity mt-1">Click to add default question</p>
             </div>
           </div>
         </section>
@@ -364,23 +341,52 @@ export default function FormBuilderPage() {
         <aside className="w-80 shrink-0 border-l border-white/5 bg-[#1e1b2e] flex flex-col hidden lg:flex z-10">
           <div className="p-4 border-b border-white/5 flex items-center gap-2">
             <Settings className="h-4 w-4 text-indigo-500" />
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Properties Panel</h3>
+            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Sync Properties</h3>
           </div>
           
           <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
             {activeId === 'title' ? (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-1">Form Settings</h4>
-                  <p className="text-xs text-slate-400 mb-6">Global settings for this evaluation.</p>
+                  <h4 className="text-sm font-bold text-white mb-1">API Form Metadata</h4>
+                  <p className="text-xs text-slate-400 mb-6">Required fields for /v1/form endpoint.</p>
                   <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-slate-500">Department ID</Label>
+                      <Input 
+                        value={departmentId}
+                        onChange={(e) => setDepartmentId(e.target.value)}
+                        placeholder="e.g. 507f1f77..."
+                        className="bg-[#0f111a] border-white/10 text-white"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-slate-500">Subject Role</Label>
+                      <select 
+                        value={subjectRole}
+                        onChange={(e) => setSubjectRole(e.target.value as FormRole)}
+                        className="w-full bg-[#0f111a] border border-white/10 text-white text-sm rounded-lg p-2"
+                      >
+                        <option value="INSTRUCTOR">Instructor</option>
+                        <option value="HOD">HOD</option>
+                        <option value="STUDENT">Student</option>
+                      </select>
+                    </div>
+
                     <div className="flex items-center justify-between bg-[#0f111a] p-3 rounded-lg border border-white/5">
-                      <span className="text-sm font-medium text-slate-300">Collect Emails</span>
-                      <Switch checked />
+                      <span className="text-sm font-medium text-slate-300">Anonymous</span>
+                      <Switch 
+                        checked={isAnonymous}
+                        onCheckedChange={setIsAnonymous}
+                      />
                     </div>
                     <div className="flex items-center justify-between bg-[#0f111a] p-3 rounded-lg border border-white/5">
-                      <span className="text-sm font-medium text-slate-300">Anonymous Responses</span>
-                      <Switch />
+                      <span className="text-sm font-medium text-slate-300">Active Status</span>
+                      <Switch 
+                        checked={isActive}
+                        onCheckedChange={setIsActive}
+                      />
                     </div>
                   </div>
                 </div>
@@ -389,210 +395,54 @@ export default function FormBuilderPage() {
               <div className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">Block Type</label>
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">API Type</label>
                     <div className="bg-[#0f111a] border border-white/10 text-white text-sm rounded-lg py-2.5 px-3 flex items-center justify-between">
-                      <span className="font-medium capitalize">{activeQuestion.type.replace('_', ' ')}</span>
+                      <span className="font-medium uppercase">{activeQuestion.type}</span>
                       <Lock className="h-3.5 w-3.5 text-slate-500" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between bg-[#0f111a] p-3 rounded-lg border border-white/5 mt-4">
                     <span className="text-sm font-medium text-slate-300">Required Field</span>
                     <Switch 
-                      checked={activeQuestion.isRequired}
-                      onCheckedChange={(val) => updateQuestion(activeQuestion.id, { isRequired: val })}
+                      checked={activeQuestion.required}
+                      onCheckedChange={(val) => updateQuestion(activeQuestion.id!, { required: val })}
                     />
                   </div>
+                  
+                  {activeQuestion.type === "linear_scale" && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase font-bold text-slate-500">Scale Range (1-10)</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number" min={1} max={10}
+                          value={activeQuestion.scale?.max || 5}
+                          onChange={(e) => updateQuestion(activeQuestion.id!, { scale: { min: 1, max: Number(e.target.value) } })}
+                          className="bg-[#0f111a] border-white/10 text-white"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="h-px w-full bg-white/5 my-6"></div>
 
-                {(activeQuestion.type.startsWith('ai_') || activeQuestion.type === 'skill_matrix' || activeQuestion.type === 'rating') && (
-                  <>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Bot className="h-4 w-4 text-purple-400" />
-                        <label className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider block">AI Analysis Targeting</label>
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-slate-400 block mb-1">Competency Tag</label>
-                        <Input 
-                          className="h-9 bg-[#0f111a] border-white/10 text-white text-sm"
-                          placeholder="General"
-                        />
-                      </div>
-                    </div>
-                    <div className="h-px w-full bg-white/5 my-6"></div>
-                  </>
-                )}
-
                 <Button 
                   variant="destructive"
-                  onClick={() => deleteQuestion(activeQuestion.id)}
+                  onClick={() => deleteQuestion(activeQuestion.id!)}
                   className="w-full py-3 rounded-xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/20 text-red-400 text-sm font-bold transition-colors flex items-center justify-center gap-2"
                 >
-                  <Trash2 className="h-4 w-4" /> Delete Question
+                  <Trash2 className="h-4 w-4" /> Remove Field
                 </Button>
               </div>
             ) : (
               <div className="text-center text-slate-500 text-sm mt-10">
                 <Settings className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                <p>Select a block in the canvas to view and edit its properties here.</p>
+                <p>Select a block to sync properties.</p>
               </div>
             )}
           </div>
         </aside>
       </main>
-
-      {/* Modals - Simplified for now to focus on UI */}
-      <AnimatePresence>
-        {isAIModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-2xl rounded-2xl border border-purple-500/30 bg-gradient-to-br from-[#1e172e] to-[#171324] p-8 shadow-2xl overflow-hidden"
-            >
-              <button 
-                onClick={() => setIsAIModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 shadow-lg">
-                  <Bot className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">Generate Form with AI</h3>
-                  <p className="text-xs text-slate-400">Describe your goal, and AI will structure the perfect evaluation.</p>
-                </div>
-              </div>
-              
-              <Textarea 
-                className="w-full bg-black/30 border border-purple-500/30 focus:border-purple-400 rounded-xl p-4 text-sm text-white placeholder-slate-500 resize-none mb-4 min-h-[120px]"
-                placeholder="e.g. Create a 360-degree performance review for software engineers focusing on code quality, teamwork, and leadership..."
-              />
-              
-              <div className="flex flex-wrap gap-2 mb-6">
-                {['+ Productivity Focus', '+ Anonymous', '+ Dept: Sales'].map(tag => (
-                  <span key={tag} className="text-[11px] bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-300 cursor-pointer hover:bg-white/10 transition-colors">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex justify-end gap-3 mt-2">
-                <Button variant="ghost" onClick={() => setIsAIModalOpen(false)} className="text-slate-300 hover:text-white">Cancel</Button>
-                <Button className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-bold px-6">
-                  <Zap className="h-4 w-4" /> Generate Form
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        {isShareModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-4xl rounded-2xl bg-[#1e1b2e] shadow-2xl flex flex-col md:flex-row overflow-hidden"
-            >
-              <button onClick={() => setIsShareModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white z-20">
-                <X className="h-5 w-5" />
-              </button>
-              
-              <div className="w-full md:w-1/2 p-8 border-r border-white/5">
-                <h3 className="text-2xl font-bold text-white mb-2">Share & Distribute</h3>
-                <p className="text-slate-400 text-sm mb-8">Get this form in front of your team.</p>
-                <div className="mb-6">
-                  <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Direct Link</label>
-                  <div className="flex items-center bg-[#0a0a0f] border border-white/10 rounded-lg p-1">
-                    <input type="text" readOnly value="https://insighto.ai/f/rev-q1" className="bg-transparent text-sm text-slate-300 w-full px-3 outline-none" />
-                    <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-md transition-colors">Copy</button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="w-full md:w-1/2 p-8 bg-[#0a0a0f] flex flex-col items-center justify-center relative">
-                <div className="bg-[#1e1b2e] border border-white/10 rounded-2xl w-64 shadow-2xl flex flex-col items-center text-center relative overflow-hidden mb-6 group">
-                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-indigo-600"></div>
-                  <div className="flex items-center gap-2 mt-6 mb-2">
-                    <LayoutGrid className="text-indigo-500 h-6 w-6" />
-                    <span className="font-black text-white text-lg tracking-tight">insightO</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-300 mb-5 px-4 leading-tight">{formTitle}</h4>
-                  <div className="bg-white p-3 rounded-xl shadow-inner mb-4">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://insighto.ai/f/rev-q1-2026&color=0f111a" alt="QR Code" className="w-36 h-36" />
-                  </div>
-                  <div className="w-full bg-white/5 py-3 border-t border-white/5">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Scan to start evaluation</p>
-                  </div>
-                </div>
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-[#2d2a42] hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-colors shadow-lg">
-                  <Download className="h-4 w-4" /> Download Custom QR
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        {isPreviewModalOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0f] text-white"
-          >
-            <div className="flex justify-between items-center px-8 py-6 shrink-0 z-20 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-white/5">
-              <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-                <LayoutGrid className="text-indigo-500 h-6 w-6" /> insightO
-              </div>
-              <button onClick={() => setIsPreviewModalOpen(false)} className="px-5 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors flex items-center gap-2">
-                Exit Preview <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="absolute top-[80px] left-0 w-full h-1 bg-white/5 z-20">
-              <div className="h-full bg-indigo-600 w-1/3 transition-all"></div>
-            </div>
-            
-            <div className="flex-1 flex items-center justify-center p-8 relative overflow-y-auto">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 blur-[150px] rounded-full pointer-events-none"></div>
-              <div className="max-w-3xl w-full z-10">
-                <div className="flex items-center gap-3 text-indigo-500 font-bold mb-6 text-sm">
-                  <ArrowRight className="h-4 w-4" /> <span>Question 1 of {questions.length > 0 ? questions.length : 1}</span>
-                </div>
-                
-                <h2 className="text-3xl md:text-5xl font-bold mb-10 leading-tight">
-                  {questions.length > 0 ? questions[0].title : "How would you rate the manager's communication skills?"} 
-                  {(questions.length > 0 ? questions[0].isRequired : true) && <span className="text-red-500 ml-2">*</span>}
-                </h2>
-                
-                <div className="flex flex-col gap-4">
-                  {['A', 'B', 'C'].map((letter, i) => (
-                    <label key={letter} className="group flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 cursor-pointer transition-all hover:border-indigo-500 hover:bg-indigo-500/10">
-                      <div className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-sm font-bold text-slate-400 transition-colors group-hover:border-indigo-500 group-hover:text-indigo-500 group-hover:bg-indigo-500/20">
-                        {letter}
-                      </div>
-                      <span className="text-lg font-medium">Option {i + 1}</span>
-                      <input type="radio" name="preview_rate" className="hidden" />
-                    </label>
-                  ))}
-                </div>
-                
-                <div className="mt-12 flex items-center gap-6">
-                  <button className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-lg transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-                    Continue <Check className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }

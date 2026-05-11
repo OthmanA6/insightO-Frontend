@@ -12,9 +12,9 @@ import {
   type ForgotPasswordFormData,
   type ResetPasswordFormData,
 } from '../schemas/auth.schema';
-import * as authService from '../api/authService';
+import * as authService from '../api/authApi';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { clearPendingOtpState, setPendingOtpState } from '../slices/authSlice';
+import { clearPendingOtpState, setPendingOtpState } from '../store/authSlice';
 
 const OTP_COUNTDOWN = 60;
 

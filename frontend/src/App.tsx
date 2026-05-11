@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import LoginPage from '@/features/Auth/pages/LoginPage'
-import RegisterPage from '@/features/Auth/pages/RegisterPage'
-import ForgotPasswordPage from '@/features/Auth/pages/ForgotPasswordPage'
-import { MainLayout } from './layout/MainLayout'
-import DashboardPlaceholder from '@/features/Auth/pages/DashboardPlaceholder'
+import LoginPage from '@/features/auth/pages/LoginPage'
+import RegisterPage from '@/features/auth/pages/RegisterPage'
+import ForgotPasswordPage from '@/features/auth/pages/ForgotPasswordPage'
+import { MainLayout } from '@/shared/components/layout/MainLayout'
+import DashboardPlaceholder from '@/features/auth/pages/DashboardPlaceholder'
 import FormsSurveysPage from '@/features/Forms/pages/FormsSurveysPage'
 import FormBuilderPage from '@/features/FormBuilder/pages/FormBuilderPage'
 import UserManagementPage from '@/features/UserManagement/pages/UserManagementPage'
@@ -26,7 +26,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/builder" element={<FormBuilderPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -42,7 +42,7 @@ function App() {
           <Route path="settings" element={<div className="p-6">Settings coming soon.</div>} />
           <Route path="forms-results" element={<FormsResultsPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
 
 

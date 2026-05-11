@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, BarChart3 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { logout } from '../slices/authSlice';
+import { logout } from '../store/authSlice';
 
 export default function DashboardPlaceholder() {
   const dispatch = useAppDispatch();

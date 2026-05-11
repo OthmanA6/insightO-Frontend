@@ -3,7 +3,7 @@ import { Search, Plus, Sparkles, Users, Megaphone, ClipboardList, MoreVertical }
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 
 type FormType = "Internal" | "External"
 type FormStatus = "Active" | "Closed"

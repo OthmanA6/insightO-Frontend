@@ -4,7 +4,7 @@ import {
   Download, Sparkles, ArrowUp, Brain, Star, ChevronDown, Smile, Meh, 
   ChevronLeft, ChevronRight, User, Calendar, Clock, Network, Lightbulb, CheckCircle2, ArrowLeft 
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 
 type TabKey = "summary" | "questions" | "individual" | "ai"
 
