@@ -10,6 +10,7 @@ import FormBuilderPage from '@/features/FormBuilder/pages/FormBuilderPage'
 import UserManagementPage from '@/features/UserManagement/pages/UserManagementPage'
 import ProfilePage from '@/features/Settings/pages/ProfilePage'
 import SettingsPage from '@/features/Settings/pages/SettingsPage'
+import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
 
 
 // import { Button } from '@/shared/components/ui/button'
@@ -38,6 +39,8 @@ function App() {
           <Route path="analytics" element={<div className="p-6">Analytics coming soon.</div>} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<div className="p-6">Settings coming soon.</div>} />
+          <Route path="forms-results" element={<FormsResultsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
