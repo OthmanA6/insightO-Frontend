@@ -1,0 +1,93 @@
+import { NavLink } from "react-router-dom"
+import { 
+  LayoutDashboard, FileText, BarChart3, Settings, 
+  Users, Building2, Calendar, ShieldCheck, ClipboardList 
+} from "lucide-react"
+import { cn } from "@/shared/lib/utils"
+import { buttonVariants } from "@/shared/components/ui/button"
+import { ScrollArea } from "@/shared/components/ui/scroll-area"
+
+export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {}
+
+export function Sidebar({ className, ...props }: SidebarProps) {
+  const navGroups = [
+    {
+      title: "Overview",
+      items: [
+        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Global Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+      ]
+    },
+    {
+      title: "Surveys & Evaluation",
+      items: [
+        { name: "Forms & Templates", href: "/dashboard/forms-surveys", icon: FileText },
+        { name: "Evaluation Cycles", href: "/dashboard/evaluation-cycles", icon: Calendar },
+        { name: "Tasks & Assignments", href: "/dashboard/tasks", icon: ClipboardList },
+      ]
+    },
+    {
+      title: "Administration",
+      items: [
+        { name: "User Management", href: "/dashboard/users", icon: Users },
+        { name: "Academic Entities", href: "/dashboard/departments", icon: Building2 },
+      ]
+    },
+    {
+      title: "System",
+      items: [
+        { name: "Security & Logs", href: "/dashboard/settings", icon: ShieldCheck },
+        { name: "Settings", href: "/dashboard/settings", icon: Settings },
+      ]
+    }
+  ]
+
+  return (
+    <aside
+      className={cn(
+        "flex h-screen w-72 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+        className
+      )}
+      {...props}
+    >
+      <div className="flex h-16 items-center border-b border-sidebar-border px-8">
+        <div className="flex items-center gap-3 font-black text-xl tracking-tighter text-sidebar-foreground">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          insightO
+        </div>
+      </div>
+      
+      <ScrollArea className="flex-1 px-4 py-8">
+        <nav className="flex flex-col gap-8">
+          {navGroups.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h4 className="px-4 text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">{group.title}</h4>
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => (
+                  <NavLink
+                    key={item.name}
+                    to={item.href}
+                    className={({ isActive }) =>
+                      cn(
+                        buttonVariants({ variant: isActive ? "outline" : "ghost" }),
+                        "w-full justify-start gap-4 h-11 px-4 rounded-xl transition-all font-bold text-xs",
+                        isActive 
+                          ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20" 
+                          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                      )
+                    }
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+      </ScrollArea>
+    </aside>
+  )
+}
