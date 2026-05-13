@@ -25,6 +25,9 @@ import type { Department } from '@/shared/api/departmentApi';
 import type { Course, CreateCoursePayload } from '@/shared/api/courseApi';
 import type { AdminUser } from '@/shared/api/userAdminApi';
 
+/** Helper to handle populated MongoDB fields (_id or id) */
+const getSafeId = (val: any) => (typeof val === 'object' && val !== null ? val._id || val.id : val);
+
 export default function DepartmentDetailPage() {
   const { departmentId } = useParams<{ departmentId: string }>();
   const navigate = useNavigate();
@@ -74,21 +77,28 @@ export default function DepartmentDetailPage() {
     fetchData();
   }, [departmentId, navigate]);
 
-  const studentsCount = useMemo(() => 
-    users.filter((u: any) => u.role === 'STUDENT' && (u.departmentId === departmentId || u.profile?.data?.departmentId === departmentId)),
-    [users, departmentId]
+  const studentsCount = useMemo(
+    () =>
+      users.filter(
+        (u: any) => u.role === 'STUDENT' && getSafeId(u.profile?.data?.departmentId) === departmentId,
+      ),
+    [users, departmentId],
   );
 
-  const instructorsCount = useMemo(() => 
-    users.filter((u: any) => u.role === 'INSTRUCTOR' && (u.departmentId === departmentId || u.profile?.data?.departmentId === departmentId)),
-    [users, departmentId]
+  const instructorsCount = useMemo(
+    () =>
+      users.filter(
+        (u: any) => u.role === 'INSTRUCTOR' && getSafeId(u.profile?.data?.departmentId) === departmentId,
+      ),
+    [users, departmentId],
   );
 
-  const hodUser = useMemo(() => 
-    users.find((u: any) => 
-      u.role === 'HOD' && u.profile?.data?.departmentId === departmentId
-    ),
-    [users, departmentId]
+  const hodUser = useMemo(
+    () =>
+      users.find(
+        (u: any) => u.role === 'HOD' && getSafeId(u.profile?.data?.departmentId) === departmentId,
+      ),
+    [users, departmentId],
   );
 
   const filteredCourses = useMemo(() => {
@@ -375,9 +385,12 @@ export default function DepartmentDetailPage() {
                         Instructor
                       </span>
                       <span className="text-xs font-bold text-slate-200">
-                        {course.instructor
-                          ? `${course.instructor.firstName} ${course.instructor.lastName}`
-                          : 'Not assigned'}
+                        {(() => {
+                          const inst = course.instructorId as any;
+                          return inst && typeof inst === 'object'
+                            ? `${inst.firstName} ${inst.lastName}`
+                            : 'Not assigned';
+                        })()}
                       </span>
                     </div>
                   </div>
@@ -390,7 +403,14 @@ export default function DepartmentDetailPage() {
                         Enrolled
                       </span>
                       <span className="text-xs font-bold text-slate-200">
-                        {course.enrolledStudents?.length ?? '—'} Students
+                        {
+                          users.filter((u) => {
+                            if (u.role !== 'STUDENT') return false;
+                            const enrolledIds = u.profile?.data?.enrolledCourses?.map(getSafeId) || [];
+                            return enrolledIds.includes(courseId);
+                          }).length
+                        }{' '}
+                        Students
                       </span>
                     </div>
                   </div>
