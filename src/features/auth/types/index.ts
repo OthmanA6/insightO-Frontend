@@ -58,6 +58,8 @@ export interface PendingUser {
   email: string;
   role: UserRole;
   nationalId: string;
+  /** Must be PENDING APPROVAL to appear in the Pending Approval tab */
+  status?: string;
   departmentId?: string;
   otpVerified: boolean;
   createdAt: string;

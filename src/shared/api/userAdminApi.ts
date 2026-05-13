@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import type { UserRole } from '@/features/auth/types';
+import type { PendingUser, UserRole } from '@/features/auth/types';
 
 /**
  * ─── User Administration API ───────────────────────────────────────────────
@@ -16,6 +16,8 @@ export interface AdminUser {
   email: string;
   role: UserRole;
   isActive: boolean;
+  /** e.g. ACTIVE, PENDING APPROVAL — when set, drives tab placement and badges */
+  status?: string;
   departmentId?: string;
   academicYear?: number;
   profile?: {
@@ -39,6 +41,14 @@ export interface UpdateUserPayload {
 export const getAllUsers = async (): Promise<AdminUser[]> => {
   const response = await api.get<{ status: string; count: number; data: AdminUser[] }>(
     '/admin/users/',
+  );
+  return response.data.data;
+};
+
+/** Pending registrations awaiting admin approval (same queue as admin pending-users). */
+export const getPendingUsersForAdmin = async (): Promise<PendingUser[]> => {
+  const response = await api.get<{ status: string; results: number; data: PendingUser[] }>(
+    '/admin/pending-users',
   );
   return response.data.data;
 };
@@ -70,4 +80,14 @@ export const updateUser = async (
 // ─── #28: DELETE /admin/users/:id ────────────────────────────────────────────
 export const deleteUser = async (userId: string): Promise<void> => {
   await api.delete(`/admin/users/${userId}`);
+};
+
+
+// ─── Approval: PATCH /admin/users/:id ─────────────────────────────────────────
+
+export const approveUser = async (userId: string): Promise<AdminUser> => {
+  return await updateUser(userId, { 
+    isActive: true,
+  
+  });
 };

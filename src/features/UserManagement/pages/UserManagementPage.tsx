@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardHeader, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
@@ -7,22 +7,28 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avat
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/shared/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { Checkbox } from '@/shared/components/ui/checkbox';
-import { 
-  Search, Plus, MoreHorizontal, Shield, Mail, UserCheck, UserX, 
-  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle 
+import {
+  Search, Plus, MoreHorizontal, Shield, Mail, UserCheck,
+  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle
 } from 'lucide-react';
 import { UserConfigurationModal } from '../components/UserConfigurationModal';
 import * as userAdminApi from '@/shared/api/userAdminApi';
-import * as authApi from '@/features/auth/api/authApi';
-import type { AdminUser } from '@/shared/api/userAdminApi';
+import { approveUser, type AdminUser } from '@/shared/api/userAdminApi';
 import type { PendingUser } from '@/features/auth/types';
 import { toast } from 'sonner';
+
+/** Matches admin user / pending-user API status strings and UI badges */
+const STATUS_PENDING_APPROVAL = 'PENDING APPROVAL';
+const STATUS_ACTIVE = 'ACTIVE';
+
+const isPendingApprovalStatus = (status?: string) =>
+  (status?.trim() ?? '') === STATUS_PENDING_APPROVAL;
 
 export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
-  
+
   // Data state
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
@@ -36,10 +42,16 @@ export default function UserManagementPage() {
     try {
       const [allUsers, pending] = await Promise.all([
         userAdminApi.getAllUsers(),
-        authApi.getPendingUsers()
+        userAdminApi.getPendingUsersForAdmin(),
       ]);
       setUsers(allUsers);
-      setPendingUsers(pending);
+      setPendingUsers(
+        pending.map((p) => ({
+          ...p,
+          id: p.id || (p as { _id?: string })._id || '',
+          status: p.status?.trim() ? p.status.trim() : undefined,
+        })),
+      );
     } catch (error) {
       toast.error('Failed to fetch user data');
     } finally {
@@ -52,15 +64,56 @@ export default function UserManagementPage() {
   }, []);
 
   const handleToggleSelect = (id: string) => {
-    setSelectedIds(prev => 
+    setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
+
+  // 1. تصفية اليوزرز لتابة All Users (المفعلين فقط)
+  const filteredUsers = users.filter((user) => {
+    const isActuallyActive = user.isActive === true;
+    const matchesSearch =
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return isActuallyActive && matchesSearch;
+  });
+
+  const filteredPending = [
+    ...pendingUsers,
+    ...users.filter(u => u.isActive === false)
+  ].filter((user, index, self) => {
+
+    const isDuplicate = self.findIndex(t => (t.id || (t as any)._id) === (user.id || (user as any)._id)) !== index;
+    if (isDuplicate) return false;
+
+    const isPending = user.isActive === false || user.status?.trim().toUpperCase() === "PENDING APPROVAL";
+    const matchesSearch =
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return isPending && matchesSearch;
+  });
+
+  const usersExcludingPendingApproval = users.filter(u => u.isActive === true);
+  const pendingApprovalOnly = [
+    ...pendingUsers,
+    ...users.filter(u => u.isActive === false)
+  ].filter((user, index, self) =>
+    self.findIndex(t => (t.id || (t as any)._id) === (user.id || (user as any)._id)) === index &&
+    (user.isActive === false || user.status?.trim().toUpperCase() === "PENDING APPROVAL")
+  );
+
+
+
+
+
+  // 4. دالة التحديد الكل
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const currentList = activeTab === 'all' ? users : pendingUsers;
-      setSelectedIds(currentList.map(u => u.id));
+      const currentList = activeTab === 'all' ? filteredUsers : filteredPending;
+      setSelectedIds(currentList.map((u) => u.id));
     } else {
       setSelectedIds([]);
     }
@@ -76,13 +129,14 @@ export default function UserManagementPage() {
     }
   };
 
+
   const handleBulkAction = async (action: 'delete' | 'suspend' | 'activate') => {
-    const confirmMsg = action === 'delete' 
+    const confirmMsg = action === 'delete'
       ? `Are you sure you want to delete ${selectedIds.length} users?`
       : `Are you sure you want to ${action} ${selectedIds.length} users?`;
-      
+
     if (!window.confirm(confirmMsg)) return;
-    
+
     try {
       if (action === 'delete') {
         await Promise.all(selectedIds.map(id => userAdminApi.deleteUser(id)));
@@ -96,16 +150,6 @@ export default function UserManagementPage() {
       toast.error('Bulk operation partially failed');
     }
   };
-
-  const filteredUsers = users.filter(user => 
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredPending = pendingUsers.filter(user => 
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 animate-in fade-in zoom-in-95 duration-200">
@@ -134,20 +178,26 @@ export default function UserManagementPage() {
           <Button variant="outline" className="flex items-center gap-2 border-white/10 hover:bg-white/5">
             <Download className="h-4 w-4" /> Export
           </Button>
-          <Button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20" onClick={() => setIsModalOpen(true)}>
+          <Button
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+            onClick={() => {
+              setSelectedPendingUser(null);
+              setIsModalOpen(true);
+            }}
+          >
             <Plus className="h-4 w-4" /> Add New User
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+      <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
         <TabsList className="bg-[#1e1b2e] border border-white/5 p-1 mb-4">
           <TabsTrigger value="all" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
-            All Users ({users.length})
+            All Users ({usersExcludingPendingApproval.length})
           </TabsTrigger>
           <TabsTrigger value="pending" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white relative">
-            Pending Approval ({pendingUsers.length})
-            {pendingUsers.length > 0 && (
+            Pending Approval ({pendingApprovalOnly.length})
+            {pendingApprovalOnly.length > 0 && (
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             )}
           </TabsTrigger>
@@ -181,8 +231,8 @@ export default function UserManagementPage() {
                   <p className="text-sm font-medium">Loading synchronization data...</p>
                 </div>
               ) : (
-                <UserTable 
-                  users={filteredUsers} 
+                <UserTable
+                  users={filteredUsers}
                   selectedIds={selectedIds}
                   onToggleSelect={handleToggleSelect}
                   onSelectAll={handleSelectAll}
@@ -191,7 +241,7 @@ export default function UserManagementPage() {
                 />
               )}
             </TabsContent>
-            
+
             <TabsContent value="pending" className="m-0">
               {isLoading ? (
                 <div className="p-12 flex flex-col items-center justify-center gap-4 text-slate-500">
@@ -199,18 +249,17 @@ export default function UserManagementPage() {
                   <p className="text-sm font-medium">Fetching pending approvals...</p>
                 </div>
               ) : (
-                <UserTable 
-                  users={filteredPending} 
+                <UserTable
+                  users={filteredPending}
                   selectedIds={selectedIds}
                   onToggleSelect={handleToggleSelect}
                   onSelectAll={handleSelectAll}
-                  onDelete={() => {}} // Handle separately
+                  onDelete={() => { }} // Handle separately
                   onApprove={(user) => {
                     setSelectedPendingUser(user);
                     setIsModalOpen(true);
                   }}
                   type="pending"
-                  onRefresh={fetchData}
                 />
               )}
             </TabsContent>
@@ -218,14 +267,14 @@ export default function UserManagementPage() {
         </Card>
       </Tabs>
 
-      <UserConfigurationModal 
-        open={isModalOpen} 
-        pendingUser={selectedPendingUser}
+      <UserConfigurationModal
+        open={isModalOpen}
+        pendingUser={selectedPendingUser ?? undefined}
+        onSuccess={fetchData}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedPendingUser(null);
-          fetchData();
-        }} 
+        }}
       />
     </div>
   );
@@ -239,17 +288,16 @@ interface UserTableProps {
   onDelete: (id: string) => void;
   onApprove?: (user: any) => void;
   type: 'all' | 'pending';
-  onRefresh?: () => void;
 }
 
-function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, onApprove, type, onRefresh }: UserTableProps) {
+function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, onApprove, type }: UserTableProps) {
   return (
     <div className="w-full overflow-auto custom-scrollbar">
       <table className="w-full caption-bottom text-sm">
         <thead className="bg-[#0f111a] border-b border-white/5">
           <tr className="transition-colors">
-            <th className="h-12 px-4 text-left align-middle w-[40px]">
-              <Checkbox 
+            <th className="h-12 px-4 text-left align-middle w-10">
+              <Checkbox
                 checked={users.length > 0 && selectedIds.length === users.length}
                 onCheckedChange={(checked) => onSelectAll(checked as boolean)}
               />
@@ -264,9 +312,9 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
         <tbody className="[&_tr:last-child]:border-0">
           {users.length > 0 ? (
             users.map((user) => (
-              <tr key={user.id} className="border-b border-white/5 transition-colors hover:bg-white/[0.02]">
+              <tr key={user.id} className="border-b border-white/5 transition-colors hover:bg-white/2">
                 <td className="p-4 align-middle">
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedIds.includes(user.id)}
                     onCheckedChange={() => onToggleSelect(user.id)}
                   />
@@ -297,17 +345,44 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                   </div>
                 </td>
                 <td className="p-4 align-middle">
-                  <Badge 
-                    variant={type === 'all' ? (user.isActive ? "success" : "destructive") : "warning"}
-                    className="font-bold px-2 py-0.5 text-[10px] uppercase tracking-wider"
-                  >
-                    {type === 'all' ? (
-                      user.isActive ? <UserCheck className="mr-1 h-3 w-3" /> : <AlertCircle className="mr-1 h-3 w-3" />
-                    ) : (
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    )}
-                    {type === 'all' ? (user.isActive ? 'Active' : 'Pending Approval') : 'Pending Sync'}
-                  </Badge>
+                  {(() => {
+                    const rowStatus =
+                      type === 'all'
+                        ? (user.status?.trim() ||
+                          (user.isActive ? STATUS_ACTIVE : STATUS_PENDING_APPROVAL))
+                        : STATUS_PENDING_APPROVAL;
+                    const isActiveRow =
+                      type === 'all' &&
+                      (rowStatus === STATUS_ACTIVE ||
+                        (user.status == null && user.isActive));
+                    return (
+                      <Badge
+                        variant={
+                          type === 'all'
+                            ? isActiveRow
+                              ? 'success'
+                              : 'destructive'
+                            : 'secondary'
+                        }
+                        className={
+                          type === 'pending'
+                            ? 'font-bold px-2 py-0.5 text-[10px] uppercase tracking-wider border-violet-500/35 bg-violet-500/15 text-violet-200 shadow-sm shadow-violet-500/10'
+                            : 'font-bold px-2 py-0.5 text-[10px] uppercase tracking-wider'
+                        }
+                      >
+                        {type === 'all' ? (
+                          isActiveRow ? (
+                            <UserCheck className="mr-1 h-3 w-3" />
+                          ) : (
+                            <AlertCircle className="mr-1 h-3 w-3" />
+                          )
+                        ) : (
+                          <AlertCircle className="mr-1 h-3 w-3" />
+                        )}
+                        {rowStatus}
+                      </Badge>
+                    );
+                  })()}
                 </td>
                 <td className="p-4 align-middle text-right">
                   {type === 'all' ? (
@@ -326,7 +401,7 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                           <Ban className="h-3.5 w-3.5" /> Suspend Account
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-white/5" />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="text-red-400 focus:bg-red-500 focus:text-white cursor-pointer gap-2"
                           onClick={() => onDelete(user.id)}
                         >
@@ -336,10 +411,9 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                     </DropdownMenu>
                   ) : (
                     <div className="flex justify-end gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="gradient"
-                        className="h-8 px-3 text-[10px] font-bold"
+                      <Button
+                        size="sm"
+                        className="h-8 px-3 text-[10px] font-bold bg-[#7c3aed] hover:bg-[#6d28d9] text-white shadow-md shadow-violet-500/25 border border-violet-400/20"
                         onClick={() => onApprove?.(user)}
                       >
                         <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Approve
