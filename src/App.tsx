@@ -12,9 +12,11 @@ import ProfilePage from '@/features/Settings/pages/ProfilePage'
 import SettingsPage from '@/features/Settings/pages/SettingsPage'
 import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
 import DepartmentManagementPage from '@/features/DepartmentManagement/pages/DepartmentManagementPage'
+import DepartmentDetailPage from '@/features/DepartmentManagement/pages/DepartmentDetailPage'
 import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCyclesPage'
 import GlobalAnalyticsPage from '@/features/Analytics/pages/GlobalAnalyticsPage'
-import TaskManagementPage from '@/features/TaskManagement/pages/TaskManagementPage'
+import CourseTasksView from '@/features/TaskManagement/pages/CourseTasksView'
+import TaskSubmissionsPage from '@/features/TaskManagement/pages/TaskSubmissionsPage'
 
 function App() {
   return (
@@ -30,9 +32,14 @@ function App() {
           <Route path="forms-surveys" element={<FormsSurveysPage />} />
           <Route path="builder" element={<Navigate to="/builder" replace />} />
           <Route path="users" element={<UserManagementPage />} />
+
+          {/* ── Hierarchical Department ➔ Course ➔ Task ➔ Submissions ── */}
           <Route path="departments" element={<DepartmentManagementPage />} />
+          <Route path="departments/:departmentId" element={<DepartmentDetailPage />} />
+          <Route path="departments/:departmentId/courses/:courseId" element={<CourseTasksView />} />
+          <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
+
           <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
-          <Route path="tasks" element={<TaskManagementPage />} />
           <Route path="analytics" element={<GlobalAnalyticsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />

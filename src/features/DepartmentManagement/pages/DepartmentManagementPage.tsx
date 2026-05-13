@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Building2, Plus, Search, MoreVertical, Edit3, Trash2, 
   Users, UserCheck, BarChart3, ChevronRight, 
@@ -18,10 +19,14 @@ import { toast } from 'sonner';
 import { DepartmentModal } from '../components/DepartmentModal';
 import type { Department, CreateDepartmentPayload } from '../types/department.types';
 
+/** Safely resolve a department ID from either MongoDB's _id or the normalized id field. */
+const resolveDeptId = (dept: Department): string => (dept as any)._id || dept.id;
+
 import * as departmentApi from '@/shared/api/departmentApi';
 import { useEffect } from 'react';
 
 export default function DepartmentManagementPage() {
+  const navigate = useNavigate();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,7 +59,7 @@ export default function DepartmentManagementPage() {
   const handleSave = async (payload: CreateDepartmentPayload) => {
     try {
       if (editingDept) {
-        await departmentApi.updateDepartment(editingDept.id, payload);
+        await departmentApi.updateDepartment(resolveDeptId(editingDept), payload);
         toast.success('Department updated successfully');
       } else {
         await departmentApi.createDepartment(payload);
@@ -159,7 +164,7 @@ export default function DepartmentManagementPage() {
           </div>
         ) : (
           filteredDepts.map((dept) => (
-          <div key={dept.id} className="group relative rounded-3xl bg-[#1e1b2e] border border-white/5 hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6">
+          <div key={resolveDeptId(dept)} className="group relative rounded-3xl bg-[#1e1b2e] border border-white/5 hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6 cursor-pointer" onClick={() => navigate(`/dashboard/departments/${resolveDeptId(dept)}`)}>
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
                 <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5">
@@ -176,20 +181,20 @@ export default function DepartmentManagementPage() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/5">
+                  <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/5" onClick={(e) => e.stopPropagation()}>
                     <MoreVertical className="h-5 w-5 text-slate-500" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-[#0a0a0f] border-white/5 min-w-[160px]">
                   <DropdownMenuItem 
-                    onClick={() => { setEditingDept(dept); setIsModalOpen(true); }}
-                    className="flex items-center gap-2 hover:bg-white/5 font-bold py-3 text-indigo-400"
+                    onClick={(e) => { e.stopPropagation(); setEditingDept(dept); setIsModalOpen(true); }}
+                    className="flex items-center gap-2 hover:bg-white/5 font-bold py-3 text-indigo-400 cursor-pointer"
                   >
                     <Edit3 className="h-4 w-4" /> Edit Details
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => handleDelete(dept.id)}
-                    className="flex items-center gap-2 hover:bg-red-500/10 font-bold py-3 text-red-400"
+                    onClick={(e) => { e.stopPropagation(); handleDelete(resolveDeptId(dept)); }}
+                    className="flex items-center gap-2 hover:bg-red-500/10 font-bold py-3 text-red-400 cursor-pointer"
                   >
                     <Trash2 className="h-4 w-4" /> Purge Entity
                   </DropdownMenuItem>
@@ -227,8 +232,12 @@ export default function DepartmentManagementPage() {
                 </div>
               </div>
               
-              <Button variant="ghost" className="h-10 px-4 rounded-xl text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-[10px] uppercase tracking-widest group">
-                Full Analytics <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <Button 
+                variant="ghost" 
+                className="h-10 px-4 rounded-xl text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-[10px] uppercase tracking-widest group/btn"
+                onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/departments/${resolveDeptId(dept)}`); }}
+              >
+                View Courses <ArrowUpRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
               </Button>
             </div>
           </div>
