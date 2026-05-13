@@ -10,6 +10,7 @@ import api from './axiosInstance';
 
 export interface Department {
   id: string;
+  _id?: string;
   name: string;
   code: string;
   description?: string;
@@ -21,6 +22,7 @@ export interface CreateDepartmentPayload {
   name: string;
   code: string;
   description?: string;
+  hodId?: string;
 }
 
 export type UpdateDepartmentPayload = Partial<CreateDepartmentPayload>;

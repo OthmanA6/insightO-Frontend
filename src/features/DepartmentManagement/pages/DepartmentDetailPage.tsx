@@ -20,8 +20,10 @@ import { BreadcrumbNav } from '@/shared/components/ui/BreadcrumbNav';
 import { CourseModal } from '../components/CourseModal';
 import * as departmentApi from '@/shared/api/departmentApi';
 import * as courseApi from '@/shared/api/courseApi';
+import * as userAdminApi from '@/shared/api/userAdminApi';
 import type { Department } from '@/shared/api/departmentApi';
 import type { Course, CreateCoursePayload } from '@/shared/api/courseApi';
+import type { AdminUser } from '@/shared/api/userAdminApi';
 
 export default function DepartmentDetailPage() {
   const { departmentId } = useParams<{ departmentId: string }>();
@@ -29,6 +31,7 @@ export default function DepartmentDetailPage() {
 
   const [department, setDepartment] = useState<Department | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
@@ -44,11 +47,13 @@ export default function DepartmentDetailPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [dept, allCourses] = await Promise.all([
+        const [dept, allCourses, allUsers] = await Promise.all([
           departmentApi.getDepartment(departmentId),
           courseApi.getCourses(),
+          userAdminApi.getAllUsers(),
         ]);
         setDepartment(dept);
+        setUsers(allUsers);
         // Filter courses belonging to this department
         // Handle populated references: departmentId may be an object { _id, name } or a plain string
         const deptCourses = allCourses.filter((c: any) => {
@@ -68,6 +73,23 @@ export default function DepartmentDetailPage() {
     };
     fetchData();
   }, [departmentId, navigate]);
+
+  const studentsCount = useMemo(() => 
+    users.filter((u: any) => u.role === 'STUDENT' && (u.departmentId === departmentId || u.profile?.data?.departmentId === departmentId)),
+    [users, departmentId]
+  );
+
+  const instructorsCount = useMemo(() => 
+    users.filter((u: any) => u.role === 'INSTRUCTOR' && (u.departmentId === departmentId || u.profile?.data?.departmentId === departmentId)),
+    [users, departmentId]
+  );
+
+  const hodUser = useMemo(() => 
+    users.find((u: any) => 
+      u.role === 'HOD' && u.profile?.data?.departmentId === departmentId
+    ),
+    [users, departmentId]
+  );
 
   const filteredCourses = useMemo(() => {
     return courses.filter(
@@ -175,7 +197,7 @@ export default function DepartmentDetailPage() {
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Students</span>
-                <span className="text-sm font-bold text-slate-200">—</span>
+                <span className="text-sm font-bold text-slate-200">{studentsCount.length}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -184,7 +206,7 @@ export default function DepartmentDetailPage() {
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Instructors</span>
-                <span className="text-sm font-bold text-slate-200">—</span>
+                <span className="text-sm font-bold text-slate-200">{instructorsCount.length}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -199,6 +221,24 @@ export default function DepartmentDetailPage() {
                     : '—'}
                 </span>
               </div>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-black text-white shadow-lg shadow-indigo-500/20">
+                {hodUser ? `${hodUser.firstName.charAt(0)}${hodUser.lastName.charAt(0)}` : '?'}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Head of Department</span>
+                <span className="text-sm font-bold text-slate-200">
+                  {hodUser ? `${hodUser.firstName} ${hodUser.lastName}` : 'Not Appointed'}
+                </span>
+              </div>
+            </div>
+            <div className="hidden md:block">
+               <Badge variant="outline" className="border-white/5 text-slate-500 text-[10px] uppercase font-bold">
+                 Sync Status: {isLoading ? 'Updating...' : 'Live'}
+               </Badge>
             </div>
           </div>
         </div>
