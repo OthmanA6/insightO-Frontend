@@ -22,6 +22,7 @@ export interface CreateDepartmentPayload {
   name: string;
   code: string;
   description?: string;
+  hodId?: string;
 }
 
 export type UpdateDepartmentPayload = Partial<CreateDepartmentPayload>;

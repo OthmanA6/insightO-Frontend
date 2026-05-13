@@ -11,6 +11,8 @@ export * as departmentApi from './departmentApi';
 export * as submissionApi from './submissionApi';
 export * as userAdminApi from './userAdminApi';
 export * as utilityApi from './utilityApi';
+export * as courseApi from './courseApi';
+export * as taskSubmissionApi from './taskSubmissionApi';
 
 export type { Department, CreateDepartmentPayload, UpdateDepartmentPayload } from './departmentApi';
 export type {
@@ -21,3 +23,9 @@ export type {
 } from './submissionApi';
 export type { AdminUser, UpdateUserPayload } from './userAdminApi';
 export type { UploadResponse, HealthCheckResponse } from './utilityApi';
+export type { Course, CreateCoursePayload, UpdateCoursePayload } from './courseApi';
+export type {
+  TaskSubmission,
+  CreateTaskSubmissionPayload,
+  FinalizeGradePayload,
+} from './taskSubmissionApi';

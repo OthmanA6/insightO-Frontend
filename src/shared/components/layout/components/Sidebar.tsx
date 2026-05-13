@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom"
 import { 
   LayoutDashboard, FileText, BarChart3, Settings, 
-  Users, Building2, Calendar, ShieldCheck, ClipboardList 
+  Users, Building2, Calendar, ShieldCheck 
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { buttonVariants } from "@/shared/components/ui/button"
@@ -23,7 +23,6 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       items: [
         { name: "Forms & Templates", href: "/dashboard/forms-surveys", icon: FileText },
         { name: "Evaluation Cycles", href: "/dashboard/evaluation-cycles", icon: Calendar },
-        { name: "Tasks & Assignments", href: "/dashboard/tasks", icon: ClipboardList },
       ]
     },
     {

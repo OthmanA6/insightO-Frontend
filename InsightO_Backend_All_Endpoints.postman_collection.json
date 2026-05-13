@@ -1,0 +1,783 @@
+{
+  "info": {
+    "name": "InsightO Backend - Organized by Feature",
+    "_postman_id": "d3e9d85e-63ec-4f1a-a7ab-2f36d8a6bd9a",
+    "description": "InsightO Backend API Collection organized by feature folders.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "adminEmail", "value": "admin@insighto.com" },
+    { "key": "adminPassword", "value": "Admin12345" },
+    { "key": "studentEmail", "value": "student1@insighto.com" },
+    { "key": "studentPassword", "value": "Student12345" },
+    { "key": "studentNationalId", "value": "30301234567890" },
+    { "key": "registerOtp", "value": "000000" },
+    { "key": "resetOtp", "value": "000000" },
+    { "key": "newPassword", "value": "Student12345" },
+    { "key": "token", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWYxZjAwZWQzYWM1NjI3MTYzYjExMiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODU4NjEwMywiZXhwIjoxNzc5MTkwOTAzfQ.GdvydlElkzn_HEABW3uAai1AbjrpF6HW8i1VqragSso" },
+    { "key": "adminToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "pendingUserId", "value": "" },
+    { "key": "departmentId", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "formId", "value": "" },
+    { "key": "questionId", "value": "" },
+    { "key": "subjectId", "value": "" },
+    { "key": "uploadFilePath", "value": "" },
+    { "key": "taskId", "value": "" },
+    { "key": "courseId", "value": "" },
+    { "key": "submissionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth & Profile",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Student\",\n  \"lastName\": \"One\",\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\",\n  \"nationalId\": \"{{studentNationalId}}\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": "{{baseUrl}}/api/register"
+          }
+        },
+        {
+          "name": "Verify Register OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('OTP verify success', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"otp\": \"{{registerOtp}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/register/verify"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  if (pm.request.body.raw.includes('admin')) {",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "  } else {",
+                  "    pm.collectionVariables.set('studentToken', json.token);",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "  }",
+                  "}",
+                  "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/login"
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/forgotPassword"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"otp\": \"{{resetOtp}}\",\n  \"password\": \"{{newPassword}}\",\n  \"confirmPassword\": \"{{newPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/resetPassword"
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - User Management",
+      "item": [
+        {
+          "name": "List Pending Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const pending = (json.data && json.data[0]) ? json.data[0] : null;",
+                  "if (pending && pending._id) pm.collectionVariables.set('pendingUserId', pending._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/pending-users"
+          }
+        },
+        {
+          "name": "Approve Pending User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.user && json.data.user.id) {",
+                  "  pm.collectionVariables.set('userId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"academicYear\": 3,\n  \"departmentId\": \"{{departmentId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/pending/{{pendingUserId}}/approve"
+          }
+        },
+        {
+          "name": "Create User (Direct)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Direct\",\n  \"lastName\": \"Student\",\n  \"email\": \"directstudent@insighto.com\",\n  \"password\": \"Password123\",\n  \"nationalId\": 20202020202020,\n  \"role\": \"STUDENT\",\n  \"departmentId\": \"{{departmentId}}\",\n  \"academicYear\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "Get User Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"StudentUpdated\",\n  \"role\": \"STUDENT\",\n  \"academicYear\": 4,\n  \"departmentId\": \"{{departmentId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Department Management",
+      "item": [
+        {
+          "name": "Create Department",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const dept = json.data || {};",
+                  "if (dept._id) pm.collectionVariables.set('departmentId', dept._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science\",\n  \"code\": \"CS\",\n  \"description\": \"Department of Computer Science\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/departments"
+          }
+        },
+        {
+          "name": "List Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/departments"
+          }
+        },
+        {
+          "name": "Get Department By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/departments/{{departmentId}}"
+          }
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated Department Description\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/departments/{{departmentId}}"
+          }
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/admin/departments/{{departmentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Form Management",
+      "item": [
+        {
+          "name": "Create Form",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const form = json.data || json.form || {};",
+                  "if (form._id) pm.collectionVariables.set('formId', form._id);",
+                  "if (form.subject_id) pm.collectionVariables.set('subjectId', form.subject_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Instructor Evaluation Form\",\n  \"description\": \"Course-end evaluation\",\n  \"evaluator_roles\": [\"STUDENT\"],\n  \"subject_role\": \"INSTRUCTOR\",\n  \"questions\": [],\n  \"is_anonymous\": false,\n  \"is_active\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/form/"
+          }
+        },
+        {
+          "name": "Get Forms",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/form/"
+          }
+        },
+        {
+          "name": "Get Form By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/form/{{formId}}"
+          }
+        },
+        {
+          "name": "Update Form Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": true,\n  \"is_anonymous\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/form/{{formId}}/settings"
+          }
+        },
+        {
+          "name": "Delete Form",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/form/{{formId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Question Management",
+      "item": [
+        {
+          "name": "Create Question",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const q = json.data || {};",
+                  "if (q._id) pm.collectionVariables.set('questionId', q._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Rate your instructor clarity\",\n  \"type\": \"linear_scale\",\n  \"ai_tag\": \"clarity\",\n  \"required\": true,\n  \"order\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/questions/{{formId}}/questions"
+          }
+        },
+        {
+          "name": "Get Questions for Form",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/questions/{{formId}}/questions"
+          }
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Rate instructor clarity and pace\",\n  \"ai_tag\": \"clarity_pace\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/questions/questions/{{questionId}}"
+          }
+        },
+        {
+          "name": "Reorder Questions",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"id\": \"{{questionId}}\",\n    \"order\": 1\n  }\n]"
+            },
+            "url": "{{baseUrl}}/api/v1/questions/{{formId}}/questions/reorder"
+          }
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/questions/questions/{{questionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Submission Management",
+      "item": [
+        {
+          "name": "Create Submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_id\": \"{{subjectId}}\",\n  \"answers\": [\n    {\n      \"question_id\": \"{{questionId}}\",\n      \"value\": 4\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/forms/{{formId}}/submissions"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task Management",
+      "item": [
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data._id) pm.collectionVariables.set('taskId', json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Final Project Phase 1\",\n  \"description\": \"Submit your initial proposal and architecture diagram.\",\n  \"target\": {\n    \"department_id\": \"{{departmentId}}\",\n    \"specific_users\": []\n  },\n  \"attachments\": [\n    {\n      \"url\": \"https://example.com/project-specs.pdf\",\n      \"fileName\": \"specs.pdf\",\n      \"size\": 102400\n    }\n  ],\n  \"ai_grading_rubric\": \"Evaluate based on clarity, architecture feasibility, and completeness.\",\n  \"deadline\": \"2026-12-31T23:59:59Z\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Get Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Get Task By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Final Project Phase 1 (Extended)\",\n  \"deadline\": \"2027-01-15T23:59:59Z\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Course Management",
+      "item": [
+        {
+          "name": "Create Course",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data._id) pm.collectionVariables.set('courseId', json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Introduction to Programming\",\n  \"courseCode\": \"CS101\",\n  \"description\": \"Basic programming concepts\",\n  \"departmentId\": \"{{departmentId}}\",\n  \"instructorId\": \"{{userId}}\",\n  \"credits\": 3,\n  \"isActive\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/courses"
+          }
+        },
+        {
+          "name": "Get Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/courses"
+          }
+        },
+        {
+          "name": "Get Course By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          }
+        },
+        {
+          "name": "Enroll Students",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentIds\": [\n    \"{{userId}}\"\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/enroll"
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task Submissions",
+      "item": [
+        {
+          "name": "Submit Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data._id) pm.collectionVariables.set('submissionId', json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Here is my submission.\",\n  \"attachments\": [\n    {\n      \"url\": \"https://example.com/submission.pdf\",\n      \"fileName\": \"submission.pdf\",\n      \"size\": 50000\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/task-submissions/task/{{taskId}}"
+          }
+        },
+        {
+          "name": "Get Task Submissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/task-submissions/task/{{taskId}}"
+          }
+        },
+        {
+          "name": "Finalize Grade",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"final_grade\": 95,\n  \"instructor_feedback\": \"Excellent work!\"\n}"
+            },
+            "url": "{{baseUrl}}/api/task-submissions/{{submissionId}}/grade"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "item": [
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{uploadFilePath}}"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/upload/"
+          }
+        }
+      ]
+    }
+  ]
+}
