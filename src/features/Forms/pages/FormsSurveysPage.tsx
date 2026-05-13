@@ -1,17 +1,18 @@
 import { useMemo, useState, useEffect } from "react"
-import { Search, Plus, Sparkles, Users, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, BarChart3, FileText } from "lucide-react"
+import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import { Badge } from "@/shared/components/ui/badge"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/shared/components/ui/dropdown-menu"
 import { cn } from "@/shared/lib/utils"
 import * as formApi from "@/features/FormBuilder/api/formApi"
+import { getFormSubmissions } from "@/shared/api/submissionApi"
 import type { Form } from "@/features/FormBuilder/types/form.types"
 import { toast } from "sonner"
 
@@ -23,12 +24,23 @@ export default function FormsSurveysPage() {
   const [query, setQuery] = useState("")
   const [forms, setForms] = useState<Form[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [totalResponses, setTotalResponses] = useState<number | null>(null)
 
   const fetchForms = async () => {
     setIsLoading(true)
     try {
       const data = await formApi.getAllForms()
       setForms(data)
+
+      // Aggregate total responses across all forms
+      const counts = await Promise.allSettled(
+        data.map((f) => getFormSubmissions(f.id))
+      )
+      const total = counts.reduce((sum, r) => {
+        if (r.status === "fulfilled") return sum + r.value.length
+        return sum
+      }, 0)
+      setTotalResponses(total)
     } catch (error) {
       toast.error("Failed to load forms and surveys")
     } finally {
@@ -39,6 +51,17 @@ export default function FormsSurveysPage() {
   useEffect(() => {
     fetchForms()
   }, [])
+
+  const handleToggleActive = async (row: Form) => {
+    const newStatus = !row.is_active
+    try {
+      await formApi.updateFormSettings(row._id || row.id, { is_active: newStatus })
+      toast.success(newStatus ? "Form reactivated" : "Form closed successfully")
+      fetchForms()
+    } catch (error) {
+      toast.error("Failed to update Form status")
+    }
+  }
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this form? This action cannot be undone.")) return
@@ -74,7 +97,7 @@ export default function FormsSurveysPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <h2 className="text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
-            Forms & Surveys
+            Forms &amp; Surveys
           </h2>
           <p className="text-slate-400 font-medium">Design and manage institutional evaluations and performance reviews.</p>
         </div>
@@ -95,17 +118,30 @@ export default function FormsSurveysPage() {
         </div>
       </div>
 
-      {/* Stats Overview (Optional Placeholder) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* Stats Overview — 2 cards, Completion Rate removed */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {[
-          { label: 'Active Surveys', count: forms.filter(f => f.is_active).length, icon: Users, color: 'text-indigo-400' },
-          { label: 'Total Responses', count: '1.2k', icon: BarChart3, color: 'text-emerald-400' },
-          { label: 'Completion Rate', count: '84%', icon: ClipboardList, color: 'text-purple-400' },
+          {
+            label: 'Active Surveys',
+            count: isLoading ? '—' : forms.filter(f => f.is_active).length,
+            icon: Users,
+            color: 'text-indigo-400',
+          },
+          {
+            label: 'Total Responses',
+            count: isLoading ? '—' : totalResponses !== null ? totalResponses.toLocaleString() : '0',
+            icon: BarChart3,
+            color: 'text-emerald-400',
+          },
         ].map((stat, i) => (
           <div key={i} className="p-6 rounded-2xl bg-[#1e1b2e] border border-white/5 shadow-lg flex items-center justify-between group hover:border-white/10 transition-all">
             <div>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-              <h4 className="text-2xl font-black text-white mt-1">{stat.count}</h4>
+              <h4 className="text-2xl font-black text-white mt-1">
+                {isLoading
+                  ? <span className="inline-block h-7 w-12 rounded-md bg-white/5 animate-pulse" />
+                  : stat.count}
+              </h4>
             </div>
             <div className={cn("p-3 rounded-xl bg-white/5 transition-transform group-hover:scale-110", stat.color)}>
               <stat.icon className="h-6 w-6" />
@@ -197,7 +233,7 @@ export default function FormsSurveysPage() {
                               {row.title}
                             </div>
                             <div className="text-xs font-bold text-slate-500 mt-0.5 flex items-center gap-2">
-                              By {row.creator_id?.firstName || 'System Admin'} 
+                              By {row.creator_id?.firstName || 'System Admin'}
                               <span className="h-1 w-1 rounded-full bg-slate-700"></span>
                               {new Date(row.createdAt!).toLocaleDateString()}
                             </div>
@@ -217,7 +253,7 @@ export default function FormsSurveysPage() {
                         </div>
                       </td>
                       <td className="px-6 py-6">
-                        <Badge 
+                        <Badge
                           variant={row.is_active ? "success" : "secondary"}
                           className="font-black px-3 py-1 text-[10px] uppercase tracking-widest rounded-lg"
                         >
@@ -226,21 +262,21 @@ export default function FormsSurveysPage() {
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-black text-white">0</span>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase">Responses</span>
+                          <span className="text-xl font-black text-white">{row.questions?.length ?? 0}</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase">Questions</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
-                            onClick={() => navigate("/dashboard/forms-results")}
+                            onClick={() => navigate(`/dashboard/forms-results/${row._id || row.id}`)}
                             className="h-10 px-4 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold flex items-center gap-2"
                           >
                             <BarChart3 className="h-4 w-4" /> Results
                           </Button>
-                          
+
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-white/5 text-slate-400">
@@ -248,12 +284,31 @@ export default function FormsSurveysPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="bg-[#1e1b2e] border-white/5 text-slate-200 min-w-[160px]">
-                              <DropdownMenuItem className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3">
-                                <Edit3 className="h-4 w-4 text-indigo-400" /> Edit Template
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                onClick={() => navigate(`/builder/${row._id || row.id}`)}
+                              >
+                                <Edit3 className="h-4 w-4 text-indigo-400" /> Edit Form
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                onClick={() => handleToggleActive(row)}
+                              >
+                                {row.is_active ? (
+                                  <>
+                                    <Lock className="h-4 w-4 text-amber-400" /> Close Form
+                                  </>
+                                ) : (
+                                  <>
+                                    <Unlock className="h-4 w-4 text-emerald-400" /> Reactivate Form
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
                                 className="flex items-center gap-2 hover:bg-red-500/10 text-red-400 cursor-pointer font-bold py-3"
-                                onClick={() => handleDelete(row.id)}
+                                onClick={() => handleDelete(row._id || row.id)}
                               >
                                 <Trash2 className="h-4 w-4" /> Delete Form
                               </DropdownMenuItem>

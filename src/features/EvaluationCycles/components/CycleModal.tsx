@@ -132,7 +132,7 @@ export function CycleModal({ open, onClose, onSave }: CycleModalProps) {
                   </SelectTrigger>
                   <SelectContent className="bg-[#1e1b2e] border-white/10 text-slate-200">
                     {forms.map(f => (
-                      <SelectItem key={f.id} value={f.id!}>{f.title}</SelectItem>
+                      <SelectItem key={f._id || f.id} value={(f._id || f.id)!}>{f.title}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -167,21 +167,24 @@ export function CycleModal({ open, onClose, onSave }: CycleModalProps) {
                   <Target className="h-3 w-3" /> Target Departments
                 </Label>
                 <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                  {departments.map(dept => (
-                    <button
-                      key={dept.id}
-                      type="button"
-                      onClick={() => toggleDept(dept.id)}
-                      className={cn(
-                        "px-3 py-2 rounded-lg text-[10px] font-bold uppercase transition-all border text-left truncate",
-                        targetDepts.includes(dept.id)
-                          ? "bg-indigo-600/20 border-indigo-500 text-indigo-400"
-                          : "bg-[#0f111a] border-white/5 text-slate-500 hover:border-white/20"
-                      )}
-                    >
-                      {dept.name}
-                    </button>
-                  ))}
+                  {departments.map(dept => {
+                    const id = dept._id || dept.id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => toggleDept(id)}
+                        className={cn(
+                          "px-3 py-2 rounded-lg text-[10px] font-bold uppercase transition-all border text-left truncate",
+                          targetDepts.includes(id)
+                            ? "bg-indigo-600/20 border-indigo-500 text-indigo-400"
+                            : "bg-[#0f111a] border-white/5 text-slate-500 hover:border-white/20"
+                        )}
+                      >
+                        {dept.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

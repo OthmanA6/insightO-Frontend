@@ -22,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/builder" element={<FormBuilderPage />} />
+        <Route path="/builder/:formId" element={<FormBuilderPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -36,7 +37,7 @@ function App() {
           <Route path="analytics" element={<GlobalAnalyticsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="forms-results" element={<FormsResultsPage />} />
+          <Route path="forms-results/:formId" element={<FormsResultsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

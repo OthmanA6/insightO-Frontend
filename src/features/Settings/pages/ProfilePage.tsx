@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
-import { User as UserIcon, Mail, Camera, Loader2, Shield, Building2, Calendar, Fingerprint, Lock } from 'lucide-react';
+import { Modal } from '@/shared/components/ui/Modal';
+import { User as UserIcon, Mail, Camera, Loader2, Shield, Building2, Calendar, Fingerprint, Lock, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
 import * as authApi from '@/features/auth/api/authApi';
 import type { User } from '@/features/auth/types';
 import { toast } from 'sonner';
@@ -14,11 +15,25 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Form State
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+
+  // Avatar upload ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Password modal state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const fetchProfile = async () => {
     setIsLoading(true);
@@ -39,12 +54,48 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
+  // ── Avatar Upload Handler ────────────────────────────────────────────────────
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file (PNG, JPEG)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const updatedUser = await authApi.uploadAvatar(file);
+      setUser((prev) => prev ? { ...prev, profileImage: updatedUser.profileImage } : prev);
+      toast.success('Profile picture updated successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset input so the same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // ── Profile Update Handler ───────────────────────────────────────────────────
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
       const updatedUser = await authApi.updateMe({ firstName, lastName, email });
-      setUser(updatedUser);
+      setUser((prev) => prev ? { ...prev, ...updatedUser } : updatedUser);
       toast.success('Profile updated successfully');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Update failed');
@@ -52,6 +103,51 @@ export default function ProfilePage() {
       setIsSaving(false);
     }
   };
+
+  // ── Password Change Handler ──────────────────────────────────────────────────
+  const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
+  const passwordLongEnough = newPassword.length >= 8;
+  const passwordFormValid = currentPassword.length > 0 && passwordsMatch && passwordLongEnough;
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordFormValid) return;
+
+    setIsChangingPassword(true);
+    try {
+      await authApi.changePassword({ currentPassword, newPassword, confirmPassword });
+      toast.success('Password changed successfully');
+      // Reset form & close modal
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+      setIsPasswordModalOpen(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to change password');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const handleClosePasswordModal = () => {
+    setIsPasswordModalOpen(false);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  // ── Avatar source logic ──────────────────────────────────────────────────────
+  const avatarSrc = user?.profileImage
+    ? user.profileImage
+    : user
+      ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`
+      : undefined;
 
   if (isLoading) {
     return (
@@ -92,11 +188,30 @@ export default function ProfilePage() {
             <CardContent className="relative pt-0 flex flex-col items-center text-center">
               <div className="relative -mt-12 mb-4">
                 <Avatar className="h-32 w-32 border-8 border-[#1e1b2e] shadow-2xl ring-2 ring-white/5 transition-transform group-hover:scale-105 duration-500">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} alt="Profile" />
+                  <AvatarImage src={avatarSrc} alt="Profile" />
                   <AvatarFallback className="text-4xl bg-indigo-500/20 text-indigo-400 font-black">{user.firstName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <button className="absolute bottom-1 right-1 p-2.5 rounded-full bg-indigo-600 border-4 border-[#1e1b2e] text-white hover:bg-indigo-500 transition-all shadow-xl">
-                  <Camera className="h-4 w-4" />
+
+                {/* Hidden file input for avatar upload */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+
+                <button
+                  onClick={handleAvatarClick}
+                  disabled={isUploadingAvatar}
+                  className="absolute bottom-1 right-1 p-2.5 rounded-full bg-indigo-600 border-4 border-[#1e1b2e] text-white hover:bg-indigo-500 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Upload profile picture"
+                >
+                  {isUploadingAvatar ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Camera className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               <h3 className="text-2xl font-black text-white tracking-tight">{user.firstName} {user.lastName}</h3>
@@ -235,13 +350,156 @@ export default function ProfilePage() {
                   <p className="text-xs text-slate-500 font-medium">Update your password and authentication methods.</p>
                 </div>
               </div>
-              <Button variant="outline" className="border-amber-500/20 text-amber-500 hover:bg-amber-500/10 h-10 px-6 rounded-xl font-bold text-xs uppercase tracking-widest">
+              <Button 
+                variant="outline" 
+                className="border-amber-500/20 text-amber-500 hover:bg-amber-500/10 h-10 px-6 rounded-xl font-bold text-xs uppercase tracking-widest"
+                onClick={() => setIsPasswordModalOpen(true)}
+              >
                 Change Password
               </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* ── Password Change Modal ─────────────────────────────────────────────── */}
+      <Modal
+        open={isPasswordModalOpen}
+        onClose={handleClosePasswordModal}
+        title={
+          <span className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-amber-500/10">
+              <Lock className="h-4 w-4 text-amber-500" />
+            </div>
+            Change Password
+          </span>
+        }
+        size="sm"
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleClosePasswordModal}
+              className="text-slate-400 hover:text-white hover:bg-white/5 h-10 px-5 rounded-xl font-bold text-sm"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="change-password-form"
+              disabled={!passwordFormValid || isChangingPassword}
+              className="bg-amber-500 hover:bg-amber-400 text-black h-10 px-6 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 disabled:opacity-40"
+            >
+              {isChangingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Update Password
+            </Button>
+          </>
+        }
+      >
+        <form id="change-password-form" onSubmit={handleChangePassword} className="space-y-5">
+          {/* Current Password */}
+          <div className="space-y-2">
+            <Label htmlFor="currentPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              Current Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="currentPassword"
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
+                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* New Password */}
+          <div className="space-y-2">
+            <Label htmlFor="newPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              New Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="newPassword"
+                type={showNewPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
+                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {/* Validation indicators */}
+            {newPassword.length > 0 && (
+              <div className="flex items-center gap-1.5 ml-1">
+                {passwordLongEnough ? (
+                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                ) : (
+                  <XCircle className="h-3 w-3 text-red-400" />
+                )}
+                <span className={`text-[10px] font-medium ${passwordLongEnough ? 'text-emerald-500' : 'text-red-400'}`}>
+                  At least 8 characters
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              Confirm New Password
+            </Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter new password"
+                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
+                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {/* Match indicator */}
+            {confirmPassword.length > 0 && (
+              <div className="flex items-center gap-1.5 ml-1">
+                {passwordsMatch ? (
+                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                ) : (
+                  <XCircle className="h-3 w-3 text-red-400" />
+                )}
+                <span className={`text-[10px] font-medium ${passwordsMatch ? 'text-emerald-500' : 'text-red-400'}`}>
+                  {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                </span>
+              </div>
+            )}
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

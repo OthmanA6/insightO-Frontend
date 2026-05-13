@@ -9,6 +9,7 @@ import type {
   User,
   PendingUser,
   ApprovePendingUserPayload,
+  ChangePasswordPayload,
 } from '../types';
 
 export const login = async (
@@ -63,33 +64,44 @@ export const resetPasswordWithOtp = async (payload: {
   return response.data;
 };
 
-// ── Endpoint #6: GET /profile ─────────────────────────────────────────────────
+// ── Endpoint: GET /profile ────────────────────────────────────────────────────
 export const getProfile = async (): Promise<User> => {
   const response = await api.get<{ status: string; user: User }>('/profile');
   return response.data.user;
 };
 
-// ── Endpoint #5: PATCH /updateMe ──────────────────────────────────────────────
+// ── Endpoint: PUT /profile  (JSON update — name, email) ──────────────────────
 export const updateMe = async (payload: {
   firstName?: string;
   lastName?: string;
   email?: string;
 }): Promise<User> => {
-  const response = await api.patch<{ status: string; user: User }>('/updateMe', payload);
+  const response = await api.put<{ status: string; user: User }>('/profile', payload);
   return response.data.user;
 };
 
-// ── Endpoint #4: PATCH /updateMyPassword ──────────────────────────────────────
-export const updateMyPassword = async (payload: {
-  passwordCurrent: string;
-  password: string;
-  passwordConfirm: string;
-}): Promise<AuthResponse> => {
-  const response = await api.patch<AuthResponse>('/updateMyPassword', payload);
+// ── Endpoint: PUT /profile  (FormData — avatar upload) ───────────────────────
+export const uploadAvatar = async (file: File): Promise<User> => {
+  const formData = new FormData();
+  formData.append('profileImage', file);
+
+  const response = await api.put<{ status: string; user: User }>(
+    '/profile',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return response.data.user;
+};
+
+// ── Endpoint: PATCH /profile/password ─────────────────────────────────────────
+export const changePassword = async (
+  payload: ChangePasswordPayload,
+): Promise<ApiMessage> => {
+  const response = await api.patch<ApiMessage>('/profile/password', payload);
   return response.data;
 };
 
-// ── Endpoint #8: GET /admin/pending-users ─────────────────────────────────────
+// ── Endpoint: GET /admin/pending-users ─────────────────────────────────────
 export const getPendingUsers = async (): Promise<PendingUser[]> => {
   const response = await api.get<{ status: string; results: number; data: PendingUser[] }>(
     '/admin/pending-users',
@@ -97,7 +109,7 @@ export const getPendingUsers = async (): Promise<PendingUser[]> => {
   return response.data.data;
 };
 
-// ── Endpoint #7: POST /admin/pending/:pendingUserId/approve ───────────────────
+// ── Endpoint: POST /admin/pending/:pendingUserId/approve ───────────────────
 export const approvePendingUser = async (
   pendingUserId: string,
   payload: ApprovePendingUserPayload,

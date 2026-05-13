@@ -141,7 +141,7 @@ export function TaskModal({ open, onClose, task, onSave }: TaskModalProps) {
                   </SelectTrigger>
                   <SelectContent className="bg-[#1e1b2e] border-white/10 text-slate-200">
                     {departments.map(dept => (
-                      <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                      <SelectItem key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

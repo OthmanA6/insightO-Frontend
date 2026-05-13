@@ -8,10 +8,17 @@ export interface User {
   email: string;
   role: UserRole;
   nationalId: string;
+  profileImage?: string;
   departmentId?: any; // Populated object or ID string
   academicYear?: number;
   createdAt: string;
   isActive: boolean;
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export interface LoginPayload {

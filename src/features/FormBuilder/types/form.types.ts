@@ -12,6 +12,7 @@ export type QuestionOption = string; // API expects array of strings for multipl
 
 export type Question = {
   id?: string;
+  _id?: string;
   label: string; // API uses 'label'
   type: QuestionType;
   required: boolean; // API uses 'required'
@@ -36,6 +37,7 @@ export type FormSettings = {
 
 export type Form = FormSettings & {
   id: string;
+  _id?: string;
   questions: Question[];
   creator_id?: {
     id: string;

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { 
   DndContext, 
   closestCenter, 
@@ -33,21 +33,29 @@ import {
   Loader2,
   AlertTriangle,
   Save,
-  Rocket
+  Rocket,
+  X,
+  Copy,
+  Check,
+  Smartphone,
+  Monitor
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/shared/lib/utils"
+import { QRCodeCanvas } from "qrcode.react"
 
 import { Button } from "@/shared/components/ui/button"
 import { Label } from "@/shared/components/ui/label"
 import { Switch } from "@/shared/components/ui/switch"
 import { Input } from "@/shared/components/ui/input"
+import { Modal } from "@/shared/components/ui/Modal"
 import { toast } from "sonner"
 
 import type { Question, QuestionType, FormRole } from "../types/form.types"
 import { QuestionCard } from "../components/QuestionCard"
 import * as formApi from "../api/formApi"
 import * as departmentApi from "@/shared/api/departmentApi"
+import { uploadFile } from "@/shared/api/utilityApi"
 import type { Department } from "@/shared/api/departmentApi"
 
 const INITIAL_QUESTIONS: Question[] = [
@@ -63,8 +71,10 @@ const INITIAL_QUESTIONS: Question[] = [
 
 export default function FormBuilderPage() {
   const navigate = useNavigate()
+  const { formId } = useParams<{ formId: string }>()
+  const [isLoading, setIsLoading] = useState(!!formId)
   
-  // ─── Form Settings State (Mirrors API) ───
+  // ─── Form Settings State ───
   const [formTitle, setFormTitle] = useState("New Evaluation Template")
   const [formDescription, setFormDescription] = useState("Provide feedback for the academic quarter.")
   const [evaluatorRoles, setEvaluatorRoles] = useState<FormRole[]>(["STUDENT"])
@@ -80,17 +90,56 @@ export default function FormBuilderPage() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved")
 
+  // Modals State
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [isPreviewMobile, setIsPreviewMobile] = useState(false)
+  const [isShareOpen, setIsShareOpen] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+  const [previewUploads, setPreviewUploads] = useState<Record<string, { name: string, url: string, loading: boolean }>>({})
+  const [previewAnswers, setPreviewAnswers] = useState<Record<string, any>>({})
+
+  // Derived share link (mocking a public URL)
+  const shareUrl = `${window.location.origin}/form/${Math.random().toString(36).substring(7)}`
+
   useEffect(() => {
-    const fetchDepts = async () => {
+    const fetchData = async () => {
       try {
-        const data = await departmentApi.getAllDepartments()
-        setDepartments(data)
+        const [deptData] = await Promise.all([
+          departmentApi.getAllDepartments()
+        ])
+        setDepartments(deptData)
+
+        if (formId) {
+          const form = await formApi.getForm(formId)
+          setFormTitle(form.title)
+          setFormDescription(form.description || "")
+          setEvaluatorRoles(form.evaluator_roles)
+          setSubjectRole(form.subject_role)
+          setIsAnonymous(form.is_anonymous)
+          setIsActive(form.is_active)
+          setDepartmentId(form.department_id || "")
+          
+          if (form.questions && form.questions.length > 0) {
+            // Defensive mapping: Ensure questions have required fields for their type
+            const sanitizedQuestions = form.questions.map((q: any) => ({
+              ...q,
+              options: q.type === "multiple_choice" ? (q.options?.length ? q.options : ["Option 1", "Option 2"]) : undefined,
+              scale: q.type === "linear_scale" ? (q.scale || { min: 1, max: 5 }) : undefined,
+              file_config: q.type === "file" ? (q.file_config || { allowed_types: ["application/pdf"], max_size: 5242880 }) : undefined,
+            }))
+            setQuestions(sanitizedQuestions)
+            setActiveId(sanitizedQuestions[0]._id || sanitizedQuestions[0].id || null)
+          }
+        }
       } catch (err) {
-        console.error("Failed to load departments")
+        console.error("Failed to load data")
+        toast.error("Failed to load form architecture")
+      } finally {
+        setIsLoading(false)
       }
     }
-    fetchDepts()
-  }, [])
+    fetchData()
+  }, [formId])
 
   const activeQuestion = useMemo(() => 
     questions.find(q => q.id === activeId) || null
@@ -127,7 +176,7 @@ export default function FormBuilderPage() {
       label: `Untitled ${type.replace('_', ' ')}`,
       required: false,
       order: questions.length + 1,
-      options: type === "multiple_choice" ? ["Option 1"] : undefined,
+      options: type === "multiple_choice" ? ["Option 1", "Option 2"] : undefined,
       scale: type === "linear_scale" ? { min: 1, max: 5 } : undefined,
       file_config: type === "file" ? { allowed_types: ["application/pdf"], max_size: 5242880 } : undefined
     }
@@ -160,36 +209,88 @@ export default function FormBuilderPage() {
       return
     }
 
+    // ─── Backend Compliance Validation ───
+    if (evaluatorRoles.includes(subjectRole)) {
+      toast.error(`Conflict: Evaluator roles cannot include the Subject role (${subjectRole}).`)
+      return
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i]
+      const qNum = i + 1
+      
+      if (q.label.trim().length < 3) {
+        toast.error(`Question ${qNum}: Label must be at least 3 characters.`)
+        return
+      }
+
+      if (q.type === "multiple_choice") {
+        if (!q.options || q.options.length < 2) {
+          toast.error(`Question ${qNum}: Multiple choice requires at least 2 options.`)
+          return
+        }
+        if (q.options.some(opt => opt.trim().length === 0)) {
+          toast.error(`Question ${qNum}: All options must have content.`)
+          return
+        }
+      }
+    }
+
     setIsPublishing(true)
     try {
-      // 1. Create the Form
-      const newForm = await formApi.createForm({
-        title: formTitle,
-        description: formDescription,
-        evaluator_roles: evaluatorRoles,
-        subject_role: subjectRole,
-        is_anonymous: isAnonymous,
-        is_active: isActive,
-        department_id: departmentId
-      })
+      let form;
+      if (formId) {
+        // 1. Update existing Form Settings
+        form = await formApi.updateFormSettings(formId, {
+          title: formTitle,
+          description: formDescription,
+          is_active: isActive,
+          is_anonymous: isAnonymous
+        })
+      } else {
+        // 1. Create the Form
+        form = await formApi.createForm({
+          title: formTitle,
+          description: formDescription,
+          evaluator_roles: evaluatorRoles,
+          subject_role: subjectRole,
+          is_anonymous: isAnonymous,
+          is_active: isActive,
+          department_id: departmentId
+        })
+      }
 
-      // 2. Add Questions
-      await Promise.all(questions.map(q => 
-        formApi.addQuestion(newForm.id, {
+      const currentFormId = formId || form._id || form.id;
+
+      // 2. Sync Questions
+      for (const q of questions) {
+        const payload: any = {
           label: q.label,
           type: q.type,
           required: q.required,
           order: q.order,
-          options: q.options,
-          scale: q.scale,
-          file_config: q.file_config
-        })
-      ))
+        }
 
-      toast.success("Form published successfully!")
+        if (q.type === 'multiple_choice') payload.options = q.options
+        if (q.type === 'linear_scale') payload.scale = q.scale
+        if (q.type === 'file') payload.file_config = q.file_config
+
+        // If it has a MongoDB ID, it's an existing question
+        const qId = q._id || (q.id?.length === 24 ? q.id : null);
+        
+        if (qId) {
+          await formApi.updateQuestion(qId, payload)
+        } else {
+          await formApi.addQuestion(currentFormId, payload)
+        }
+      }
+
+      toast.success(formId ? "Form Architecture Updated!" : "Form Architecture Published!")
       navigate("/dashboard/forms-surveys")
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to publish form")
+      console.error("Publishing Error:", err)
+      const backendMessage = err.response?.data?.message || err.response?.data?.error || "Failed to publish architecture"
+      toast.error(backendMessage)
     } finally {
       setIsPublishing(false)
     }
@@ -201,8 +302,37 @@ export default function FormBuilderPage() {
     )
   }
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl)
+    setIsCopied(true)
+    toast.success("Share link copied to clipboard")
+    setTimeout(() => setIsCopied(false), 2000)
+  }
+
+  const handlePreviewFileUpload = async (qId: string, file: File) => {
+    setPreviewUploads(prev => ({ ...prev, [qId]: { name: file.name, url: "", loading: true } }))
+    try {
+      const res = await uploadFile(file)
+      setPreviewUploads(prev => ({ ...prev, [qId]: { name: file.name, url: res.url, loading: false } }))
+      toast.success(`File "${file.name}" provisioned successfully`)
+    } catch (err) {
+      toast.error("Failed to upload evidence package")
+      setPreviewUploads(prev => {
+        const next = { ...prev }
+        delete next[qId]
+        return next
+      })
+    }
+  }
+
+  const handleSimulatedSubmit = () => {
+    toast.success("Survey Simulation Success: Data provisioned to local sandbox")
+    setIsPreviewOpen(false)
+    setPreviewAnswers({})
+  }
+
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden font-geist">
       {/* Header */}
       <header className="shrink-0 flex h-16 w-full items-center justify-between border-b border-white/5 bg-[#0a0a0f] px-6 z-20 relative">
         <div className="flex items-center gap-4">
@@ -241,12 +371,14 @@ export default function FormBuilderPage() {
           <div className="h-6 w-px bg-white/10 mx-2"></div>
           <Button 
             variant="ghost" 
+            onClick={() => setIsShareOpen(true)}
             className="h-10 px-4 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition-colors flex items-center gap-2"
           >
             <Share2 className="h-4 w-4" /> Share
           </Button>
           <Button 
             variant="ghost"
+            onClick={() => setIsPreviewOpen(true)}
             className="h-10 px-4 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition-colors flex items-center gap-2"
           >
             <Eye className="h-4 w-4" /> Preview
@@ -327,7 +459,7 @@ export default function FormBuilderPage() {
             {/* Questions List */}
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={questions.map(q => q.id!)} strategy={verticalListSortingStrategy}>
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 relative">
                   <AnimatePresence>
                     {questions.map((question) => (
                       <motion.div key={question.id} layout initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
@@ -352,7 +484,7 @@ export default function FormBuilderPage() {
             <div className="w-full h-24 border-2 border-dashed border-white/5 rounded-3xl flex items-center justify-center group hover:border-indigo-500/20 hover:bg-indigo-500/5 transition-all cursor-pointer" onClick={() => addQuestion('short_text')}>
                <div className="flex items-center gap-3 text-slate-600 group-hover:text-indigo-400 transition-colors">
                   <Plus className="h-6 w-6" />
-                  <span className="text-sm font-black uppercase tracking-widest">Append Data Point</span>
+                  <span className="text-sm font-black uppercase tracking-widest">Append Data Node</span>
                </div>
             </div>
           </div>
@@ -378,7 +510,7 @@ export default function FormBuilderPage() {
                     >
                       <option value="">Select Target Entity</option>
                       {departments.map(dept => (
-                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                        <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
                       ))}
                     </select>
                   </div>
@@ -393,6 +525,7 @@ export default function FormBuilderPage() {
                       <option value="INSTRUCTOR">Instructor</option>
                       <option value="HOD">Head of Dept</option>
                       <option value="STUDENT">Student Body</option>
+                      <option value="ADMIN">Administrator</option>
                     </select>
                   </div>
 
@@ -458,6 +591,40 @@ export default function FormBuilderPage() {
                       />
                     </div>
                   )}
+
+                  {activeQuestion.type === "multiple_choice" && (
+                    <div className="space-y-4">
+                       <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Choice Options</Label>
+                       <div className="space-y-2">
+                         {activeQuestion.options?.map((opt, idx) => (
+                           <div key={idx} className="flex gap-2">
+                             <Input 
+                               value={opt}
+                               onChange={(e) => {
+                                 const next = [...(activeQuestion.options || [])]
+                                 next[idx] = e.target.value
+                                 updateQuestion(activeQuestion.id!, { options: next })
+                               }}
+                               className="bg-[#0f111a] border-white/10 text-white h-9 rounded-lg text-xs"
+                             />
+                             <button 
+                               onClick={() => updateQuestion(activeQuestion.id!, { options: activeQuestion.options?.filter((_, i) => i !== idx) })}
+                               className="p-2 text-slate-600 hover:text-red-400"
+                             >
+                               <X className="h-4 w-4" />
+                             </button>
+                           </div>
+                         ))}
+                         <Button 
+                           variant="ghost" size="sm" 
+                           onClick={() => updateQuestion(activeQuestion.id!, { options: [...(activeQuestion.options || []), `New Option`] })}
+                           className="w-full text-[9px] uppercase font-black tracking-widest text-indigo-500 hover:bg-indigo-500/5"
+                         >
+                           + Add New Path
+                         </Button>
+                       </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-8 border-t border-white/5">
@@ -479,6 +646,222 @@ export default function FormBuilderPage() {
           </div>
         </aside>
       </main>
+
+      {/* ── PREVIEW MODAL ─────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isPreviewOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-[#0a0a0f] flex flex-col overflow-hidden"
+          >
+            <div className="h-16 border-b border-white/5 px-8 flex items-center justify-between bg-white/[0.02]">
+              <div className="flex items-center gap-6">
+                <span className="text-xs font-black uppercase tracking-widest text-indigo-500">Preview Engine v1.0</span>
+                <div className="flex bg-white/5 rounded-xl p-1 gap-1">
+                  <button 
+                    onClick={() => setIsPreviewMobile(false)}
+                    className={cn("p-2 rounded-lg transition-all", !isPreviewMobile ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-white")}
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => setIsPreviewMobile(true)}
+                    className={cn("p-2 rounded-lg transition-all", isPreviewMobile ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-white")}
+                  >
+                    <Smartphone className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <button onClick={() => setIsPreviewOpen(false)} className="p-2 rounded-full hover:bg-white/10 text-slate-500 transition-colors">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-slate-100 dark:bg-[#0f111a] p-8 md:p-20 custom-scrollbar">
+              <div className={cn(
+                "mx-auto transition-all duration-500 ease-in-out",
+                isPreviewMobile ? "max-w-[375px] rounded-[3rem] border-[12px] border-[#1e1b2e] shadow-2xl h-[700px] overflow-y-auto custom-scrollbar bg-white dark:bg-[#1e1b2e]" : "max-w-3xl"
+              )}>
+                <div className={cn("p-10 space-y-12", isPreviewMobile && "p-6")}>
+                  <div className="space-y-4">
+                    <h1 className={cn("font-black tracking-tight dark:text-white", isPreviewMobile ? "text-2xl" : "text-4xl")}>{formTitle}</h1>
+                    <p className="text-slate-500 font-medium leading-relaxed">{formDescription}</p>
+                    <div className="h-1 w-20 bg-indigo-600 rounded-full"></div>
+                  </div>
+
+                  <div className="space-y-16">
+                    {questions.map((q, i) => (
+                      <div key={i} className="space-y-6">
+                        <div className="flex items-start gap-4">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 text-sm font-black">{i + 1}</span>
+                          <h3 className="text-lg font-bold dark:text-slate-100 leading-snug">{q.label}{q.required && <span className="text-red-500 ml-1">*</span>}</h3>
+                        </div>
+                        
+                        <div className="pl-12">
+                          {q.type === 'short_text' && (
+                            <Input 
+                              value={previewAnswers[q._id || q.id!] || ""}
+                              onChange={(e) => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: e.target.value }))}
+                              placeholder="Short response text" 
+                              className="bg-transparent border-slate-300 dark:border-white/10" 
+                            />
+                          )}
+                          {q.type === 'long_text' && (
+                            <textarea 
+                              value={previewAnswers[q._id || q.id!] || ""}
+                              onChange={(e) => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: e.target.value }))}
+                              placeholder="Detailed narrative response" 
+                              className="w-full bg-transparent border border-slate-300 dark:border-white/10 rounded-xl p-4 min-h-[100px] text-sm focus:ring-indigo-500 outline-none transition-all" 
+                            />
+                          )}
+                          {q.type === 'multiple_choice' && (
+                            <div className="space-y-3">
+                              {q.options?.map((opt, idx) => (
+                                <div 
+                                  key={idx} 
+                                  onClick={() => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: opt }))}
+                                  className={cn(
+                                    "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
+                                    previewAnswers[q._id || q.id!] === opt
+                                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
+                                      : "border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-slate-500"
+                                  )}
+                                >
+                                  <div className={cn(
+                                    "h-4 w-4 rounded-full border-2 transition-all",
+                                    previewAnswers[q._id || q.id!] === opt ? "border-indigo-500 bg-indigo-500" : "border-slate-400 dark:border-white/20"
+                                  )}></div>
+                                  <span className="text-sm font-medium">{opt}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {q.type === 'linear_scale' && (
+                            <div className="flex flex-col gap-4">
+                               <div className="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                  <span>{q.scale?.min || 1} (Poor)</span>
+                                  <span>{q.scale?.max || 5} (Excellent)</span>
+                               </div>
+                               <div className="flex gap-2">
+                                  {Array.from({ length: (q.scale?.max || 5) }, (_, idx) => idx + 1).map(val => (
+                                    <div 
+                                      key={val} 
+                                      onClick={() => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: val }))}
+                                      className={cn(
+                                        "h-12 flex-1 flex items-center justify-center rounded-xl border text-sm font-black transition-all cursor-pointer",
+                                        previewAnswers[q._id || q.id!] === val
+                                          ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
+                                          : "border-slate-200 dark:border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-indigo-500"
+                                      )}
+                                    >
+                                      {val}
+                                    </div>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
+                          {q.type === 'file' && (
+                            <div className="space-y-4">
+                              <label className={cn(
+                                "border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer",
+                                previewUploads[q.id!]?.loading ? "border-indigo-500/50 bg-indigo-500/5" : "border-slate-300 dark:border-white/10 hover:border-indigo-500/30",
+                                previewUploads[q.id!]?.url ? "border-emerald-500/30 bg-emerald-500/5" : ""
+                              )}>
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  onChange={(e) => e.target.files?.[0] && handlePreviewFileUpload(q.id!, e.target.files[0])}
+                                />
+                                {previewUploads[q.id!]?.loading ? (
+                                  <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                                ) : previewUploads[q.id!]?.url ? (
+                                  <Check className="h-8 w-8 text-emerald-500" />
+                                ) : (
+                                  <Upload className="h-8 w-8 opacity-20" />
+                                )}
+                                <div className="text-center">
+                                  <span className="text-sm font-bold uppercase tracking-widest block dark:text-slate-200">
+                                    {previewUploads[q.id!]?.loading ? "Uploading Evidence..." : previewUploads[q.id!]?.name || "Provision Evidence Package"}
+                                  </span>
+                                  {!previewUploads[q.id!]?.loading && (
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase mt-1 block">
+                                      {previewUploads[q.id!]?.url ? "File Ready for Submission" : "Click to select or drag & drop"}
+                                    </span>
+                                  )}
+                                </div>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-10 border-t border-slate-200 dark:border-white/5">
+                     <Button 
+                       onClick={handleSimulatedSubmit}
+                       className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/20"
+                     >
+                       Finalize Submission
+                     </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── SHARE MODAL ──────────────────────────────────────────────────── */}
+      <Modal
+        open={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        title={
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+                <Share2 className="h-4 w-4" />
+             </div>
+             <span className="font-black text-white uppercase tracking-widest">Distribute Architecture</span>
+          </div>
+        }
+        size="sm"
+      >
+        <div className="space-y-8 py-4">
+          <div className="flex flex-col items-center text-center gap-6">
+            <div className="p-4 rounded-3xl bg-white shadow-2xl shadow-indigo-500/10">
+               <QRCodeCanvas value={shareUrl} size={180} level="H" includeMargin />
+            </div>
+            <div>
+               <h4 className="text-lg font-black text-white">Quantum Link Provisioned</h4>
+               <p className="text-xs text-slate-500 mt-1 font-medium">Any respondent with this encrypted link can participate in the data collection cycle.</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+             <Label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Universal Resource Locator</Label>
+             <div className="relative group">
+                <Input 
+                  readOnly 
+                  value={shareUrl}
+                  className="bg-[#0f111a] border-white/10 text-indigo-400 h-12 pr-12 rounded-xl font-bold truncate focus:ring-indigo-500"
+                />
+                <button 
+                  onClick={handleCopyLink}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white transition-all"
+                >
+                  {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </button>
+             </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex gap-3">
+             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
+             <p className="text-[10px] text-amber-500 font-bold leading-relaxed uppercase tracking-wider">
+                Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
+             </p>
+          </div>
+        </div>
+      </Modal>
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }

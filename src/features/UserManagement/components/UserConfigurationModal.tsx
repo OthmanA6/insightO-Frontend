@@ -285,7 +285,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
                 </SelectTrigger>
                 <SelectContent className="bg-[#1e1b2e] border-white/10 text-slate-200">
                   {departments.map(dept => (
-                    <SelectItem key={dept.id} value={dept.id} className="hover:bg-violet-600 focus:bg-violet-600">
+                    <SelectItem key={dept._id || dept.id} value={dept._id || dept.id} className="hover:bg-violet-600 focus:bg-violet-600">
                       {dept.name} ({dept.code})
                     </SelectItem>
                   ))}

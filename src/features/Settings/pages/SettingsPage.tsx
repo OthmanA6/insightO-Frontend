@@ -35,7 +35,7 @@ export default function SettingsPage() {
 
     setIsSaving(true);
     try {
-      await authApi.updateMyPassword({ passwordCurrent, password, passwordConfirm });
+      await authApi.changePassword({ currentPassword: passwordCurrent, newPassword: password, confirmPassword: passwordConfirm });
       toast.success('Password updated successfully. Please use your new credentials for future logins.');
       setPasswordCurrent('');
       setPassword('');

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { 
@@ -7,9 +8,17 @@ import {
   CheckSquare,
   Star,
   Upload,
+  ChevronDown,
+  Trash2,
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { Input } from "@/shared/components/ui/input"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu"
 import type { Question, QuestionType } from "../types/form.types"
 
 interface QuestionCardProps {
@@ -23,20 +32,40 @@ interface QuestionCardProps {
   onOpenProperties: (question: Question) => void
 }
 
+const TYPE_OPTIONS: { type: QuestionType; label: string; icon: any }[] = [
+  { type: "short_text",      label: "Short Text",    icon: Type },
+  { type: "long_text",       label: "Long Text",     icon: AlignLeft },
+  { type: "multiple_choice", label: "Multi Choice",  icon: CheckSquare },
+  { type: "linear_scale",    label: "Linear Scale",  icon: Star },
+  { type: "file",            label: "File Upload",   icon: Upload },
+]
+
 const typeConfig: Record<QuestionType, { label: string; icon: any }> = {
-  short_text: { label: "Short Text", icon: Type },
-  long_text: { label: "Long Text", icon: AlignLeft },
+  short_text:      { label: "Short Text",   icon: Type },
+  long_text:       { label: "Long Text",    icon: AlignLeft },
   multiple_choice: { label: "Multi Choice", icon: CheckSquare },
-  linear_scale: { label: "Linear Scale", icon: Star },
-  file: { label: "File Upload", icon: Upload },
+  linear_scale:    { label: "Linear Scale", icon: Star },
+  file:            { label: "File Upload",  icon: Upload },
+}
+
+// Default values when switching types
+function getTypeDefaults(type: QuestionType): Partial<Question> {
+  switch (type) {
+    case "multiple_choice": return { options: ["Option 1", "Option 2"], scale: undefined, file_config: undefined }
+    case "linear_scale":    return { scale: { min: 1, max: 5 }, options: undefined, file_config: undefined }
+    case "file":            return { file_config: { allowed_types: ["application/pdf"], max_size: 5242880 }, options: undefined, scale: undefined }
+    default:                return { options: undefined, scale: undefined, file_config: undefined }
+  }
 }
 
 export function QuestionCard({
   question,
   isActive,
   onActivate,
+  onDelete,
   onUpdate,
 }: QuestionCardProps) {
+
   const {
     attributes,
     listeners,
@@ -54,6 +83,11 @@ export function QuestionCard({
 
   const Config = typeConfig[question.type]
 
+  const handleTypeChange = (type: QuestionType) => {
+    if (type === question.type) return
+    onUpdate(question.id!, { type, label: question.label, ...getTypeDefaults(type) })
+  }
+
   const renderPreview = () => {
     switch (question.type) {
       case "short_text":
@@ -69,8 +103,8 @@ export function QuestionCard({
             {(question.options || []).map((opt, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-4 h-4 rounded-full border-2 border-slate-600"></div>
-                <Input 
-                  value={opt} 
+                <Input
+                  value={opt}
                   onChange={(e) => {
                     const newOpts = [...(question.options || [])]
                     newOpts[idx] = e.target.value
@@ -80,7 +114,7 @@ export function QuestionCard({
                 />
               </div>
             ))}
-            <div 
+            <div
               className="text-sm text-indigo-500 cursor-pointer mt-2 pl-7 hover:text-indigo-400 font-medium"
               onClick={(e) => {
                 e.stopPropagation()
@@ -101,12 +135,12 @@ export function QuestionCard({
             </div>
             <div className="flex justify-between gap-2 overflow-x-auto pb-2">
               {Array.from({ length: (question.scale?.max || 5) - (question.scale?.min || 1) + 1 }, (_, i) => (question.scale?.min || 1) + i).map((val) => (
-                <div 
-                  key={val} 
+                <div
+                  key={val}
                   className={cn(
                     "h-10 flex-1 min-w-[36px] rounded-lg border flex items-center justify-center text-sm font-medium transition-all",
-                    val === (question.scale?.max || 5) 
-                      ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-bold" 
+                    val === (question.scale?.max || 5)
+                      ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-bold"
                       : "border-white/10 bg-[#1e1b2e] text-slate-400"
                   )}
                 >
@@ -136,13 +170,14 @@ export function QuestionCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative mt-4",
-        isDragging && "opacity-50 z-50 py-4 scale-[1.02]"
+        "group relative mt-4", 
+        isDragging && "opacity-50 z-[100] py-4 scale-[1.02]",
+        isActive && "z-50"
       )}
-      onClick={() => onActivate(question.id || "")}
-      id={question.id}
+      onClick={() => onActivate(question.id || question._id || "")}
+      id={question.id || question._id}
     >
-      {/* Drag Handle - Left Side */}
+      {/* Drag Handle */}
       <div
         {...attributes}
         {...listeners}
@@ -153,14 +188,15 @@ export function QuestionCard({
 
       <div
         className={cn(
-          "question-card rounded-2xl bg-[#1e1b2e] p-6 shadow-lg cursor-pointer relative group transition-all duration-300 border-2",
+          "question-card rounded-2xl bg-[#1e1b2e] p-6 shadow-lg cursor-pointer relative group transition-all duration-300 border-2 overflow-visible",
           isActive ? "border-indigo-600 shadow-indigo-600/10" : "border-white/5 hover:border-white/10",
         )}
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3">
+            {/* Label input */}
             <div className="flex-1">
-              <input 
+              <input
                 type="text"
                 value={question.label}
                 onChange={(e) => onUpdate(question.id!, { label: e.target.value })}
@@ -168,10 +204,50 @@ export function QuestionCard({
                 placeholder={`New ${Config.label}`}
               />
             </div>
-            <div className="flex items-center gap-2 bg-[#0f111a] border border-white/10 rounded-lg px-3 py-2 shrink-0 pointer-events-none">
-              <Config.icon className={cn("h-4 w-4", "text-slate-400")} />
-              <span className="text-xs font-bold text-slate-300 hidden sm:block uppercase tracking-wider">{Config.label}</span>
+
+            {/* ── Inline Type Dropdown (Portal Based) ─────────────────────────── */}
+            <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-2 bg-[#0f111a] border border-white/10 hover:border-indigo-500/50 rounded-lg px-3 py-2 transition-all group/type"
+                  >
+                    <Config.icon className="h-4 w-4 text-slate-400 group-hover/type:text-indigo-400 transition-colors" />
+                    <span className="text-xs font-bold text-slate-300 hidden sm:block uppercase tracking-wider">{Config.label}</span>
+                    <ChevronDown className="h-3.5 w-3.5 text-slate-500 transition-transform" />
+                  </button>
+                </DropdownMenuTrigger>
+                
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-[#1e1b2e] border-white/10 text-slate-300 z-[101]"
+                >
+                  {TYPE_OPTIONS.map((opt) => (
+                    <DropdownMenuItem
+                      key={opt.type}
+                      onSelect={() => handleTypeChange(opt.type)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-wider cursor-pointer outline-none",
+                        question.type === opt.type
+                          ? "bg-indigo-600/20 text-indigo-400"
+                          : "hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white"
+                      )}
+                    >
+                      <opt.icon className="h-4 w-4 shrink-0" />
+                      {opt.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
+
+            {/* Delete button — visible on hover */}
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(question.id!) }}
+              className="shrink-0 p-2 rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
           </div>
 
           <div className="mt-2">
