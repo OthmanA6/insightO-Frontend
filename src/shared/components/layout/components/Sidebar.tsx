@@ -1,16 +1,19 @@
 import { NavLink } from "react-router-dom"
 import { 
   LayoutDashboard, FileText, BarChart3, Settings, 
-  Users, Building2, Calendar, ShieldCheck 
+  Users, Building2, Calendar, ShieldCheck, BookOpen, ClipboardCheck 
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { buttonVariants } from "@/shared/components/ui/button"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {}
 
 export function Sidebar({ className, ...props }: SidebarProps) {
-  const navGroups = [
+  const { user } = useAuth();
+
+  const adminNavGroups = [
     {
       title: "Overview",
       items: [
@@ -39,7 +42,20 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         { name: "Settings", href: "/dashboard/settings", icon: Settings },
       ]
     }
-  ]
+  ];
+
+  const studentNavGroups = [
+    {
+      title: "My Portal",
+      items: [
+        { name: "My Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "My Courses & Tasks", href: "/dashboard/courses-tasks", icon: BookOpen },
+        { name: "My Evaluations", href: "/dashboard/student-evaluations", icon: ClipboardCheck },
+      ]
+    }
+  ];
+
+  const navGroups = user?.role === 'STUDENT' ? studentNavGroups : adminNavGroups;
 
   return (
     <aside

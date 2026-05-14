@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Building2, BookOpen, Plus, Search, MoreVertical, Trash2,
+  Building2, BookOpen, Plus, Search, MoreVertical, Trash2, Edit3,
   Users, GraduationCap, Clock, ChevronRight, Loader2, Filter,
   Download,
 } from 'lucide-react';
@@ -38,6 +38,36 @@ export default function DepartmentDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!departmentId || departmentId === 'undefined') return;
+    setIsLoading(true);
+    try {
+      const [dept, allCourses, allUsers] = await Promise.all([
+        departmentApi.getDepartment(departmentId),
+        courseApi.getCourses(),
+        userAdminApi.getAllUsers(),
+      ]);
+      setDepartment(dept);
+      setUsers(allUsers);
+      // Filter courses belonging to this department
+      // Handle populated references: departmentId may be an object { _id, name } or a plain string
+      const deptCourses = allCourses.filter((c: any) => {
+        const raw = c.departmentId ?? c.department_id;
+        const cDeptId =
+          typeof raw === 'object' && raw !== null
+            ? raw._id || raw.id
+            : raw;
+        return cDeptId === departmentId;
+      });
+      setCourses(deptCourses);
+    } catch (error) {
+      toast.error('Failed to load department data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [departmentId]);
 
   useEffect(() => {
     // ── Guard: prevent API calls with invalid/undefined departmentId ──
@@ -46,36 +76,8 @@ export default function DepartmentDetailPage() {
       navigate('/dashboard/departments');
       return;
     }
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [dept, allCourses, allUsers] = await Promise.all([
-          departmentApi.getDepartment(departmentId),
-          courseApi.getCourses(),
-          userAdminApi.getAllUsers(),
-        ]);
-        setDepartment(dept);
-        setUsers(allUsers);
-        // Filter courses belonging to this department
-        // Handle populated references: departmentId may be an object { _id, name } or a plain string
-        const deptCourses = allCourses.filter((c: any) => {
-          const raw = c.departmentId ?? c.department_id;
-          const cDeptId =
-            typeof raw === 'object' && raw !== null
-              ? raw._id || raw.id
-              : raw;
-          return cDeptId === departmentId;
-        });
-        setCourses(deptCourses);
-      } catch (error) {
-        toast.error('Failed to load department data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchData();
-  }, [departmentId, navigate]);
+  }, [departmentId, navigate, fetchData]);
 
   const studentsCount = useMemo(
     () =>
@@ -127,23 +129,31 @@ export default function DepartmentDetailPage() {
 
   const handleSaveCourse = async (payload: CreateCoursePayload, studentIds?: string[]) => {
     try {
-      const newCourse = await courseApi.createCourse(payload);
-      // Enroll students if any were selected
-      const courseId = (newCourse as any)._id || newCourse.id;
-      if (studentIds && studentIds.length > 0 && courseId) {
-        try {
-          await courseApi.enrollStudents(courseId, studentIds);
-          toast.success(`Course created & ${studentIds.length} student(s) enrolled`);
-        } catch {
-          toast.success('Course created, but student enrollment failed');
-        }
+      let savedCourse: Course;
+      const isEditing = !!editingCourse;
+
+      // Inject studentIds into the main payload so the backend handles it in one atomic transaction
+      const completePayload = {
+        ...payload,
+        ...(studentIds !== undefined ? { studentIds } : {})
+      };
+
+      if (isEditing) {
+        const courseId = getSafeId(editingCourse);
+        savedCourse = await courseApi.updateCourse(courseId!, completePayload);
+        toast.success('Course updated successfully');
       } else {
+        savedCourse = await courseApi.createCourse(completePayload);
         toast.success('Course created successfully');
       }
-      setCourses((prev) => [...prev, newCourse]);
+
       setIsCourseModalOpen(false);
+      setEditingCourse(null);
+
+      // CRITICAL: Fetch fresh data to pull counts and names (instructor & students)
+      await fetchData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create course');
+      toast.error(error.response?.data?.message || `Failed to ${editingCourse ? 'update' : 'create'} course`);
     }
   };
 
@@ -176,7 +186,10 @@ export default function DepartmentDetailPage() {
             <Download className="mr-2 h-4 w-4" /> Export
           </Button>
           <Button
-            onClick={() => setIsCourseModalOpen(true)}
+            onClick={() => {
+              setEditingCourse(null);
+              setIsCourseModalOpen(true);
+            }}
             className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-xl shadow-indigo-500/20 transition-all flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
@@ -361,6 +374,17 @@ export default function DepartmentDetailPage() {
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
+                          setEditingCourse(course);
+                          setIsCourseModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 hover:bg-white/5 font-bold py-3 text-slate-300 cursor-pointer"
+                      >
+                        <Edit3 className="h-4 w-4" /> Edit Course
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleDeleteCourse(courseId);
                         }}
                         className="flex items-center gap-2 hover:bg-red-500/10 font-bold py-3 text-red-400 cursor-pointer"
@@ -387,9 +411,11 @@ export default function DepartmentDetailPage() {
                       <span className="text-xs font-bold text-slate-200">
                         {(() => {
                           const inst = course.instructorId as any;
-                          return inst && typeof inst === 'object'
-                            ? `${inst.firstName} ${inst.lastName}`
-                            : 'Not assigned';
+                          if (inst && typeof inst === 'object') {
+                            return `${inst.firstName} ${inst.lastName}`;
+                          }
+                          const found = users.find((u) => (u._id || u.id) === inst);
+                          return found ? `${found.firstName} ${found.lastName}` : 'Not assigned';
                         })()}
                       </span>
                     </div>
@@ -440,7 +466,11 @@ export default function DepartmentDetailPage() {
       {/* Course Creation Modal */}
       <CourseModal
         open={isCourseModalOpen}
-        onClose={() => setIsCourseModalOpen(false)}
+        onClose={() => {
+          setIsCourseModalOpen(false);
+          setEditingCourse(null);
+        }}
+        course={editingCourse}
         departmentId={departmentId!}
         onSave={handleSaveCourse}
       />

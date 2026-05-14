@@ -87,8 +87,8 @@ export default function CourseTasksView() {
   const filteredTasks = useMemo(() => {
     return tasks.filter(
       (t) =>
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description.toLowerCase().includes(searchQuery.toLowerCase()),
+        (t.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (t.description?.toLowerCase() || '').includes(searchQuery.toLowerCase()),
     );
   }, [tasks, searchQuery]);
 

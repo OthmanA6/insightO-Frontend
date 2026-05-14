@@ -36,6 +36,7 @@ export interface CreateCoursePayload {
   instructorId?: string;
   credits?: number;
   isActive?: boolean;
+  studentIds?: string[];
 }
 
 export type UpdateCoursePayload = Partial<CreateCoursePayload>;
@@ -69,7 +70,3 @@ export const deleteCourse = async (id: string): Promise<void> => {
   await api.delete(`/courses/${id}`);
 };
 
-// ─── POST /api/courses/:id/enroll ─────────────────────────────────────────────
-export const enrollStudents = async (courseId: string, studentIds: string[]): Promise<void> => {
-  await api.post(`/courses/${courseId}/enroll`, { studentIds });
-};

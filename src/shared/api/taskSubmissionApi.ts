@@ -26,11 +26,13 @@ export interface TaskSubmission {
   } | string;
   content: string;
   attachments?: TaskSubmissionAttachment[];
-  ai_grade?: number;
-  ai_feedback?: string;
+  ai_evaluation?: {
+    suggested_grade?: number;
+    feedback?: string;
+  };
   final_grade?: number;
   instructor_feedback?: string;
-  status: 'PENDING' | 'GRADED' | 'REVIEWED';
+  status: 'SUBMITTED' | 'AI_GRADED' | 'FINALIZED';
   createdAt?: string;
   updatedAt?: string;
 }
@@ -75,4 +77,12 @@ export const finalizeGrade = async (
     payload,
   );
   return response.data.data;
+};
+
+// ─── GET /api/task-submissions/my-submissions ─────────────────────────────────
+export const getMySubmissions = async (): Promise<TaskSubmission[]> => {
+  const response = await api.get<{ status: string; data: { submissions: TaskSubmission[] } }>(
+    `/task-submissions/my-submissions`,
+  );
+  return response.data.data.submissions;
 };
