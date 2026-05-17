@@ -55,7 +55,17 @@ export function Sidebar({ className, ...props }: SidebarProps) {
     }
   ];
 
-  const navGroups = user?.role === 'STUDENT' ? studentNavGroups : adminNavGroups;
+  const instructorNavGroups = [
+    {
+      title: "Teaching Hub",
+      items: [
+        { name: "Command Center", href: "/dashboard", icon: LayoutDashboard },
+        { name: "My Courses", href: "/dashboard/courses", icon: BookOpen },
+      ]
+    }
+  ];
+
+  const navGroups = user?.role === 'STUDENT' ? studentNavGroups : user?.role === 'INSTRUCTOR' ? instructorNavGroups : adminNavGroups;
 
   return (
     <aside

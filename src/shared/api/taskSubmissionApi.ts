@@ -18,7 +18,7 @@ export interface TaskSubmission {
   id: string;
   _id?: string;
   task_id: string;
-  student_id: {
+  submitter_id: {
     _id: string;
     firstName: string;
     lastName: string;

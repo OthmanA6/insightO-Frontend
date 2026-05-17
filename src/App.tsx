@@ -24,10 +24,17 @@ import MySubmissionsPage from '@/features/TaskManagement/pages/MySubmissionsPage
 import CourseDetailView from '@/features/TaskManagement/pages/CourseDetailView'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
+import InstructorDashboardPage from '@/features/InstructorPortal/pages/InstructorDashboardPage'
+import InstructorCourseManagement from '@/features/InstructorPortal/pages/InstructorCourseManagement'
+import InstructorCourseDetailView from '@/features/InstructorPortal/pages/InstructorCourseDetailView'
+
 function DashboardRouter() {
   const { user } = useAuth();
   if (user?.role === 'STUDENT') {
     return <StudentDashboardPage />;
+  }
+  if (user?.role === 'INSTRUCTOR') {
+    return <InstructorDashboardPage />;
   }
   return <DashboardPlaceholder />;
 }
@@ -51,6 +58,13 @@ function App() {
             <Route path="courses-tasks" element={<StudentCoursesAndTasksPage />} />
             <Route path="student-evaluations" element={<MySubmissionsPage />} />
             <Route path="student-courses/:courseId" element={<CourseDetailView />} />
+          </Route>
+
+          {/* Instructor routes */}
+          <Route element={<ProtectedRoute allowedRoles={['INSTRUCTOR']} />}>
+            <Route path="courses" element={<InstructorCourseManagement />} />
+            <Route path="courses/:courseId" element={<InstructorCourseDetailView />} />
+            <Route path="courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'HOD', 'INSTRUCTOR']} />}>
