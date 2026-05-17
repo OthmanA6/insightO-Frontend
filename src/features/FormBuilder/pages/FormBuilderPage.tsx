@@ -1,11 +1,11 @@
-import { useState, useCallback, useMemo, useEffect } from "react"
+import { useState, useCallback, useMemo, useEffect, useRef } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
   useSensors
 } from "@dnd-kit/core"
 import type { DragEndEvent } from "@dnd-kit/core"
@@ -15,11 +15,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import { 
-  Plus, 
-  Trash2, 
-  Settings, 
-  Eye, 
+import {
+  Plus,
+  Trash2,
+  Settings,
+  Eye,
   CheckSquare,
   ArrowLeft,
   Share2,
@@ -38,7 +38,11 @@ import {
   Copy,
   Check,
   Smartphone,
-  Monitor
+  Monitor,
+  Info,
+  Search,
+  AlertCircle,
+  ChevronDown
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/shared/lib/utils"
@@ -55,8 +59,12 @@ import type { Question, QuestionType, FormRole } from "../types/form.types"
 import { QuestionCard } from "../components/QuestionCard"
 import * as formApi from "../api/formApi"
 import * as departmentApi from "@/shared/api/departmentApi"
+import * as courseApi from "@/shared/api/courseApi"
+import * as userAdminApi from "@/shared/api/userAdminApi"
 import { uploadFile } from "@/shared/api/utilityApi"
 import type { Department } from "@/shared/api/departmentApi"
+import type { Course } from "@/shared/api/courseApi"
+import type { AdminUser } from "@/shared/api/userAdminApi"
 
 const INITIAL_QUESTIONS: Question[] = [
   {
@@ -69,12 +77,41 @@ const INITIAL_QUESTIONS: Question[] = [
   }
 ]
 
+const MOCK_COURSES = [
+  { id: 'c1', name: 'React Native Development', instructors: [{ id: 'i1', name: 'Dr. Ahmed' }, { id: 'i2', name: 'Eng. Sara' }] },
+  { id: 'c2', name: 'Advanced Node.js', instructors: [{ id: 'i3', name: 'Dr. Ali' }] }
+];
+
+const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative flex items-center group" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      {children}
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 5 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 5 }}
+            className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-[100] w-48 p-2 rounded-xl backdrop-blur-md bg-black/80 border border-white/10 text-[10px] font-bold text-slate-200 shadow-2xl pointer-events-none text-center"
+          >
+            {text}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+
+
 export default function FormBuilderPage() {
   const navigate = useNavigate()
   const { formId } = useParams<{ formId: string }>()
   const [isLoading, setIsLoading] = useState(!!formId)
-  
+
   // ─── Form Settings State ───
+  const [category, setCategory] = useState<"GENERAL" | "SPECIALIZED">("SPECIALIZED")
   const [formTitle, setFormTitle] = useState("New Evaluation Template")
   const [formDescription, setFormDescription] = useState("Provide feedback for the academic quarter.")
   const [evaluatorRoles, setEvaluatorRoles] = useState<FormRole[]>(["STUDENT"])
@@ -82,11 +119,16 @@ export default function FormBuilderPage() {
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [isActive, setIsActive] = useState(true)
   const [departmentId, setDepartmentId] = useState("")
+  const [courseId, setCourseId] = useState("")
+  const [instructorId, setInstructorId] = useState("")
   const [departments, setDepartments] = useState<Department[]>([])
+  const [courses, setCourses] = useState<Course[]>([])
+  const [instructors, setInstructors] = useState<AdminUser[]>([])
+  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({})
 
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS)
   const [activeId, setActiveId] = useState<string | null>("q1")
-  
+
   const [isPublishing, setIsPublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved")
 
@@ -104,21 +146,28 @@ export default function FormBuilderPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [deptData] = await Promise.all([
-          departmentApi.getAllDepartments()
+        const [deptData, courseData, userData] = await Promise.all([
+          departmentApi.getAllDepartments(),
+          courseApi.getCourses(),
+          userAdminApi.getAllUsers()
         ])
         setDepartments(deptData)
+        setCourses(courseData)
+        setInstructors(userData.filter(u => u.role === 'INSTRUCTOR'))
 
         if (formId) {
           const form = await formApi.getForm(formId)
           setFormTitle(form.title)
           setFormDescription(form.description || "")
+          setCategory(form.category || "SPECIALIZED")
           setEvaluatorRoles(form.evaluator_roles)
           setSubjectRole(form.subject_role)
           setIsAnonymous(form.is_anonymous)
           setIsActive(form.is_active)
           setDepartmentId(form.department_id || "")
-          
+          setCourseId(form.course_id || "")
+          setInstructorId(form.instructor_id || "")
+
           if (form.questions && form.questions.length > 0) {
             // Defensive mapping: Ensure questions have required fields for their type
             const sanitizedQuestions = form.questions.map((q: any) => ({
@@ -141,15 +190,15 @@ export default function FormBuilderPage() {
     fetchData()
   }, [formId])
 
-  const activeQuestion = useMemo(() => 
+  const activeQuestion = useMemo(() =>
     questions.find(q => q.id === activeId) || null
-  , [questions, activeId])
+    , [questions, activeId])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-        activationConstraint: {
-            distance: 8,
-        },
+      activationConstraint: {
+        distance: 8,
+      },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -200,10 +249,23 @@ export default function FormBuilderPage() {
       toast.error("Form title is too short (min 5 characters)")
       return
     }
-    if (!departmentId) {
-      toast.error("Please select a target Department")
+
+    // Validation for specialized fields
+    const errors: Record<string, boolean> = {}
+    if (category === "SPECIALIZED") {
+      if (!departmentId) errors.department = true
+      if (subjectRole === "COURSE") {
+        if (!courseId) errors.course = true
+        if (!instructorId) errors.instructor = true
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors)
+      setActiveId('title') // Focus on properties to show cues
       return
     }
+    setValidationErrors({})
     if (questions.length === 0) {
       toast.error("Please add at least one question")
       return
@@ -218,7 +280,7 @@ export default function FormBuilderPage() {
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
       const qNum = i + 1
-      
+
       if (q.label.trim().length < 3) {
         toast.error(`Question ${qNum}: Label must be at least 3 characters.`)
         return
@@ -244,6 +306,7 @@ export default function FormBuilderPage() {
         form = await formApi.updateFormSettings(formId, {
           title: formTitle,
           description: formDescription,
+          category: category,
           is_active: isActive,
           is_anonymous: isAnonymous
         })
@@ -252,11 +315,14 @@ export default function FormBuilderPage() {
         form = await formApi.createForm({
           title: formTitle,
           description: formDescription,
+          category: category,
           evaluator_roles: evaluatorRoles,
           subject_role: subjectRole,
           is_anonymous: isAnonymous,
           is_active: isActive,
-          department_id: departmentId
+          department_id: category === "SPECIALIZED" ? departmentId : undefined,
+          course_id: category === "SPECIALIZED" ? courseId : undefined,
+          instructor_id: category === "SPECIALIZED" ? instructorId : undefined,
         })
       }
 
@@ -277,7 +343,7 @@ export default function FormBuilderPage() {
 
         // If it has a MongoDB ID, it's an existing question
         const qId = q._id || (q.id?.length === 24 ? q.id : null);
-        
+
         if (qId) {
           await formApi.updateQuestion(qId, payload)
         } else {
@@ -297,9 +363,23 @@ export default function FormBuilderPage() {
   }
 
   const toggleRole = (role: FormRole) => {
-    setEvaluatorRoles(prev => 
+    setEvaluatorRoles(prev =>
       prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
     )
+  }
+
+  const handleCategoryChange = (newCategory: "GENERAL" | "SPECIALIZED") => {
+    if (newCategory === category) return
+    setCategory(newCategory)
+
+    // Clear irrelevant fields to keep payload clean
+    if (newCategory === "GENERAL") {
+      setDepartmentId("")
+      setCourseId("")
+      setInstructorId("")
+      setEvaluatorRoles(["STUDENT"]) // Reset to default
+      setSubjectRole("INSTRUCTOR")   // Reset to default
+    }
   }
 
   const handleCopyLink = () => {
@@ -348,14 +428,14 @@ export default function FormBuilderPage() {
           <div className="flex items-center gap-3">
             <LayoutGrid className="h-5 w-5 text-indigo-500" />
             <div className="flex flex-col">
-              <input 
-                type="text" 
-                value={formTitle} 
+              <input
+                type="text"
+                value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
                 className="bg-transparent text-sm font-black text-white border-none focus:ring-0 w-64 p-0 focus:outline-none"
               />
               <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
-                {saveStatus === 'Saving...' ? <Loader2 className="h-2 w-2 animate-spin" /> : <Save className="h-2 w-2" />} 
+                {saveStatus === 'Saving...' ? <Loader2 className="h-2 w-2 animate-spin" /> : <Save className="h-2 w-2" />}
                 Draft Sync: {saveStatus}
               </span>
             </div>
@@ -363,27 +443,27 @@ export default function FormBuilderPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button 
+          <Button
             className="h-10 flex items-center gap-2 rounded-xl bg-purple-500/10 border border-purple-500/30 px-4 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-white"
           >
             <Zap className="h-4 w-4" /> AI Generate
           </Button>
           <div className="h-6 w-px bg-white/10 mx-2"></div>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => setIsShareOpen(true)}
             className="h-10 px-4 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition-colors flex items-center gap-2"
           >
             <Share2 className="h-4 w-4" /> Share
           </Button>
-          <Button 
+          <Button
             variant="ghost"
             onClick={() => setIsPreviewOpen(true)}
             className="h-10 px-4 rounded-xl hover:bg-white/5 text-slate-300 text-xs font-bold transition-colors flex items-center gap-2"
           >
             <Eye className="h-4 w-4" /> Preview
           </Button>
-          <Button 
+          <Button
             onClick={handlePublish}
             disabled={isPublishing}
             className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2"
@@ -410,7 +490,7 @@ export default function FormBuilderPage() {
                 { type: 'linear_scale', label: 'Linear Scale', desc: 'Numerical rating (1-10)', icon: Star },
                 { type: 'file', label: 'File Provisioning', desc: 'Evidence & document upload', icon: Upload },
               ].map((field) => (
-                <button 
+                <button
                   key={field.type}
                   onClick={() => addQuestion(field.type as QuestionType)}
                   className="flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-[#0f111a] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-left group"
@@ -431,27 +511,27 @@ export default function FormBuilderPage() {
         {/* Main Canvas */}
         <section className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar bg-[#0f111a]" id="canvas-container">
           <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-          
+
           <div className="w-full max-w-3xl mx-auto py-16 px-6 relative z-10 flex flex-col gap-6 pb-40">
             {/* Title Block */}
-            <div 
+            <div
               className={cn(
                 "rounded-3xl bg-[#1e1b2e] p-10 shadow-2xl cursor-pointer transition-all duration-300 border-2",
                 activeId === 'title' ? "border-indigo-600 shadow-indigo-600/10" : "border-white/5 hover:border-white/10"
               )}
               onClick={() => setActiveId('title')}
             >
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
                 className="w-full bg-transparent text-4xl font-black text-white border-none focus:ring-0 p-0 mb-4 placeholder-slate-800 outline-none tracking-tight"
                 placeholder="Form Title"
               />
-              <textarea 
+              <textarea
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
-                className="w-full bg-transparent text-sm font-medium text-slate-400 border-none focus:ring-0 p-0 resize-none outline-none custom-scrollbar min-h-[60px]" 
+                className="w-full bg-transparent text-sm font-medium text-slate-400 border-none focus:ring-0 p-0 resize-none outline-none custom-scrollbar min-h-[60px]"
                 placeholder="Elaborate on the purpose and context of this evaluation..."
               />
             </div>
@@ -467,7 +547,7 @@ export default function FormBuilderPage() {
                           question={question}
                           isActive={activeId === question.id}
                           isSelected={false}
-                          onSelect={() => {}}
+                          onSelect={() => { }}
                           onActivate={setActiveId}
                           onDelete={deleteQuestion}
                           onUpdate={updateQuestion}
@@ -482,10 +562,10 @@ export default function FormBuilderPage() {
 
             {/* Visual Placeholder for New Field */}
             <div className="w-full h-24 border-2 border-dashed border-white/5 rounded-3xl flex items-center justify-center group hover:border-indigo-500/20 hover:bg-indigo-500/5 transition-all cursor-pointer" onClick={() => addQuestion('short_text')}>
-               <div className="flex items-center gap-3 text-slate-600 group-hover:text-indigo-400 transition-colors">
-                  <Plus className="h-6 w-6" />
-                  <span className="text-sm font-black uppercase tracking-widest">Append Data Node</span>
-               </div>
+              <div className="flex items-center gap-3 text-slate-600 group-hover:text-indigo-400 transition-colors">
+                <Plus className="h-6 w-6" />
+                <span className="text-sm font-black uppercase tracking-widest">Append Data Node</span>
+              </div>
             </div>
           </div>
         </section>
@@ -496,79 +576,216 @@ export default function FormBuilderPage() {
             <Settings className="h-4 w-4 text-indigo-500" />
             <h3 className="text-[10px] font-black text-slate-200 uppercase tracking-widest">Property Inspector</h3>
           </div>
-          
+
+          {/* Form Category Selector */}
+          <div className="p-4 border-b border-white/5 bg-white/[0.01]">
+            <div className="flex bg-[#0f111a] p-1 rounded-xl border border-white/5">
+              <button
+                onClick={() => handleCategoryChange("GENERAL")}
+                className={cn(
+                  "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
+                  category === "GENERAL" ? "bg-indigo-600 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
+                )}
+              >
+                General
+              </button>
+              <button
+                onClick={() => handleCategoryChange("SPECIALIZED")}
+                className={cn(
+                  "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
+                  category === "SPECIALIZED" ? "bg-amber-500 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
+                )}
+              >
+                Academic
+              </button>
+            </div>
+          </div>
+
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             {activeId === 'title' ? (
-              <div className="space-y-8 animate-in fade-in">
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Academic Department</Label>
-                    <select 
-                      value={departmentId}
-                      onChange={(e) => setDepartmentId(e.target.value)}
-                      className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
-                    >
-                      <option value="">Select Target Entity</option>
-                      {departments.map(dept => (
-                        <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Subject Entity</Label>
-                    <select 
-                      value={subjectRole}
-                      onChange={(e) => setSubjectRole(e.target.value as FormRole)}
-                      className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none"
-                    >
-                      <option value="INSTRUCTOR">Instructor</option>
-                      <option value="HOD">Head of Dept</option>
-                      <option value="STUDENT">Student Body</option>
-                      <option value="ADMIN">Administrator</option>
-                    </select>
-                  </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={category}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-8"
+                >
+                  <div className="space-y-6">
+                    {category === "GENERAL" ? (
+                      <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                        <div className="space-y-3">
+                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Contextual Description</Label>
+                          <textarea
+                            value={formDescription}
+                            onChange={(e) => setFormDescription(e.target.value)}
+                            className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-medium rounded-xl p-3 outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none custom-scrollbar"
+                            placeholder="Describe the purpose of this data collection..."
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-3">
+                          <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.department ? "text-red-400" : "text-slate-500")}>Academic Department</Label>
+                          <select
+                            value={departmentId}
+                            onChange={(e) => {
+                              setDepartmentId(e.target.value);
+                              if (e.target.value) setValidationErrors(prev => ({ ...prev, department: false }));
+                            }}
+                            className={cn(
+                              "w-full bg-[#0f111a] border text-white text-xs font-bold rounded-xl p-3 outline-none transition-all focus:border-indigo-500",
+                              validationErrors.department ? "border-red-500/50" : "border-white/10"
+                            )}
+                          >
+                            <option value="">Select Target Entity</option>
+                            {departments.map(dept => (
+                              <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
+                            ))}
+                          </select>
+                        </div>
 
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Evaluator Audience</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {["STUDENT", "INSTRUCTOR", "HOD", "ADMIN"].map(role => (
-                        <button
-                          key={role}
-                          onClick={() => toggleRole(role as FormRole)}
-                          className={cn(
-                            "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
-                            evaluatorRoles.includes(role as FormRole)
-                              ? "bg-indigo-600 border-indigo-500 text-white"
-                              : "bg-[#0f111a] border-white/5 text-slate-500 hover:text-slate-300"
+                        <div className="space-y-3">
+                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Subject Entity</Label>
+                          <select
+                            value={subjectRole}
+                            onChange={(e) => {
+                              setSubjectRole(e.target.value as FormRole);
+                              setCourseId("");
+                              setInstructorId("");
+                            }}
+                            className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
+                          >
+                            <option value="INSTRUCTOR">Instructor</option>
+                            <option value="COURSE">Course</option>
+                            <option value="ADMIN">Administrator</option>
+                            <option value="HOD">Head of Department</option>
+                          </select>
+                        </div>
+
+                        {/* Cascading Logic: Select Course -> Select Instructor */}
+                        <AnimatePresence>
+                          {subjectRole === "COURSE" && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="space-y-6 overflow-hidden"
+                            >
+                              <div className="space-y-3">
+                                <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.course ? "text-red-400" : "text-slate-500")}>Select Course</Label>
+                                <div className="relative">
+                                  <select 
+                                    value={courseId}
+                                    onChange={(e) => {
+                                      setCourseId(e.target.value);
+                                      setInstructorId("");
+                                      if (e.target.value) setValidationErrors(prev => ({ ...prev, course: false }));
+                                    }}
+                                    className={cn(
+                                      "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                      validationErrors.course ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
+                                    )}
+                                  >
+                                    <option value="" disabled hidden>Choose Course...</option>
+                                    {MOCK_COURSES.map(course => (
+                                      <option key={course.id} value={course.id}>{course.name}</option>
+                                    ))}
+                                  </select>
+                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
+                                </div>
+                              </div>
+
+                              <AnimatePresence>
+                                {courseId && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="space-y-3 overflow-hidden"
+                                  >
+                                    <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.instructor ? "text-red-400" : "text-slate-500")}>Target Instructor</Label>
+                                    <div className="relative">
+                                      <select 
+                                        value={instructorId}
+                                        onChange={(e) => {
+                                          setInstructorId(e.target.value);
+                                          if (e.target.value) setValidationErrors(prev => ({ ...prev, instructor: false }));
+                                        }}
+                                        className={cn(
+                                          "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                          validationErrors.instructor ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
+                                        )}
+                                      >
+                                        <option value="" disabled hidden>Select Instructor...</option>
+                                        {(MOCK_COURSES.find(c => c.id === courseId)?.instructors || []).map(inst => (
+                                          <option key={inst.id} value={inst.id}>{inst.name}</option>
+                                        ))}
+                                      </select>
+                                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
                           )}
-                        >
-                          {role}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                        </AnimatePresence>
 
-                  <div className="space-y-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">Anonymize Responses</span>
-                      <Switch checked={isAnonymous} onCheckedChange={setIsAnonymous} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-400">Availability Status</span>
-                      <Switch checked={isActive} onCheckedChange={setIsActive} />
+                        <div className="space-y-3">
+                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Evaluator Audience</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {["STUDENT", "INSTRUCTOR", "HOD"].map(role => (
+                              <button
+                                key={role}
+                                onClick={() => toggleRole(role as FormRole)}
+                                className={cn(
+                                  "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
+                                  evaluatorRoles.includes(role as FormRole)
+                                    ? "bg-indigo-600 border-indigo-500 text-white"
+                                    : "bg-[#0f111a] border-white/5 text-slate-500 hover:text-slate-300"
+                                )}
+                              >
+                                {role}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-400">Anonymize Responses</span>
+                          <Tooltip text="Hides respondent identity from the instructor and analytics dashboard.">
+                            <Info className="h-3 w-3 text-slate-600 cursor-help hover:text-indigo-400 transition-colors" />
+                          </Tooltip>
+                        </div>
+                        <Switch checked={isAnonymous} onCheckedChange={setIsAnonymous} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-400">Availability Status</span>
+                          <Tooltip text="Controls whether the form is currently open for submissions.">
+                            <Info className="h-3 w-3 text-slate-600 cursor-help hover:text-indigo-400 transition-colors" />
+                          </Tooltip>
+                        </div>
+                        <Switch checked={isActive} onCheckedChange={setIsActive} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </AnimatePresence>
             ) : activeQuestion ? (
               <div className="space-y-8 animate-in fade-in">
                 <div className="p-4 rounded-2xl bg-[#0f111a] border border-white/5 flex flex-col gap-2">
-                   <span className="text-[9px] font-black text-slate-600 uppercase">Field Classification</span>
-                   <div className="flex items-center gap-3">
-                      <Lock className="h-3.5 w-3.5 text-indigo-500" />
-                      <span className="text-xs font-black text-white uppercase tracking-wider">{activeQuestion.type.replace('_', ' ')}</span>
-                   </div>
+                  <span className="text-[9px] font-black text-slate-600 uppercase">Field Classification</span>
+                  <div className="flex items-center gap-3">
+                    <Lock className="h-3.5 w-3.5 text-indigo-500" />
+                    <span className="text-xs font-black text-white uppercase tracking-wider">{activeQuestion.type.replace('_', ' ')}</span>
+                  </div>
                 </div>
 
                 <div className="space-y-6">
@@ -579,11 +796,11 @@ export default function FormBuilderPage() {
                     </div>
                     <Switch checked={activeQuestion.required} onCheckedChange={(val) => updateQuestion(activeQuestion.id!, { required: val })} />
                   </div>
-                  
+
                   {activeQuestion.type === "linear_scale" && (
                     <div className="space-y-3">
                       <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Scale Amplitude (1-10)</Label>
-                      <Input 
+                      <Input
                         type="number" min={1} max={10}
                         value={activeQuestion.scale?.max || 5}
                         onChange={(e) => updateQuestion(activeQuestion.id!, { scale: { min: 1, max: Number(e.target.value) } })}
@@ -594,41 +811,41 @@ export default function FormBuilderPage() {
 
                   {activeQuestion.type === "multiple_choice" && (
                     <div className="space-y-4">
-                       <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Choice Options</Label>
-                       <div className="space-y-2">
-                         {activeQuestion.options?.map((opt, idx) => (
-                           <div key={idx} className="flex gap-2">
-                             <Input 
-                               value={opt}
-                               onChange={(e) => {
-                                 const next = [...(activeQuestion.options || [])]
-                                 next[idx] = e.target.value
-                                 updateQuestion(activeQuestion.id!, { options: next })
-                               }}
-                               className="bg-[#0f111a] border-white/10 text-white h-9 rounded-lg text-xs"
-                             />
-                             <button 
-                               onClick={() => updateQuestion(activeQuestion.id!, { options: activeQuestion.options?.filter((_, i) => i !== idx) })}
-                               className="p-2 text-slate-600 hover:text-red-400"
-                             >
-                               <X className="h-4 w-4" />
-                             </button>
-                           </div>
-                         ))}
-                         <Button 
-                           variant="ghost" size="sm" 
-                           onClick={() => updateQuestion(activeQuestion.id!, { options: [...(activeQuestion.options || []), `New Option`] })}
-                           className="w-full text-[9px] uppercase font-black tracking-widest text-indigo-500 hover:bg-indigo-500/5"
-                         >
-                           + Add New Path
-                         </Button>
-                       </div>
+                      <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Choice Options</Label>
+                      <div className="space-y-2">
+                        {activeQuestion.options?.map((opt, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <Input
+                              value={opt}
+                              onChange={(e) => {
+                                const next = [...(activeQuestion.options || [])]
+                                next[idx] = e.target.value
+                                updateQuestion(activeQuestion.id!, { options: next })
+                              }}
+                              className="bg-[#0f111a] border-white/10 text-white h-9 rounded-lg text-xs"
+                            />
+                            <button
+                              onClick={() => updateQuestion(activeQuestion.id!, { options: activeQuestion.options?.filter((_, i) => i !== idx) })}
+                              className="p-2 text-slate-600 hover:text-red-400"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <Button
+                          variant="ghost" size="sm"
+                          onClick={() => updateQuestion(activeQuestion.id!, { options: [...(activeQuestion.options || []), `New Option`] })}
+                          className="w-full text-[9px] uppercase font-black tracking-widest text-indigo-500 hover:bg-indigo-500/5"
+                        >
+                          + Add New Path
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
 
                 <div className="pt-8 border-t border-white/5">
-                  <Button 
+                  <Button
                     variant="ghost"
                     onClick={() => deleteQuestion(activeId!)}
                     className="w-full py-6 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/20 text-red-400 text-xs font-black transition-all flex items-center justify-center gap-3 uppercase tracking-widest"
@@ -650,7 +867,7 @@ export default function FormBuilderPage() {
       {/* ── PREVIEW MODAL ─────────────────────────────────────────────────── */}
       <AnimatePresence>
         {isPreviewOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-[#0a0a0f] flex flex-col overflow-hidden"
           >
@@ -658,13 +875,13 @@ export default function FormBuilderPage() {
               <div className="flex items-center gap-6">
                 <span className="text-xs font-black uppercase tracking-widest text-indigo-500">Preview Engine v1.0</span>
                 <div className="flex bg-white/5 rounded-xl p-1 gap-1">
-                  <button 
+                  <button
                     onClick={() => setIsPreviewMobile(false)}
                     className={cn("p-2 rounded-lg transition-all", !isPreviewMobile ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-white")}
                   >
                     <Monitor className="h-4 w-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsPreviewMobile(true)}
                     className={cn("p-2 rounded-lg transition-all", isPreviewMobile ? "bg-indigo-600 text-white" : "text-slate-500 hover:text-white")}
                   >
@@ -696,29 +913,29 @@ export default function FormBuilderPage() {
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 text-sm font-black">{i + 1}</span>
                           <h3 className="text-lg font-bold dark:text-slate-100 leading-snug">{q.label}{q.required && <span className="text-red-500 ml-1">*</span>}</h3>
                         </div>
-                        
+
                         <div className="pl-12">
                           {q.type === 'short_text' && (
-                            <Input 
+                            <Input
                               value={previewAnswers[q._id || q.id!] || ""}
                               onChange={(e) => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: e.target.value }))}
-                              placeholder="Short response text" 
-                              className="bg-transparent border-slate-300 dark:border-white/10" 
+                              placeholder="Short response text"
+                              className="bg-transparent border-slate-300 dark:border-white/10"
                             />
                           )}
                           {q.type === 'long_text' && (
-                            <textarea 
+                            <textarea
                               value={previewAnswers[q._id || q.id!] || ""}
                               onChange={(e) => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: e.target.value }))}
-                              placeholder="Detailed narrative response" 
-                              className="w-full bg-transparent border border-slate-300 dark:border-white/10 rounded-xl p-4 min-h-[100px] text-sm focus:ring-indigo-500 outline-none transition-all" 
+                              placeholder="Detailed narrative response"
+                              className="w-full bg-transparent border border-slate-300 dark:border-white/10 rounded-xl p-4 min-h-[100px] text-sm focus:ring-indigo-500 outline-none transition-all"
                             />
                           )}
                           {q.type === 'multiple_choice' && (
                             <div className="space-y-3">
                               {q.options?.map((opt, idx) => (
-                                <div 
-                                  key={idx} 
+                                <div
+                                  key={idx}
                                   onClick={() => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: opt }))}
                                   className={cn(
                                     "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
@@ -738,26 +955,26 @@ export default function FormBuilderPage() {
                           )}
                           {q.type === 'linear_scale' && (
                             <div className="flex flex-col gap-4">
-                               <div className="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                  <span>{q.scale?.min || 1} (Poor)</span>
-                                  <span>{q.scale?.max || 5} (Excellent)</span>
-                               </div>
-                               <div className="flex gap-2">
-                                  {Array.from({ length: (q.scale?.max || 5) }, (_, idx) => idx + 1).map(val => (
-                                    <div 
-                                      key={val} 
-                                      onClick={() => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: val }))}
-                                      className={cn(
-                                        "h-12 flex-1 flex items-center justify-center rounded-xl border text-sm font-black transition-all cursor-pointer",
-                                        previewAnswers[q._id || q.id!] === val
-                                          ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
-                                          : "border-slate-200 dark:border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-indigo-500"
-                                      )}
-                                    >
-                                      {val}
-                                    </div>
-                                  ))}
-                               </div>
+                              <div className="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                <span>{q.scale?.min || 1} (Poor)</span>
+                                <span>{q.scale?.max || 5} (Excellent)</span>
+                              </div>
+                              <div className="flex gap-2">
+                                {Array.from({ length: (q.scale?.max || 5) }, (_, idx) => idx + 1).map(val => (
+                                  <div
+                                    key={val}
+                                    onClick={() => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: val }))}
+                                    className={cn(
+                                      "h-12 flex-1 flex items-center justify-center rounded-xl border text-sm font-black transition-all cursor-pointer",
+                                      previewAnswers[q._id || q.id!] === val
+                                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
+                                        : "border-slate-200 dark:border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-indigo-500"
+                                    )}
+                                  >
+                                    {val}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                           {q.type === 'file' && (
@@ -767,9 +984,9 @@ export default function FormBuilderPage() {
                                 previewUploads[q.id!]?.loading ? "border-indigo-500/50 bg-indigo-500/5" : "border-slate-300 dark:border-white/10 hover:border-indigo-500/30",
                                 previewUploads[q.id!]?.url ? "border-emerald-500/30 bg-emerald-500/5" : ""
                               )}>
-                                <input 
-                                  type="file" 
-                                  className="hidden" 
+                                <input
+                                  type="file"
+                                  className="hidden"
                                   onChange={(e) => e.target.files?.[0] && handlePreviewFileUpload(q.id!, e.target.files[0])}
                                 />
                                 {previewUploads[q.id!]?.loading ? (
@@ -798,12 +1015,12 @@ export default function FormBuilderPage() {
                   </div>
 
                   <div className="pt-10 border-t border-slate-200 dark:border-white/5">
-                     <Button 
-                       onClick={handleSimulatedSubmit}
-                       className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/20"
-                     >
-                       Finalize Submission
-                     </Button>
+                    <Button
+                      onClick={handleSimulatedSubmit}
+                      className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/20"
+                    >
+                      Finalize Submission
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -818,10 +1035,10 @@ export default function FormBuilderPage() {
         onClose={() => setIsShareOpen(false)}
         title={
           <div className="flex items-center gap-3">
-             <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
-                <Share2 className="h-4 w-4" />
-             </div>
-             <span className="font-black text-white uppercase tracking-widest">Distribute Architecture</span>
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+              <Share2 className="h-4 w-4" />
+            </div>
+            <span className="font-black text-white uppercase tracking-widest">Distribute Architecture</span>
           </div>
         }
         size="sm"
@@ -829,36 +1046,36 @@ export default function FormBuilderPage() {
         <div className="space-y-8 py-4">
           <div className="flex flex-col items-center text-center gap-6">
             <div className="p-4 rounded-3xl bg-white shadow-2xl shadow-indigo-500/10">
-               <QRCodeCanvas value={shareUrl} size={180} level="H" includeMargin />
+              <QRCodeCanvas value={shareUrl} size={180} level="H" includeMargin />
             </div>
             <div>
-               <h4 className="text-lg font-black text-white">Quantum Link Provisioned</h4>
-               <p className="text-xs text-slate-500 mt-1 font-medium">Any respondent with this encrypted link can participate in the data collection cycle.</p>
+              <h4 className="text-lg font-black text-white">Quantum Link Provisioned</h4>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Any respondent with this encrypted link can participate in the data collection cycle.</p>
             </div>
           </div>
 
           <div className="space-y-3">
-             <Label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Universal Resource Locator</Label>
-             <div className="relative group">
-                <Input 
-                  readOnly 
-                  value={shareUrl}
-                  className="bg-[#0f111a] border-white/10 text-indigo-400 h-12 pr-12 rounded-xl font-bold truncate focus:ring-indigo-500"
-                />
-                <button 
-                  onClick={handleCopyLink}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white transition-all"
-                >
-                  {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                </button>
-             </div>
+            <Label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Universal Resource Locator</Label>
+            <div className="relative group">
+              <Input
+                readOnly
+                value={shareUrl}
+                className="bg-[#0f111a] border-white/10 text-indigo-400 h-12 pr-12 rounded-xl font-bold truncate focus:ring-indigo-500"
+              />
+              <button
+                onClick={handleCopyLink}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white transition-all"
+              >
+                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex gap-3">
-             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
-             <p className="text-[10px] text-amber-500 font-bold leading-relaxed uppercase tracking-wider">
-                Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
-             </p>
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
+            <p className="text-[10px] text-amber-500 font-bold leading-relaxed uppercase tracking-wider">
+              Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
+            </p>
           </div>
         </div>
       </Modal>

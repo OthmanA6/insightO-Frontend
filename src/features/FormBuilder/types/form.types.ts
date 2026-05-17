@@ -23,16 +23,19 @@ export type Question = {
   ai_tag?: string; // Optional utility
 };
 
-export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT";
+export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT" | "COURSE";
 
 export type FormSettings = {
   title: string;
   description: string;
+  category: "GENERAL" | "SPECIALIZED";
   evaluator_roles: FormRole[];
   subject_role: FormRole;
   is_anonymous: boolean;
   is_active: boolean;
-  department_id: string;
+  department_id?: string;
+  course_id?: string;
+  instructor_id?: string;
 };
 
 export type Form = FormSettings & {
@@ -53,7 +56,7 @@ export type CreateQuestionPayload = Omit<Question, 'id'>;
 
 // Partial update payload for PATCH /v1/form/:id/settings
 export type UpdateFormSettingsPayload = Partial<Pick<FormSettings,
-  'title' | 'description' | 'is_active' | 'is_anonymous'
+  'title' | 'description' | 'is_active' | 'is_anonymous' | 'category'
 >>;
 
 // Partial update payload for PATCH /v1/questions/:id
