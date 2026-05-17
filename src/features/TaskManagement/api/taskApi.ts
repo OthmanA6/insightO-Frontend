@@ -38,6 +38,7 @@ export interface CreateTaskPayload {
   }[];
   ai_grading_rubric?: string;
   deadline: string;
+  status?: 'ACTIVE' | 'CLOSED';
 }
 
 export const createTask = async (payload: CreateTaskPayload): Promise<Task> => {

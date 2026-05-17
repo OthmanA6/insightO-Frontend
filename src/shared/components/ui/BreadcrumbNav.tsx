@@ -9,10 +9,12 @@ export interface BreadcrumbItem {
 
 interface BreadcrumbNavProps {
   items: BreadcrumbItem[];
+  homeItem?: { label: string; href: string };
   className?: string;
 }
 
-export function BreadcrumbNav({ items, className }: BreadcrumbNavProps) {
+// 🚨 الحل هنا: ضفنا homeItem في الـ Destructuring
+export function BreadcrumbNav({ items, homeItem, className }: BreadcrumbNavProps) {
   return (
     <nav
       aria-label="Breadcrumb"
@@ -22,16 +24,17 @@ export function BreadcrumbNav({ items, className }: BreadcrumbNavProps) {
       )}
     >
       <Link
-        to="/dashboard/departments"
+        to={homeItem?.href || "/dashboard/departments"}
         className="flex items-center gap-1.5 text-slate-500 hover:text-indigo-400 transition-colors group"
       >
         <Home className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
         <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider">
-          Departments
+          {homeItem?.label || "Departments"}
         </span>
       </Link>
 
-      {items.map((item, index) => {
+      {/* ضفنا علامة الاستفهام للأمان عشان لو مفيش items ميعملش كراش */}
+      {items?.map((item, index) => {
         const isLast = index === items.length - 1;
 
         return (

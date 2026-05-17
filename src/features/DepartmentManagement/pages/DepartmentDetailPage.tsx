@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Building2, BookOpen, Plus, Search, MoreVertical, Trash2,
+  Building2, BookOpen, Plus, Search, MoreVertical, Trash2, Edit3,
   Users, GraduationCap, Clock, ChevronRight, Loader2, Filter,
   Download,
 } from 'lucide-react';
@@ -38,6 +38,36 @@ export default function DepartmentDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!departmentId || departmentId === 'undefined') return;
+    setIsLoading(true);
+    try {
+      const [dept, allCourses, allUsers] = await Promise.all([
+        departmentApi.getDepartment(departmentId),
+        courseApi.getCourses(),
+        userAdminApi.getAllUsers(),
+      ]);
+      setDepartment(dept);
+      setUsers(allUsers);
+      // Filter courses belonging to this department
+      // Handle populated references: departmentId may be an object { _id, name } or a plain string
+      const deptCourses = allCourses.filter((c: any) => {
+        const raw = c.departmentId ?? c.department_id;
+        const cDeptId =
+          typeof raw === 'object' && raw !== null
+            ? raw._id || raw.id
+            : raw;
+        return cDeptId === departmentId;
+      });
+      setCourses(deptCourses);
+    } catch (error) {
+      toast.error('Failed to load department data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [departmentId]);
 
   useEffect(() => {
     // ── Guard: prevent API calls with invalid/undefined departmentId ──
@@ -46,36 +76,8 @@ export default function DepartmentDetailPage() {
       navigate('/dashboard/departments');
       return;
     }
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [dept, allCourses, allUsers] = await Promise.all([
-          departmentApi.getDepartment(departmentId),
-          courseApi.getCourses(),
-          userAdminApi.getAllUsers(),
-        ]);
-        setDepartment(dept);
-        setUsers(allUsers);
-        // Filter courses belonging to this department
-        // Handle populated references: departmentId may be an object { _id, name } or a plain string
-        const deptCourses = allCourses.filter((c: any) => {
-          const raw = c.departmentId ?? c.department_id;
-          const cDeptId =
-            typeof raw === 'object' && raw !== null
-              ? raw._id || raw.id
-              : raw;
-          return cDeptId === departmentId;
-        });
-        setCourses(deptCourses);
-      } catch (error) {
-        toast.error('Failed to load department data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchData();
-  }, [departmentId, navigate]);
+  }, [departmentId, navigate, fetchData]);
 
   const studentsCount = useMemo(
     () =>
@@ -127,23 +129,31 @@ export default function DepartmentDetailPage() {
 
   const handleSaveCourse = async (payload: CreateCoursePayload, studentIds?: string[]) => {
     try {
-      const newCourse = await courseApi.createCourse(payload);
-      // Enroll students if any were selected
-      const courseId = (newCourse as any)._id || newCourse.id;
-      if (studentIds && studentIds.length > 0 && courseId) {
-        try {
-          await courseApi.enrollStudents(courseId, studentIds);
-          toast.success(`Course created & ${studentIds.length} student(s) enrolled`);
-        } catch {
-          toast.success('Course created, but student enrollment failed');
-        }
+      let savedCourse: Course;
+      const isEditing = !!editingCourse;
+
+      // Inject studentIds into the main payload so the backend handles it in one atomic transaction
+      const completePayload = {
+        ...payload,
+        ...(studentIds !== undefined ? { studentIds } : {})
+      };
+
+      if (isEditing) {
+        const courseId = getSafeId(editingCourse);
+        savedCourse = await courseApi.updateCourse(courseId!, completePayload);
+        toast.success('Course updated successfully');
       } else {
+        savedCourse = await courseApi.createCourse(completePayload);
         toast.success('Course created successfully');
       }
-      setCourses((prev) => [...prev, newCourse]);
+
       setIsCourseModalOpen(false);
+      setEditingCourse(null);
+
+      // CRITICAL: Fetch fresh data to pull counts and names (instructor & students)
+      await fetchData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to create course');
+      toast.error(error.response?.data?.message || `Failed to ${editingCourse ? 'update' : 'create'} course`);
     }
   };
 
@@ -160,7 +170,7 @@ export default function DepartmentDetailPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-indigo-500" />
+            <Building2 className="h-8 w-8 text-indigo-500"/>
             {department?.name || 'Department'}
           </h2>
           <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">
@@ -171,15 +181,18 @@ export default function DepartmentDetailPage() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-xl border-white/10 hover:bg-white/5 text-slate-300 font-bold"
+            className="h-12 px-6 rounded-xl border-white/10 hover:bg-[#1a1d29] text-slate-300 font-bold"
           >
-            <Download className="mr-2 h-4 w-4" /> Export
+            <Download className="mr-2 h-4 w-4"/> Export
           </Button>
           <Button
-            onClick={() => setIsCourseModalOpen(true)}
-            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-xl shadow-indigo-500/20 transition-all flex items-center gap-2"
+            onClick={() => {
+              setEditingCourse(null);
+              setIsCourseModalOpen(true);
+            }}
+            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5"/>
             Create Course
           </Button>
         </div>
@@ -187,14 +200,14 @@ export default function DepartmentDetailPage() {
 
       {/* Department Info Card */}
       {department && (
-        <div className="p-6 rounded-3xl bg-[#1e1b2e] border border-white/5 shadow-2xl">
+        <div className="p-6 rounded-3xl bg-[#13151f] border border-white/5">
           <p className="text-sm text-slate-400 leading-relaxed italic">
             "{department.description || 'No description provided for this academic entity.'}"
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/5">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5 text-indigo-400">
-                <BookOpen className="h-4 w-4" />
+              <div className="p-2 rounded-lg bg-[#1a1d29] text-indigo-400">
+                <BookOpen className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Courses</span>
@@ -202,8 +215,8 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5 text-emerald-400">
-                <Users className="h-4 w-4" />
+              <div className="p-2 rounded-lg bg-[#1a1d29] text-emerald-400">
+                <Users className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Students</span>
@@ -211,8 +224,8 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5 text-purple-400">
-                <GraduationCap className="h-4 w-4" />
+              <div className="p-2 rounded-lg bg-[#1a1d29] text-purple-400">
+                <GraduationCap className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Instructors</span>
@@ -220,8 +233,8 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5 text-amber-400">
-                <Clock className="h-4 w-4" />
+              <div className="p-2 rounded-lg bg-[#1a1d29] text-amber-400">
+                <Clock className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Created</span>
@@ -235,7 +248,7 @@ export default function DepartmentDetailPage() {
           </div>
           <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-black text-white shadow-lg shadow-indigo-500/20">
+              <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-black text-white shadow-indigo-500/20">
                 {hodUser ? `${hodUser.firstName.charAt(0)}${hodUser.lastName.charAt(0)}` : '?'}
               </div>
               <div className="flex flex-col">
@@ -246,16 +259,16 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
             <div className="hidden md:block">
-               <Badge variant="outline" className="border-white/5 text-slate-500 text-[10px] uppercase font-bold">
-                 Sync Status: {isLoading ? 'Updating...' : 'Live'}
-               </Badge>
+              <Badge variant="outline"className="border-white/5 text-slate-500 text-[10px] uppercase font-bold">
+                Sync Status: {isLoading ? 'Updating...' : 'Live'}
+              </Badge>
             </div>
           </div>
         </div>
       )}
 
       {/* Control Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#1e1b2e] p-4 rounded-3xl border border-white/5 shadow-2xl">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#13151f] p-4 rounded-3xl border border-white/5">
         <div className="w-full lg:w-96 relative group">
           <Input
             value={searchQuery}
@@ -263,17 +276,17 @@ export default function DepartmentDetailPage() {
             placeholder="Search courses by name or code..."
             className="h-12 rounded-2xl bg-[#0f111a] border-white/5 text-white pl-12 pr-4 font-bold"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-500 transition-colors"/>
         </div>
 
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <Button
             variant="ghost"
-            className="text-slate-400 font-bold hover:text-white hover:bg-white/5"
+            className="text-slate-400 font-bold hover:text-white hover:bg-[#1a1d29]"
           >
-            <Filter className="mr-2 h-4 w-4" /> All
+            <Filter className="mr-2 h-4 w-4"/> All
           </Button>
-          <div className="h-8 w-px bg-white/5 mx-2 hidden lg:block" />
+          <div className="h-8 w-px bg-[#1a1d29] mx-2 hidden lg:block"/>
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
             Courses: {filteredCourses.length}
           </p>
@@ -284,14 +297,14 @@ export default function DepartmentDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {isLoading ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+            <Loader2 className="h-10 w-10 animate-spin text-indigo-500"/>
             <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
               Loading Courses...
             </p>
           </div>
         ) : filteredCourses.length === 0 ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4 opacity-20">
-            <BookOpen className="h-16 w-16 text-slate-500" />
+            <BookOpen className="h-16 w-16 text-slate-500"/>
             <p className="text-lg font-bold text-slate-500">
               No courses found in this department
             </p>
@@ -302,7 +315,7 @@ export default function DepartmentDetailPage() {
             return (
               <div
                 key={courseId}
-                className="group relative rounded-3xl bg-[#1e1b2e] border border-white/5 hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6 cursor-pointer"
+                className="group relative rounded-3xl bg-[#13151f] border border-white/5 hover:border-indigo-500/50 transition-[border-color,background-color] p-8 flex flex-col gap-6 cursor-pointer"
                 onClick={() =>
                   navigate(
                     `/dashboard/departments/${departmentId}/courses/${courseId}`,
@@ -312,7 +325,7 @@ export default function DepartmentDetailPage() {
                 <div className="flex justify-between items-start">
                   <div className="flex gap-4">
                     <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5">
-                      <BookOpen className="h-8 w-8" />
+                      <BookOpen className="h-8 w-8"/>
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">
@@ -348,10 +361,10 @@ export default function DepartmentDetailPage() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="h-10 w-10 p-0 rounded-xl hover:bg-white/5"
+                        className="h-10 w-10 p-0 rounded-xl hover:bg-[#1a1d29]"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <MoreVertical className="h-5 w-5 text-slate-500" />
+                        <MoreVertical className="h-5 w-5 text-slate-500"/>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -361,11 +374,22 @@ export default function DepartmentDetailPage() {
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
+                          setEditingCourse(course);
+                          setIsCourseModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 hover:bg-[#1a1d29] font-bold py-3 text-slate-300 cursor-pointer"
+                      >
+                        <Edit3 className="h-4 w-4"/> Edit Course
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleDeleteCourse(courseId);
                         }}
                         className="flex items-center gap-2 hover:bg-red-500/10 font-bold py-3 text-red-400 cursor-pointer"
                       >
-                        <Trash2 className="h-4 w-4" /> Delete Course
+                        <Trash2 className="h-4 w-4"/> Delete Course
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -377,8 +401,8 @@ export default function DepartmentDetailPage() {
 
                 <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-white/5 text-indigo-400">
-                      <GraduationCap className="h-4 w-4" />
+                    <div className="p-2 rounded-lg bg-[#1a1d29] text-indigo-400">
+                      <GraduationCap className="h-4 w-4"/>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-black text-slate-600 uppercase">
@@ -387,16 +411,18 @@ export default function DepartmentDetailPage() {
                       <span className="text-xs font-bold text-slate-200">
                         {(() => {
                           const inst = course.instructorId as any;
-                          return inst && typeof inst === 'object'
-                            ? `${inst.firstName} ${inst.lastName}`
-                            : 'Not assigned';
+                          if (inst && typeof inst === 'object') {
+                            return `${inst.firstName} ${inst.lastName}`;
+                          }
+                          const found = users.find((u) => (u._id || u.id) === inst);
+                          return found ? `${found.firstName} ${found.lastName}` : 'Not assigned';
                         })()}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-white/5 text-purple-400">
-                      <Users className="h-4 w-4" />
+                    <div className="p-2 rounded-lg bg-[#1a1d29] text-purple-400">
+                      <Users className="h-4 w-4"/>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-black text-slate-600 uppercase">
@@ -428,7 +454,7 @@ export default function DepartmentDetailPage() {
                     }}
                   >
                     View Tasks{' '}
-                    <ChevronRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <ChevronRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform"/>
                   </Button>
                 </div>
               </div>
@@ -440,7 +466,11 @@ export default function DepartmentDetailPage() {
       {/* Course Creation Modal */}
       <CourseModal
         open={isCourseModalOpen}
-        onClose={() => setIsCourseModalOpen(false)}
+        onClose={() => {
+          setIsCourseModalOpen(false);
+          setEditingCourse(null);
+        }}
+        course={editingCourse}
         departmentId={departmentId!}
         onSave={handleSaveCourse}
       />

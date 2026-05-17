@@ -22,15 +22,16 @@ interface CourseModalProps {
   onSave: (payload: CreateCoursePayload, studentIds?: string[]) => Promise<void>;
 }
 
+/** Helper to handle populated MongoDB fields (_id or id) */
+const getSafeId = (val: any) => (typeof val === 'object' && val !== null ? val._id || val.id : val);
+
 /** Safely resolve a user ID from either MongoDB's _id or normalized id */
-const resolveUserId = (u: AdminUser): string => (u as any)._id || u.id;
+const resolveUserId = (u: AdminUser): string => getSafeId(u);
 
 /** Safely resolve a user's departmentId, which may be a populated object or string */
 const resolveUserDeptId = (u: AdminUser): string | undefined => {
   const raw = (u as any).departmentId ?? (u as any).profile?.data?.departmentId;
-  if (!raw) return undefined;
-  if (typeof raw === 'object' && raw !== null) return raw._id || raw.id;
-  return raw;
+  return getSafeId(raw);
 };
 
 export function CourseModal({ open, onClose, departmentId, course, onSave }: CourseModalProps) {
@@ -49,7 +50,7 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
 
   // ── Student selection ──
   const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
-  const [deptFilterOn, setDeptFilterOn] = useState(true);
+  const [deptFilterOn, setDeptFilterOn] = useState(false);
   const [studentSearch, setStudentSearch] = useState('');
 
   // Fetch users when modal opens
@@ -75,10 +76,9 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
       setName(course.name);
       setCourseCode(course.courseCode);
       setDescription(course.description || '');
-      setInstructorId(course.instructorId || '');
+      setInstructorId(getSafeId(course.instructorId) || '');
       setCredits(course.credits ?? '');
-      // Pre-select enrolled students if available
-      setSelectedStudentIds(new Set(course.enrolledStudents ?? []));
+      // Selection is handled by the useEffect watching allUsers + course below
     } else {
       setName('');
       setCourseCode('');
@@ -89,6 +89,21 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
     }
     setStudentSearch('');
   }, [course, open]);
+
+  // ── Pre-select enrolled students based on user profiles ──
+  useEffect(() => {
+    if (course && allUsers.length > 0) {
+      const courseId = getSafeId(course);
+      const enrolledIds = allUsers
+        .filter((u) => {
+          if (u.role !== 'STUDENT') return false;
+          const courses = (u as any).profile?.data?.enrolledCourses || [];
+          return courses.some((cId: any) => getSafeId(cId) === courseId);
+        })
+        .map((u) => getSafeId(u));
+      setSelectedStudentIds(new Set(enrolledIds));
+    }
+  }, [course, allUsers]);
 
   // ── Derived lists ──
   const instructors = useMemo(() => {
@@ -146,7 +161,7 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
           credits: credits !== '' ? Number(credits) : undefined,
           isActive: true,
         },
-        selectedStudentIds.size > 0 ? Array.from(selectedStudentIds) : undefined,
+        Array.from(selectedStudentIds) // Always pass array, even if empty, to trigger un-enrollment
       );
       onClose();
     } catch (error) {

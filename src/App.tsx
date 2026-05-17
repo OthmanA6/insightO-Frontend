@@ -17,6 +17,27 @@ import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCy
 import GlobalAnalyticsPage from '@/features/Analytics/pages/GlobalAnalyticsPage'
 import CourseTasksView from '@/features/TaskManagement/pages/CourseTasksView'
 import TaskSubmissionsPage from '@/features/TaskManagement/pages/TaskSubmissionsPage'
+import { ProtectedRoute } from '@/shared/components/layout/ProtectedRoute'
+import StudentDashboardPage from '@/features/StudentPortal/pages/StudentDashboardPage'
+import StudentCoursesAndTasksPage from '@/features/StudentPortal/pages/StudentCoursesAndTasksPage'
+import MySubmissionsPage from '@/features/TaskManagement/pages/MySubmissionsPage'
+import CourseDetailView from '@/features/TaskManagement/pages/CourseDetailView'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+
+import InstructorDashboardPage from '@/features/InstructorPortal/pages/InstructorDashboardPage'
+import InstructorCourseManagement from '@/features/InstructorPortal/pages/InstructorCourseManagement'
+import InstructorCourseDetailView from '@/features/InstructorPortal/pages/InstructorCourseDetailView'
+
+function DashboardRouter() {
+  const { user } = useAuth();
+  if (user?.role === 'STUDENT') {
+    return <StudentDashboardPage />;
+  }
+  if (user?.role === 'INSTRUCTOR') {
+    return <InstructorDashboardPage />;
+  }
+  return <DashboardPlaceholder />;
+}
 
 function App() {
   return (
@@ -29,22 +50,39 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/dashboard" element={<MainLayout />}>
-          <Route index element={<DashboardPlaceholder />} />
-          <Route path="forms-surveys" element={<FormsSurveysPage />} />
-          <Route path="builder" element={<Navigate to="/builder" replace />} />
-          <Route path="users" element={<UserManagementPage />} />
-
-          {/* ── Hierarchical Department ➔ Course ➔ Task ➔ Submissions ── */}
-          <Route path="departments" element={<DepartmentManagementPage />} />
-          <Route path="departments/:departmentId" element={<DepartmentDetailPage />} />
-          <Route path="departments/:departmentId/courses/:courseId" element={<CourseTasksView />} />
-          <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
-
-          <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
-          <Route path="analytics" element={<GlobalAnalyticsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route index element={<DashboardRouter />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="forms-results/:formId" element={<FormsResultsPage />} />
+          
+          {/* Student routes */}
+          <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
+            <Route path="courses-tasks" element={<StudentCoursesAndTasksPage />} />
+            <Route path="student-evaluations" element={<MySubmissionsPage />} />
+            <Route path="student-courses/:courseId" element={<CourseDetailView />} />
+          </Route>
+
+          {/* Instructor routes */}
+          <Route element={<ProtectedRoute allowedRoles={['INSTRUCTOR']} />}>
+            <Route path="courses" element={<InstructorCourseManagement />} />
+            <Route path="courses/:courseId" element={<InstructorCourseDetailView />} />
+            <Route path="courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'HOD', 'INSTRUCTOR']} />}>
+            <Route path="forms-surveys" element={<FormsSurveysPage />} />
+            <Route path="builder" element={<Navigate to="/builder" replace />} />
+            <Route path="users" element={<UserManagementPage />} />
+
+            {/* ── Hierarchical Department ➔ Course ➔ Task ➔ Submissions ── */}
+            <Route path="departments" element={<DepartmentManagementPage />} />
+            <Route path="departments/:departmentId" element={<DepartmentDetailPage />} />
+            <Route path="departments/:departmentId/courses/:courseId" element={<CourseTasksView />} />
+            <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
+
+            <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
+            <Route path="analytics" element={<GlobalAnalyticsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="forms-results/:formId" element={<FormsResultsPage />} />
+          </Route>
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
