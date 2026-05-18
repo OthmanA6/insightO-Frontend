@@ -140,6 +140,11 @@ export default function FormBuilderPage() {
   const [previewUploads, setPreviewUploads] = useState<Record<string, { name: string, url: string, loading: boolean }>>({})
   const [previewAnswers, setPreviewAnswers] = useState<Record<string, any>>({})
 
+  // AI Generator State
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false)
+  const [aiPrompt, setAiPrompt] = useState("")
+  const [isAIGenerating, setIsAIGenerating] = useState(false)
+
   // Derived share link (mocking a public URL)
   const shareUrl = `${window.location.origin}/form/${Math.random().toString(36).substring(7)}`
 
@@ -411,6 +416,29 @@ export default function FormBuilderPage() {
     setPreviewAnswers({})
   }
 
+  const handleAIGenerate = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsAIGenerating(true);
+    try {
+      const generatedQuestions = await formApi.generateAIForm(aiPrompt);
+      const newQuestions = generatedQuestions.map((q, idx) => ({
+        ...q,
+        id: `q-${Math.random().toString(36).substr(2, 9)}`,
+        order: questions.length + idx + 1,
+      }));
+      setQuestions(prev => [...prev, ...newQuestions]);
+      toast.success("AI form architecture generated successfully!");
+      setIsAIModalOpen(false);
+      setAiPrompt("");
+      if (newQuestions.length > 0) setActiveId(newQuestions[0].id!);
+    } catch (error) {
+      toast.error("Failed to generate form questions");
+      console.error(error);
+    } finally {
+      setIsAIGenerating(false);
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden font-geist">
       {/* Header */}
@@ -444,6 +472,7 @@ export default function FormBuilderPage() {
 
         <div className="flex items-center gap-3">
           <Button
+            onClick={() => setIsAIModalOpen(true)}
             className="h-10 flex items-center gap-2 rounded-xl bg-purple-500/10 border border-purple-500/30 px-4 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-white"
           >
             <Zap className="h-4 w-4" /> AI Generate
@@ -1077,6 +1106,47 @@ export default function FormBuilderPage() {
               Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
             </p>
           </div>
+        </div>
+      </Modal>
+
+      {/* ── AI GENERATE MODAL ──────────────────────────────────────────────── */}
+      <Modal
+        open={isAIModalOpen}
+        onClose={() => !isAIGenerating && setIsAIModalOpen(false)}
+        title={
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+              <Zap className="h-4 w-4" />
+            </div>
+            <span className="font-black text-white uppercase tracking-widest">AI Form Generator</span>
+          </div>
+        }
+        size="md"
+      >
+        <div className="space-y-6 py-4">
+          <div className="space-y-3">
+            <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Prompt</Label>
+            <textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="e.g., Create a student feedback form for a math course"
+              className="w-full bg-[#0f111a] border border-white/10 text-white text-sm font-medium rounded-xl p-4 min-h-[120px] outline-none focus:border-purple-500 transition-all resize-none"
+              disabled={isAIGenerating}
+            />
+          </div>
+          <Button
+            onClick={handleAIGenerate}
+            disabled={isAIGenerating || !aiPrompt.trim()}
+            className="w-full h-12 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+          >
+            {isAIGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Generating...
+              </>
+            ) : (
+              "Generate Fields"
+            )}
+          </Button>
         </div>
       </Modal>
 

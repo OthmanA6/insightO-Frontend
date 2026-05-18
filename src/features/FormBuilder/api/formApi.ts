@@ -100,3 +100,9 @@ export const reorderQuestions = async (
 ): Promise<void> => {
   await api.patch(`/v1/questions/${formId}/questions/reorder`, items);
 };
+
+// ── #19: POST /v1/ai/generate-form ──────────────────────────────────────────
+export const generateAIForm = async (prompt: string): Promise<Question[]> => {
+  const response = await api.post<{ message: string; data: Question[] }>('/ai/generate-form', { prompt });
+  return response.data.data;
+};
