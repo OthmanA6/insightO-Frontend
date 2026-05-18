@@ -131,3 +131,47 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #4a4a5e; 
 }
+/* ==========================================
+   PREMIUM SaaS MINIMALIST SCROLLBAR ENGINE
+   ========================================== */
+
+/* لتطبيق الشريط الرفيع على المتصفح بالكامل (صفحات الوقع) */
+html {
+  scrollbar-width: thin !important;
+  scrollbar-color: #2d2a42 transparent !important;
+}
+
+/* 1. تخصيص المتصفحات المبنية على Webkit (Chrome, Safari, Edge, Opera) */
+::-webkit-scrollbar {
+  width: 5px !important;  /* شريط رأسي رفيع جداً */
+  height: 5px !important; /* شريط أفقي رفيع جداً */
+}
+
+/* خلفية المجرى (تكون شفافة تماماً عشان متبوّظش الـ Dark Solid Theme) */
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* الشريط المتحرك نفسه (الـ Thumb) */
+::-webkit-scrollbar-thumb {
+  background: #2d2a42 !important; /* اللون الافتراضي الداكن المتناسق مع الثيم */
+  border-radius: 9999px !important; /* حواف دائرية فخمة Pill-shaped */
+  border: 1px solid transparent; /* مسافة أمان صامتة */
+  background-clip: padding-box;
+}
+
+/* تأثير المرور بالماوس (Hover Effect) */
+::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5 !important; /* ينور باللون الـ Indigo بتاعنا لما اليوزر يمسكه */
+}
+
+/* 2. دعم الحاويات المعزولة (Scrollable Containers) مثل الـ Sidebars والـ ScrollAreas */
+.overflow-y-auto, 
+.overflow-x-auto,
+.overflow-auto,
+aside,
+main,
+table {
+  scrollbar-width: thin !important;
+  scrollbar-color: #2d2a42 transparent !important;
+}
