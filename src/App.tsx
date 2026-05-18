@@ -22,6 +22,7 @@ import { ProtectedRoute } from '@/shared/components/layout/ProtectedRoute'
 import StudentDashboardPage from '@/features/StudentPortal/pages/StudentDashboardPage'
 import StudentCoursesAndTasksPage from '@/features/StudentPortal/pages/StudentCoursesAndTasksPage'
 import MySubmissionsPage from '@/features/TaskManagement/pages/MySubmissionsPage'
+import StudentSurveysPage from '@/features/StudentPortal/pages/StudentSurveysPage'
 import CourseDetailView from '@/features/TaskManagement/pages/CourseDetailView'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
@@ -45,13 +46,20 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/builder" element={<FormBuilderPage />} />
-        <Route path="/builder/:formId" element={<FormBuilderPage />} />
+        
+        {/* Form Builder routes (Protected) */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'HOD', 'INSTRUCTOR']} />}>
+          <Route path="/builder" element={<FormBuilderPage />} />
+          <Route path="/builder/:formId" element={<FormBuilderPage />} />
+        </Route>
+
         <Route path="/form/:formId" element={<FormResponsePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/dashboard" element={<MainLayout />}>
+
+        {/* Dashboard layout (Protected) */}
+        <Route path="/dashboard" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route index element={<DashboardRouter />} />
           <Route path="profile" element={<ProfilePage />} />
           
@@ -59,6 +67,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
             <Route path="courses-tasks" element={<StudentCoursesAndTasksPage />} />
             <Route path="student-evaluations" element={<MySubmissionsPage />} />
+            <Route path="student-surveys" element={<StudentSurveysPage />} />
             <Route path="student-courses/:courseId" element={<CourseDetailView />} />
           </Route>
 

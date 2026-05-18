@@ -83,8 +83,15 @@ export default function FormResponsePage() {
          };
       });
 
-      // Default subject tracking based on what the form evaluated
-      const subject_id = form.instructor_id || form.course_id || form.department_id || form._id || form.id;
+      // Helper to extract raw ID string from populated objects or strings
+      const getRawId = (val: any) => {
+        if (!val) return undefined;
+        if (typeof val === 'object' && val._id) return val._id;
+        if (typeof val === 'object' && val.id) return val.id;
+        return val;
+      };
+
+      const subject_id = getRawId(form.instructor_id) || getRawId(form.course_id) || getRawId(form.department_id) || form._id || form.id;
 
       await createSubmission(formId, {
         subject_id: subject_id,

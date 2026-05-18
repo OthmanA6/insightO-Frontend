@@ -1,4 +1,3 @@
-import React from "react"
 import { Link } from "react-router-dom"
 import { Search, Bell, User, Settings, LogOut } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
@@ -14,8 +13,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { buttonVariants } from "@/shared/components/ui/button"
 import { ThemeToggle } from "@/shared/components/ui/ThemeToggle"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 
 export function Navbar() {
+  const { logout } = useAuth();
+
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur-md">
       
@@ -65,7 +67,10 @@ export function Navbar() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+            <DropdownMenuItem 
+              onClick={logout}
+              className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>

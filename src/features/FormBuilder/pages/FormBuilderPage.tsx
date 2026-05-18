@@ -393,7 +393,7 @@ export default function FormBuilderPage() {
     setTimeout(() => setIsCopied(false), 2000)
   }
 
-  const handleAIGenerate = () => {
+  const handleAIGenerate = async () => {
     if (!aiPrompt.trim()) {
       toast.error("Please describe what you want the AI to generate.");
       return;
@@ -420,200 +420,44 @@ export default function FormBuilderPage() {
       }
     }, 900);
 
-    setTimeout(() => {
+    try {
+      const generated = await formApi.generateAIForm(aiPrompt);
       clearInterval(interval);
-      
-      const promptLower = aiPrompt.toLowerCase();
-      let generatedQuestions: Question[] = [];
 
-      if (promptLower.includes("db") || promptLower.includes("database") || promptLower.includes("sql") || promptLower.includes("بيانات")) {
-        generatedQuestions = [
-          {
-            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "How would you rate the clarity of the database schema design lectures?",
-            required: true,
-            order: 1,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "Rate your understanding of SQL query optimization techniques after this course.",
-            required: true,
-            order: 2,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
-            type: "multiple_choice",
-            label: "Which relational database engine did you find most challenging to work with?",
-            required: false,
-            order: 3,
-            options: ["PostgreSQL", "MySQL", "SQLite", "Oracle"]
-          },
-          {
-            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
-            type: "long_text",
-            label: "What was the most challenging part of the database project? (e.g., normalization, transactions)",
-            required: false,
-            order: 4
-          },
-          {
-            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
-            type: "file",
-            label: "Upload your final SQL project script or schema diagram.",
-            required: false,
-            order: 5,
-            file_config: { allowed_types: ["application/pdf", "image/png"], max_size: 5242880 }
-          }
-        ];
-        setFormTitle("Database Systems Evaluation");
-        setFormDescription("A specialized assessment for the Database Systems module, covering schema design, SQL, and transactional logic.");
-      } else if (promptLower.includes("programming") || promptLower.includes("code") || promptLower.includes("cs") || promptLower.includes("developer") || promptLower.includes("software") || promptLower.includes("برمجة") || promptLower.includes("كود")) {
-        generatedQuestions = [
-          {
-            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "How well did the coding assignments align with the theoretical concepts?",
-            required: true,
-            order: 1,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "Rate your confidence in writing clean, modular code after completing this module.",
-            required: true,
-            order: 2,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
-            type: "multiple_choice",
-            label: "Which programming language did you utilize for the primary course tasks?",
-            required: false,
-            order: 3,
-            options: ["Python", "Java", "C++", "TypeScript"]
-          },
-          {
-            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
-            type: "long_text",
-            label: "Describe any specific algorithms or data structures you struggled to implement.",
-            required: false,
-            order: 4
-          },
-          {
-            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
-            type: "file",
-            label: "Upload your final project code package (.zip or PDF).",
-            required: false,
-            order: 5,
-            file_config: { allowed_types: ["application/pdf", "application/zip"], max_size: 10485760 }
-          }
-        ];
-        setFormTitle("Software Engineering Evaluation");
-        setFormDescription("An evaluation targeted at core programming proficiency, code quality, and implementation mechanics.");
-      } else if (promptLower.includes("design") || promptLower.includes("ui") || promptLower.includes("ux") || promptLower.includes("product") || promptLower.includes("تصميم")) {
-        generatedQuestions = [
-          {
-            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "Rate the usefulness of the design sprint and prototyping workshops.",
-            required: true,
-            order: 1,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "How would you rate the instructor's feedback on your wireframes?",
-            required: true,
-            order: 2,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
-            type: "multiple_choice",
-            label: "Which prototyping tool did you spend the most time using?",
-            required: false,
-            order: 3,
-            options: ["Figma", "Adobe XD", "Sketch", "Framer"]
-          },
-          {
-            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
-            type: "long_text",
-            label: "What areas of user testing did you find most insightful for your prototype?",
-            required: false,
-            order: 4
-          },
-          {
-            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
-            type: "file",
-            label: "Upload your high-fidelity UI mockup or case study PDF.",
-            required: false,
-            order: 5,
-            file_config: { allowed_types: ["application/pdf", "image/png"], max_size: 5242880 }
-          }
-        ];
-        setFormTitle("UI/UX Design Evaluation");
-        setFormDescription("A detailed evaluation focusing on wireframing, user research, and high-fidelity product prototyping.");
-      } else {
-        generatedQuestions = [
-          {
-            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "How would you rate the instructor's ability to explain complex concepts?",
-            required: true,
-            order: 1,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
-            type: "linear_scale",
-            label: "The course materials and readings were highly relevant and updated.",
-            required: true,
-            order: 2,
-            scale: { min: 1, max: 5 }
-          },
-          {
-            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
-            type: "multiple_choice",
-            label: "Which instructional method did you find most engaging?",
-            required: false,
-            order: 3,
-            options: ["Interactive Lectures", "Live Coding", "Group Discussions", "Self-paced Labs"]
-          },
-          {
-            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
-            type: "long_text",
-            label: "Provide constructive suggestions to improve the learning experience for future quarters.",
-            required: false,
-            order: 4
-          },
-          {
-            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
-            type: "file",
-            label: "Upload your lecture notes or reference sheets if you wish to share them.",
-            required: false,
-            order: 5,
-            file_config: { allowed_types: ["application/pdf"], max_size: 5242880 }
-          }
-        ];
-        setFormTitle("Academic Course Evaluation");
-        setFormDescription(`AI Generated survey based on: "${aiPrompt.substring(0, 45)}..."`);
+      if (!generated || generated.length === 0) {
+        throw new Error("No questions were generated by the AI.");
       }
 
-      setQuestions(generatedQuestions);
-      if (generatedQuestions.length > 0) {
-        setActiveId(generatedQuestions[0].id!);
+      const mappedQuestions = generated.map((q: any, idx: number) => ({
+        id: `q-ai-${Math.random().toString(36).substr(2, 9)}`,
+        type: q.type,
+        label: q.label,
+        required: !!q.required,
+        order: idx + 1,
+        options: q.type === "multiple_choice" ? (q.options?.length ? q.options : ["Option 1", "Option 2"]) : undefined,
+        scale: q.type === "linear_scale" ? (q.scale || { min: 1, max: 5 }) : undefined,
+        file_config: q.type === "file" ? { allowed_types: ["application/pdf"], max_size: 5242880 } : undefined
+      }));
+
+      setQuestions(mappedQuestions);
+      setFormTitle(`${aiPrompt.substring(0, 30)} Assessment`);
+      setFormDescription(`AI Generated survey based on: "${aiPrompt}"`);
+
+      if (mappedQuestions.length > 0) {
+        setActiveId(mappedQuestions[0].id!);
       }
-      setIsAIGenerating(false);
       setIsAIModalOpen(false);
       setAiPrompt("");
       toast.success("AI form structure synthesized perfectly!");
-    }, 4500);
-  }
+    } catch (err: any) {
+      console.error("AI Generation Error:", err);
+      const backendError = err.response?.data?.error || err.response?.data?.message || err.message || "Failed to generate AI form architecture";
+      toast.error(backendError);
+    } finally {
+      clearInterval(interval);
+      setIsAIGenerating(false);
+    }
+  };
 
   const handlePreviewFileUpload = async (qId: string, file: File) => {
     setPreviewUploads(prev => ({ ...prev, [qId]: { name: file.name, url: "", loading: true } }))
@@ -907,9 +751,20 @@ export default function FormBuilderPage() {
                                   <select 
                                     value={courseId}
                                     onChange={(e) => {
-                                      setCourseId(e.target.value);
-                                      setInstructorId("");
-                                      if (e.target.value) setValidationErrors(prev => ({ ...prev, course: false }));
+                                      const newCourseId = e.target.value;
+                                      setCourseId(newCourseId);
+                                      const selectedCourse = courses.find(c => (c._id || c.id) === newCourseId);
+                                      const instId = selectedCourse?.instructorId 
+                                        ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
+                                        : null;
+                                        
+                                      if (instId) {
+                                        setInstructorId(instId);
+                                        setValidationErrors(prev => ({ ...prev, course: false, instructor: false }));
+                                      } else {
+                                        setInstructorId("");
+                                        if (newCourseId) setValidationErrors(prev => ({ ...prev, course: false }));
+                                      }
                                     }}
                                     className={cn(
                                       "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
@@ -947,11 +802,22 @@ export default function FormBuilderPage() {
                                         )}
                                       >
                                         <option value="" disabled hidden>Select Instructor...</option>
-                                        {instructors.map(inst => (
-                                          <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
-                                            {inst.firstName} {inst.lastName}
-                                          </option>
-                                        ))}
+                                        {(() => {
+                                          const selectedCourse = courses.find(c => (c._id || c.id) === courseId);
+                                          const instId = selectedCourse?.instructorId 
+                                            ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
+                                            : null;
+                                            
+                                          const filteredInstructors = instId
+                                            ? instructors.filter(inst => ((inst as any)._id || inst.id) === instId)
+                                            : instructors;
+                                            
+                                          return filteredInstructors.map(inst => (
+                                            <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
+                                              {inst.firstName} {inst.lastName}
+                                            </option>
+                                          ));
+                                        })()}
                                       </select>
                                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
                                     </div>
