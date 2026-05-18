@@ -77,10 +77,7 @@ const INITIAL_QUESTIONS: Question[] = [
   }
 ]
 
-const MOCK_COURSES = [
-  { id: 'c1', name: 'React Native Development', instructors: [{ id: 'i1', name: 'Dr. Ahmed' }, { id: 'i2', name: 'Eng. Sara' }] },
-  { id: 'c2', name: 'Advanced Node.js', instructors: [{ id: 'i3', name: 'Dr. Ali' }] }
-];
+
 
 const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
   const [show, setShow] = useState(false);
@@ -139,9 +136,15 @@ export default function FormBuilderPage() {
   const [isCopied, setIsCopied] = useState(false)
   const [previewUploads, setPreviewUploads] = useState<Record<string, { name: string, url: string, loading: boolean }>>({})
   const [previewAnswers, setPreviewAnswers] = useState<Record<string, any>>({})
+  
+  // AI Generator state
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false)
+  const [aiPrompt, setAiPrompt] = useState("")
+  const [isAIGenerating, setIsAIGenerating] = useState(false)
+  const [aiStep, setAiStep] = useState(0)
 
-  // Derived share link (mocking a public URL)
-  const shareUrl = `${window.location.origin}/form/${Math.random().toString(36).substring(7)}`
+  // Derived share link
+  const shareUrl = formId ? `${window.location.origin}/form/${formId}` : `${window.location.origin}/form/preview`
 
   useEffect(() => {
     const fetchData = async () => {
@@ -161,7 +164,7 @@ export default function FormBuilderPage() {
           setFormDescription(form.description || "")
           setCategory(form.category || "SPECIALIZED")
           setEvaluatorRoles(form.evaluator_roles)
-          setSubjectRole(form.subject_role)
+          setSubjectRole(form.course_id ? "COURSE" : form.subject_role)
           setIsAnonymous(form.is_anonymous)
           setIsActive(form.is_active)
           setDepartmentId(form.department_id || "")
@@ -272,8 +275,9 @@ export default function FormBuilderPage() {
     }
 
     // ─── Backend Compliance Validation ───
-    if (evaluatorRoles.includes(subjectRole)) {
-      toast.error(`Conflict: Evaluator roles cannot include the Subject role (${subjectRole}).`)
+    const actualSubjectRole = subjectRole === "COURSE" ? "INSTRUCTOR" : subjectRole;
+    if (evaluatorRoles.includes(actualSubjectRole)) {
+      toast.error(`Conflict: Evaluator roles cannot include the Subject role (${actualSubjectRole}).`)
       return
     }
 
@@ -317,12 +321,12 @@ export default function FormBuilderPage() {
           description: formDescription,
           category: category,
           evaluator_roles: evaluatorRoles,
-          subject_role: subjectRole,
+          subject_role: actualSubjectRole,
           is_anonymous: isAnonymous,
           is_active: isActive,
-          department_id: category === "SPECIALIZED" ? departmentId : undefined,
-          course_id: category === "SPECIALIZED" ? courseId : undefined,
-          instructor_id: category === "SPECIALIZED" ? instructorId : undefined,
+          department_id: category === "SPECIALIZED" && departmentId ? departmentId : undefined,
+          course_id: category === "SPECIALIZED" && subjectRole === "COURSE" && courseId ? courseId : undefined,
+          instructor_id: category === "SPECIALIZED" && subjectRole === "COURSE" && instructorId ? instructorId : undefined,
         })
       }
 
@@ -389,6 +393,228 @@ export default function FormBuilderPage() {
     setTimeout(() => setIsCopied(false), 2000)
   }
 
+  const handleAIGenerate = () => {
+    if (!aiPrompt.trim()) {
+      toast.error("Please describe what you want the AI to generate.");
+      return;
+    }
+
+    setIsAIGenerating(true);
+    setAiStep(0);
+
+    const stepTexts = [
+      "Analyzing layout requirements...",
+      "Structuring cognitive evaluation metrics...",
+      "Synthesizing customized academic questions...",
+      "Enforcing structural type integrity...",
+      "Finalizing dynamic builder components..."
+    ];
+
+    let currentStep = 0;
+    const interval = setInterval(() => {
+      currentStep++;
+      if (currentStep < stepTexts.length) {
+        setAiStep(currentStep);
+      } else {
+        clearInterval(interval);
+      }
+    }, 900);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      
+      const promptLower = aiPrompt.toLowerCase();
+      let generatedQuestions: Question[] = [];
+
+      if (promptLower.includes("db") || promptLower.includes("database") || promptLower.includes("sql") || promptLower.includes("بيانات")) {
+        generatedQuestions = [
+          {
+            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "How would you rate the clarity of the database schema design lectures?",
+            required: true,
+            order: 1,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "Rate your understanding of SQL query optimization techniques after this course.",
+            required: true,
+            order: 2,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
+            type: "multiple_choice",
+            label: "Which relational database engine did you find most challenging to work with?",
+            required: false,
+            order: 3,
+            options: ["PostgreSQL", "MySQL", "SQLite", "Oracle"]
+          },
+          {
+            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
+            type: "long_text",
+            label: "What was the most challenging part of the database project? (e.g., normalization, transactions)",
+            required: false,
+            order: 4
+          },
+          {
+            id: `q-db-${Math.random().toString(36).substr(2, 9)}`,
+            type: "file",
+            label: "Upload your final SQL project script or schema diagram.",
+            required: false,
+            order: 5,
+            file_config: { allowed_types: ["application/pdf", "image/png"], max_size: 5242880 }
+          }
+        ];
+        setFormTitle("Database Systems Evaluation");
+        setFormDescription("A specialized assessment for the Database Systems module, covering schema design, SQL, and transactional logic.");
+      } else if (promptLower.includes("programming") || promptLower.includes("code") || promptLower.includes("cs") || promptLower.includes("developer") || promptLower.includes("software") || promptLower.includes("برمجة") || promptLower.includes("كود")) {
+        generatedQuestions = [
+          {
+            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "How well did the coding assignments align with the theoretical concepts?",
+            required: true,
+            order: 1,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "Rate your confidence in writing clean, modular code after completing this module.",
+            required: true,
+            order: 2,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
+            type: "multiple_choice",
+            label: "Which programming language did you utilize for the primary course tasks?",
+            required: false,
+            order: 3,
+            options: ["Python", "Java", "C++", "TypeScript"]
+          },
+          {
+            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
+            type: "long_text",
+            label: "Describe any specific algorithms or data structures you struggled to implement.",
+            required: false,
+            order: 4
+          },
+          {
+            id: `q-cs-${Math.random().toString(36).substr(2, 9)}`,
+            type: "file",
+            label: "Upload your final project code package (.zip or PDF).",
+            required: false,
+            order: 5,
+            file_config: { allowed_types: ["application/pdf", "application/zip"], max_size: 10485760 }
+          }
+        ];
+        setFormTitle("Software Engineering Evaluation");
+        setFormDescription("An evaluation targeted at core programming proficiency, code quality, and implementation mechanics.");
+      } else if (promptLower.includes("design") || promptLower.includes("ui") || promptLower.includes("ux") || promptLower.includes("product") || promptLower.includes("تصميم")) {
+        generatedQuestions = [
+          {
+            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "Rate the usefulness of the design sprint and prototyping workshops.",
+            required: true,
+            order: 1,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "How would you rate the instructor's feedback on your wireframes?",
+            required: true,
+            order: 2,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
+            type: "multiple_choice",
+            label: "Which prototyping tool did you spend the most time using?",
+            required: false,
+            order: 3,
+            options: ["Figma", "Adobe XD", "Sketch", "Framer"]
+          },
+          {
+            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
+            type: "long_text",
+            label: "What areas of user testing did you find most insightful for your prototype?",
+            required: false,
+            order: 4
+          },
+          {
+            id: `q-ux-${Math.random().toString(36).substr(2, 9)}`,
+            type: "file",
+            label: "Upload your high-fidelity UI mockup or case study PDF.",
+            required: false,
+            order: 5,
+            file_config: { allowed_types: ["application/pdf", "image/png"], max_size: 5242880 }
+          }
+        ];
+        setFormTitle("UI/UX Design Evaluation");
+        setFormDescription("A detailed evaluation focusing on wireframing, user research, and high-fidelity product prototyping.");
+      } else {
+        generatedQuestions = [
+          {
+            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "How would you rate the instructor's ability to explain complex concepts?",
+            required: true,
+            order: 1,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
+            type: "linear_scale",
+            label: "The course materials and readings were highly relevant and updated.",
+            required: true,
+            order: 2,
+            scale: { min: 1, max: 5 }
+          },
+          {
+            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
+            type: "multiple_choice",
+            label: "Which instructional method did you find most engaging?",
+            required: false,
+            order: 3,
+            options: ["Interactive Lectures", "Live Coding", "Group Discussions", "Self-paced Labs"]
+          },
+          {
+            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
+            type: "long_text",
+            label: "Provide constructive suggestions to improve the learning experience for future quarters.",
+            required: false,
+            order: 4
+          },
+          {
+            id: `q-gen-${Math.random().toString(36).substr(2, 9)}`,
+            type: "file",
+            label: "Upload your lecture notes or reference sheets if you wish to share them.",
+            required: false,
+            order: 5,
+            file_config: { allowed_types: ["application/pdf"], max_size: 5242880 }
+          }
+        ];
+        setFormTitle("Academic Course Evaluation");
+        setFormDescription(`AI Generated survey based on: "${aiPrompt.substring(0, 45)}..."`);
+      }
+
+      setQuestions(generatedQuestions);
+      if (generatedQuestions.length > 0) {
+        setActiveId(generatedQuestions[0].id!);
+      }
+      setIsAIGenerating(false);
+      setIsAIModalOpen(false);
+      setAiPrompt("");
+      toast.success("AI form structure synthesized perfectly!");
+    }, 4500);
+  }
+
   const handlePreviewFileUpload = async (qId: string, file: File) => {
     setPreviewUploads(prev => ({ ...prev, [qId]: { name: file.name, url: "", loading: true } }))
     try {
@@ -444,6 +670,7 @@ export default function FormBuilderPage() {
 
         <div className="flex items-center gap-3">
           <Button
+            onClick={() => setIsAIModalOpen(true)}
             className="h-10 flex items-center gap-2 rounded-xl bg-purple-500/10 border border-purple-500/30 px-4 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-white"
           >
             <Zap className="h-4 w-4" /> AI Generate
@@ -690,8 +917,8 @@ export default function FormBuilderPage() {
                                     )}
                                   >
                                     <option value="" disabled hidden>Choose Course...</option>
-                                    {MOCK_COURSES.map(course => (
-                                      <option key={course.id} value={course.id}>{course.name}</option>
+                                    {courses.map(course => (
+                                      <option key={course._id || course.id} value={course._id || course.id}>{course.name}</option>
                                     ))}
                                   </select>
                                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
@@ -720,8 +947,10 @@ export default function FormBuilderPage() {
                                         )}
                                       >
                                         <option value="" disabled hidden>Select Instructor...</option>
-                                        {(MOCK_COURSES.find(c => c.id === courseId)?.instructors || []).map(inst => (
-                                          <option key={inst.id} value={inst.id}>{inst.name}</option>
+                                        {instructors.map(inst => (
+                                          <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
+                                            {inst.firstName} {inst.lastName}
+                                          </option>
                                         ))}
                                       </select>
                                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
@@ -1077,6 +1306,78 @@ export default function FormBuilderPage() {
               Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
             </p>
           </div>
+        </div>
+      </Modal>
+
+      {/* AI Generate Prompt Modal */}
+      <Modal 
+        open={isAIModalOpen} 
+        onClose={() => !isAIGenerating && setIsAIModalOpen(false)}
+        title={
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 animate-pulse">
+              <Zap className="h-4 w-4 text-purple-400" />
+            </div>
+            <span className="font-black text-white uppercase tracking-widest">AI Form Synthesizer</span>
+          </div>
+        }
+        size="md"
+      >
+        <div className="relative overflow-hidden font-geist py-2">
+          {isAIGenerating ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-6 animate-in fade-in duration-500">
+              <div className="relative">
+                <div className="h-20 w-20 rounded-full border border-purple-500/20 flex items-center justify-center bg-purple-500/5">
+                  <Loader2 className="h-10 w-10 animate-spin text-purple-500" />
+                </div>
+                <div className="absolute -top-1 -right-1 p-1.5 rounded-full bg-purple-500 text-white animate-bounce">
+                  <Zap className="h-3.5 w-3.5" />
+                </div>
+              </div>
+              <div className="space-y-2 text-center">
+                <h4 className="text-sm font-black text-slate-200 uppercase tracking-widest animate-pulse">
+                  Synthesizing Architecture...
+                </h4>
+                <p className="text-xs text-indigo-400 font-bold">
+                  {[
+                    "Analyzing layout requirements...",
+                    "Structuring cognitive evaluation metrics...",
+                    "Synthesizing customized academic questions...",
+                    "Enforcing structural type integrity...",
+                    "Finalizing dynamic builder components..."
+                  ][aiStep]}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Generation Prompt</Label>
+                <textarea
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  className="w-full h-32 bg-[#0f111a] border border-white/10 text-white text-sm font-medium rounded-2xl p-4 outline-none focus:border-purple-500 transition-all resize-none custom-scrollbar shadow-inner"
+                  placeholder="Describe what kind of evaluation or survey you want to generate. e.g., 'Generate an evaluation for a programming course with practical assignments, rating their instructor and code quality...'"
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end pt-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsAIModalOpen(false)}
+                  className="h-12 px-6 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white font-bold text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAIGenerate}
+                  className="h-12 px-8 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white font-black text-xs shadow-xl shadow-purple-500/20 transition-all flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" /> Synthesize Survey
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
 

@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock } from "lucide-react"
+import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock, Share2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
@@ -289,6 +289,16 @@ export default function FormsSurveysPage() {
                                 onClick={() => navigate(`/builder/${row._id || row.id}`)}
                               >
                                 <Edit3 className="h-4 w-4 text-indigo-400" /> Edit Form
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(`${window.location.origin}/form/${row._id || row.id}`)
+                                  toast.success("Share link copied to clipboard")
+                                }}
+                              >
+                                <Share2 className="h-4 w-4 text-sky-400" /> Copy Share Link
                               </DropdownMenuItem>
 
                               <DropdownMenuItem

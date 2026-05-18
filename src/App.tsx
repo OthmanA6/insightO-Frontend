@@ -11,6 +11,7 @@ import UserManagementPage from '@/features/UserManagement/pages/UserManagementPa
 import ProfilePage from '@/features/Settings/pages/ProfilePage'
 import SettingsPage from '@/features/Settings/pages/SettingsPage'
 import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
+import FormResponsePage from '@/features/Forms/pages/FormResponsePage'
 import DepartmentManagementPage from '@/features/DepartmentManagement/pages/DepartmentManagementPage'
 import DepartmentDetailPage from '@/features/DepartmentManagement/pages/DepartmentDetailPage'
 import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCyclesPage'
@@ -46,6 +47,7 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/builder" element={<FormBuilderPage />} />
         <Route path="/builder/:formId" element={<FormBuilderPage />} />
+        <Route path="/form/:formId" element={<FormResponsePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
