@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getForm } from "@/features/FormBuilder/api/formApi";
-import { createSubmission } from "@/shared/api/submissionApi";
+import { getPublicForm } from "@/features/FormBuilder/api/formApi";
+import { createPublicSubmission } from "@/shared/api/submissionApi";
 import { uploadFile } from "@/shared/api/utilityApi";
 import type { Form } from "@/features/FormBuilder/types/form.types";
 import { Button } from "@/shared/components/ui/button";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Loader2, CheckCircle2, ArrowRight, AlertCircle, FileText, Upload, Trash2, Check } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
-export default function FormResponsePage() {
+export default function PublicFormViewPage() {
   const { formId } = useParams<{ formId: string }>();
   const navigate = useNavigate();
   const [form, setForm] = useState<Form | null>(null);
@@ -27,7 +27,7 @@ export default function FormResponsePage() {
     const loadForm = async () => {
       try {
         if (!formId) return;
-        const data = await getForm(formId);
+        const data = await getPublicForm(formId);
         setForm(data);
       } catch (err) {
         toast.error("Failed to load the form. It might be closed or invalid.");
@@ -93,7 +93,7 @@ export default function FormResponsePage() {
 
       const subject_id = getRawId(form.instructor_id) || getRawId(form.course_id) || getRawId(form.department_id) || form._id || form.id;
 
-      await createSubmission(formId, {
+      await createPublicSubmission(formId, {
         subject_id: subject_id,
         answers: payloadAnswers
       });

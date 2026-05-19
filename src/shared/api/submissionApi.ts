@@ -58,6 +58,18 @@ export const createSubmission = async (
   return response.data.data;
 };
 
+// ─── POST /forms/public/:formId/submissions ─────────────────────────────────
+export const createPublicSubmission = async (
+  formId: string,
+  payload: CreateSubmissionPayload,
+): Promise<Submission> => {
+  const response = await api.post<{ status: string; data: Submission }>(
+    `/forms/public/${formId}/submissions`,
+    payload,
+  );
+  return response.data.data;
+};
+
 // ─── GET /forms/:formId/submissions ──────────────────────────────────────────
 export const getFormSubmissions = async (formId: string): Promise<Submission[]> => {
   const response = await api.get<{ status: string; data: Submission[] }>(
