@@ -35,6 +35,12 @@ export const getForm = async (formId: string): Promise<Form> => {
   return response.data.data;
 };
 
+// ── GET /v1/form/public/:id ───────────────────────────────────────────────────
+export const getPublicForm = async (formId: string): Promise<Form> => {
+  const response = await api.get<{ status: string; data: Form }>(`/v1/form/public/${formId}`);
+  return response.data.data;
+};
+
 // ── #12: DELETE /v1/form/:id ──────────────────────────────────────────────────
 export const deleteForm = async (formId: string): Promise<void> => {
   await api.delete(`/v1/form/${formId}`);
@@ -102,7 +108,7 @@ export const reorderQuestions = async (
 };
 
 // ── #19: POST /v1/ai/generate-form ──────────────────────────────────────────
-export const generateAIForm = async (prompt: string): Promise<Question[]> => {
-  const response = await api.post<{ message: string; data: Question[] }>('/ai/generate-form', { prompt });
+export const generateAIForm = async (prompt: string): Promise<{ title: string; description: string; questions: Question[] }> => {
+  const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-form', { prompt });
   return response.data.data;
 };

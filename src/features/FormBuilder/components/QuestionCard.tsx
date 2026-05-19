@@ -6,6 +6,7 @@ import {
   Type,
   AlignLeft,
   CheckSquare,
+  CircleDot,
   Star,
   Upload,
   ChevronDown,
@@ -35,7 +36,8 @@ interface QuestionCardProps {
 const TYPE_OPTIONS: { type: QuestionType; label: string; icon: any }[] = [
   { type: "short_text",      label: "Short Text",    icon: Type },
   { type: "long_text",       label: "Long Text",     icon: AlignLeft },
-  { type: "multiple_choice", label: "Multi Choice",  icon: CheckSquare },
+  { type: "multiple_choice", label: "Multi Choice",  icon: CircleDot },
+  { type: "checkbox",        label: "Checkbox",      icon: CheckSquare },
   { type: "linear_scale",    label: "Linear Scale",  icon: Star },
   { type: "file",            label: "File Upload",   icon: Upload },
 ]
@@ -43,7 +45,8 @@ const TYPE_OPTIONS: { type: QuestionType; label: string; icon: any }[] = [
 const typeConfig: Record<QuestionType, { label: string; icon: any }> = {
   short_text:      { label: "Short Text",   icon: Type },
   long_text:       { label: "Long Text",    icon: AlignLeft },
-  multiple_choice: { label: "Multi Choice", icon: CheckSquare },
+  multiple_choice: { label: "Multi Choice", icon: CircleDot },
+  checkbox:        { label: "Checkbox",     icon: CheckSquare },
   linear_scale:    { label: "Linear Scale", icon: Star },
   file:            { label: "File Upload",  icon: Upload },
 }
@@ -51,7 +54,8 @@ const typeConfig: Record<QuestionType, { label: string; icon: any }> = {
 // Default values when switching types
 function getTypeDefaults(type: QuestionType): Partial<Question> {
   switch (type) {
-    case "multiple_choice": return { options: ["Option 1", "Option 2"], scale: undefined, file_config: undefined }
+    case "multiple_choice": 
+    case "checkbox":        return { options: ["Option 1", "Option 2"], scale: undefined, file_config: undefined }
     case "linear_scale":    return { scale: { min: 1, max: 5 }, options: undefined, file_config: undefined }
     case "file":            return { file_config: { allowed_types: ["application/pdf"], max_size: 5242880 }, options: undefined, scale: undefined }
     default:                return { options: undefined, scale: undefined, file_config: undefined }
@@ -98,11 +102,12 @@ export function QuestionCard({
           </div>
         )
       case "multiple_choice":
+      case "checkbox":
         return (
           <div className="bg-[#0f111a] rounded-xl p-4 border border-white/5 space-y-2">
             {(question.options || []).map((opt, idx) => (
               <div key={idx} className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full border-2 border-slate-600"></div>
+                <div className={cn("w-4 h-4 border-2 border-slate-600", question.type === "checkbox" ? "rounded-sm" : "rounded-full")}></div>
                 <Input
                   value={opt}
                   onChange={(e) => {

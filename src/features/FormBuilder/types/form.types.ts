@@ -6,6 +6,7 @@ export type QuestionType =
   | "long_text"
   | "linear_scale"
   | "multiple_choice"
+  | "checkbox"
   | "file";
 
 export type QuestionOption = string; // API expects array of strings for multiple_choice

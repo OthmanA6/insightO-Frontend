@@ -12,6 +12,7 @@ import ProfilePage from '@/features/Settings/pages/ProfilePage'
 import SettingsPage from '@/features/Settings/pages/SettingsPage'
 import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
 import FormResponsePage from '@/features/Forms/pages/FormResponsePage'
+import PublicFormViewPage from '@/features/Forms/pages/PublicFormViewPage'
 import DepartmentManagementPage from '@/features/DepartmentManagement/pages/DepartmentManagementPage'
 import DepartmentDetailPage from '@/features/DepartmentManagement/pages/DepartmentDetailPage'
 import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCyclesPage'
@@ -54,6 +55,7 @@ function App() {
         </Route>
 
         <Route path="/form/:formId" element={<FormResponsePage />} />
+        <Route path="/public/form/:formId" element={<PublicFormViewPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
