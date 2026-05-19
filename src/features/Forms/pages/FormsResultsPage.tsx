@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { 
   Download, Sparkles, ArrowUp, Brain, Star, 
-  ChevronLeft, ChevronRight, User, Calendar, Network, Lightbulb, CheckCircle2, ArrowLeft, Loader2, FileText, Meh
+  ChevronLeft, ChevronRight, User, Calendar, Network, Lightbulb, CheckCircle2, ArrowLeft, Loader2, FileText, Meh,
+  AlertTriangle, TrendingUp, TrendingDown, Zap, RefreshCw
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { Badge } from "@/shared/components/ui/badge"
@@ -11,6 +12,8 @@ import { getFormSubmissions } from "@/shared/api/submissionApi"
 import type { Submission } from "@/shared/api/submissionApi"
 import type { Form, Question } from "@/features/FormBuilder/types/form.types"
 import { toast } from "sonner"
+import { analyzeFormDeep } from "@/features/Forms/api/formAiApi"
+import type { FormDeepAnalysisPayload } from "@/features/Forms/api/formAiApi"
 
 type TabKey = "summary" | "questions" | "individual" | "ai"
 
@@ -23,6 +26,10 @@ export default function FormsResultsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0)
   const [selectedSubmissionIndex, setSelectedSubmissionIndex] = useState(0)
+  // AI analysis state
+  const [aiData, setAiData] = useState<FormDeepAnalysisPayload | null>(null)
+  const [isAiLoading, setIsAiLoading] = useState(false)
+  const [aiTokenError, setAiTokenError] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,10 +86,32 @@ export default function FormsResultsPage() {
 
   const aiInsights = useMemo(() => {
     if (!submissions.length) return "No data available for analysis."
-    // Simple mock logic based on real data for "AI Synthesis"
     const total = submissions.length
     return `Overall engagement is stable with ${total} responses. The most discussed topic is "${form?.title}". Preliminary data suggests high satisfaction in core metrics.`
   }, [submissions, form])
+
+  const handleGenerateAudit = async () => {
+    if (!formId) return
+    setIsAiLoading(true)
+    setAiTokenError(false)
+    setAiData(null)
+    try {
+      const result = await analyzeFormDeep(formId)
+      setAiData(result)
+      toast.success("AI audit generated successfully!")
+    } catch (err: any) {
+      const status = err?.response?.status
+      const errMsg = err?.response?.data?.message || err?.response?.data?.error || err?.message || "Please try again."
+      if (status === 429) {
+        setAiTokenError(true)
+        toast.error(`Token limit exceeded: ${errMsg}`)
+      } else {
+        toast.error(`Failed to generate AI audit: ${errMsg}`)
+      }
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -533,49 +562,54 @@ export default function FormsResultsPage() {
                   <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px]">Autonomous Pattern Recognition • Sentiment Mapping • Actionable Forecasting</p>
                 </div>
 
+                {/* Token limit error banner */}
+                {aiTokenError && (
+                  <div className="flex items-center gap-4 p-5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 mb-4">
+                    <AlertTriangle className="h-5 w-5 shrink-0" />
+                    <p className="text-sm font-bold">AI analysis unavailable due to token limit. The dataset is too large. Please reduce the number of submissions or response length.</p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left: Sentiment Vectors */}
                   <div className="bg-white dark:bg-surface-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 shadow-sm">
                     <h3 className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-200 dark:border-white/5 pb-4">Extracted Sentiment Vectors</h3>
                     <div className="space-y-8">
-                      <div>
-                        <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
-                          <span className="text-slate-900 dark:text-white">Positive Sentiment</span>
-                          <span className="text-green-600 dark:text-green-400">82% Magnitude</span>
+                      {[
+                        { label: "Positive Sentiment", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "positive").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 82, textColor: "text-green-600 dark:text-green-400", barClass: "bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
+                        { label: "Constructive Feedback", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "neutral").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 14, textColor: "text-amber-600 dark:text-amber-400", barClass: "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
+                        { label: "Critical Indicators", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "negative").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 4, textColor: "text-red-600 dark:text-red-400", barClass: "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
+                      ].map((item) => (
+                        <div key={item.label}>
+                          <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
+                            <span className="text-slate-900 dark:text-white">{item.label}</span>
+                            <span className={item.textColor}>{item.pct}% {item.suffix}</span>
+                          </div>
+                          <div className="h-3 w-full bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
+                            <div className={`h-full ${item.barClass} rounded-full transition-all duration-700`} style={{ width: `${item.pct}%` }}></div>
+                          </div>
                         </div>
-                        <div className="h-3 w-full bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
-                          <div className="h-full bg-green-500 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.5)]" style={{ width: '82%' }}></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
-                          <span className="text-slate-900 dark:text-white">Constructive Feedback</span>
-                          <span className="text-amber-600 dark:text-amber-400">14% Magnitude</span>
-                        </div>
-                        <div className="h-3 w-full bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)]" style={{ width: '14%' }}></div>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
-                          <span className="text-slate-900 dark:text-white">Critical Indicators</span>
-                          <span className="text-red-600 dark:text-red-400">4% Magnitude</span>
-                        </div>
-                        <div className="h-3 w-full bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
-                          <div className="h-full bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)]" style={{ width: '4%' }}></div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
 
+                  {/* Right: Gradient card with roadmap + button */}
                   <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-8 relative overflow-hidden shadow-2xl group">
                     <Lightbulb className="absolute right-[-40px] bottom-[-40px] opacity-10 h-64 w-64 text-white pointer-events-none group-hover:scale-110 transition-transform duration-700" />
                     <h3 className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-8 border-b border-white/20 pb-4 relative z-10">AI Deployment Roadmap</h3>
                     <ul className="space-y-6 relative z-10">
-                      {[
-                        { title: "Strategic Resource Allocation", text: "82% of respondents emphasize specific operational bottlenecks. Reallocating bandwidth to Section B could yield a 15% efficiency boost." },
-                        { title: "Communication Synthesis", text: "Sentiment analysis indicates a decoupling between internal updates and execution. Implement a bi-weekly synchronization protocol." },
-                        { title: "Predictive Retention", text: "Neutral sentiment trends in the Junior tier suggest a potential 12% attrition risk if engagement benchmarks aren't met by Q4." }
-                      ].map((item, i) => (
+                      {(aiData
+                        ? [
+                            { title: "Strategic Summary", text: aiData.global?.overall_summary || "Cross-category analysis complete." },
+                            { title: "Key Problem", text: aiData.global?.key_problems?.[0] || "No critical issues detected." },
+                            { title: "Top Recommendation", text: aiData.global?.recommendations?.[0] || "Continue monitoring response patterns." },
+                          ]
+                        : [
+                            { title: "Strategic Resource Allocation", text: "82% of respondents emphasize specific operational bottlenecks. Reallocating bandwidth to Section B could yield a 15% efficiency boost." },
+                            { title: "Communication Synthesis", text: "Sentiment analysis indicates a decoupling between internal updates and execution. Implement a bi-weekly synchronization protocol." },
+                            { title: "Predictive Retention", text: "Neutral sentiment trends in the Junior tier suggest a potential 12% attrition risk if engagement benchmarks aren't met by Q4." },
+                          ]
+                      ).map((item, i) => (
                         <li key={i} className="flex items-start gap-4">
                           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-white border border-white/30 backdrop-blur-md">
                             <CheckCircle2 className="h-3.5 w-3.5" />
@@ -586,9 +620,175 @@ export default function FormsResultsPage() {
                         </li>
                       ))}
                     </ul>
-                    <button className="mt-10 w-full py-4 rounded-2xl bg-white text-indigo-700 text-sm font-black uppercase tracking-widest shadow-xl hover:bg-slate-50 transition-all relative z-10">Generate Comprehensive Audit</button>
+                    <button
+                      onClick={handleGenerateAudit}
+                      disabled={isAiLoading || !submissions.length}
+                      className="w-full py-4 rounded-2xl bg-white text-indigo-700 text-sm font-black uppercase tracking-widest shadow-xl hover:bg-slate-50 transition-all relative z-10 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {isAiLoading ? (
+                        <><Loader2 className="h-5 w-5 animate-spin" /> Generating Audit...</>
+                      ) : (
+                        <><Sparkles className="h-5 w-5" /> Generate Comprehensive Audit</>
+                      )}
+                    </button>
+                    {!submissions.length && (
+                      <p className="text-center text-white/50 text-xs font-bold uppercase tracking-widest mt-3 relative z-10">No submissions available to analyze</p>
+                    )}
                   </div>
                 </div>
+
+
+                {/* Re-run button after result is shown */}
+                {aiData && (
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleGenerateAudit}
+                      disabled={isAiLoading}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black uppercase tracking-widest hover:bg-purple-700 transition-all disabled:opacity-50"
+                    >
+                      <RefreshCw className={cn("h-3.5 w-3.5", isAiLoading && "animate-spin")} />
+                      {isAiLoading ? "Re-generating..." : "Re-run Audit"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Loading skeleton */}
+                {isAiLoading && !aiData && (
+                  <div className="space-y-4">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="h-32 rounded-2xl bg-purple-500/10 animate-pulse" />
+                    ))}
+                  </div>
+                )}
+
+                {/* ── Real AI Results ── */}
+                {aiData && !isAiLoading && (
+                  <div className="space-y-8">
+
+                    {/* Global Summary Banner */}
+                    {aiData.global && (
+                      <div className="relative rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-600/10 to-indigo-600/5 p-7 overflow-hidden">
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/20 shrink-0">
+                              <Brain className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Global Strategic Summary</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{aiData.global.overall_summary}</p>
+                            </div>
+                          </div>
+                          {aiData.global.overall?.score !== undefined && (
+                            <div className="flex flex-col items-end shrink-0 bg-white dark:bg-white/5 border border-purple-500/20 rounded-2xl p-4 shadow-sm">
+                              <span className="text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1">Overall Performance</span>
+                              <span className="text-3xl font-black bg-gradient-to-r from-purple-600 to-indigo-500 bg-clip-text text-transparent">{aiData.global.overall.score}%</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Global Key Problems & Recommendations */}
+                    {aiData.global && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-white dark:bg-surface-dark rounded-2xl border border-red-500/20 p-6 shadow-sm">
+                          <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-5 border-b border-red-500/10 pb-3 flex items-center gap-2">
+                            <TrendingDown className="h-3.5 w-3.5" /> Key Systemic Problems
+                          </h4>
+                          <ul className="space-y-3">
+                            {aiData.global.key_problems.length ? aiData.global.key_problems.map((p, i) => (
+                              <li key={i} className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+                                <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                                {p}
+                              </li>
+                            )) : <li className="text-xs text-slate-400 italic">No major systemic issues identified.</li>}
+                          </ul>
+                        </div>
+                        <div className="bg-white dark:bg-surface-dark rounded-2xl border border-emerald-500/20 p-6 shadow-sm">
+                          <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-5 border-b border-emerald-500/10 pb-3 flex items-center gap-2">
+                            <TrendingUp className="h-3.5 w-3.5" /> Strategic Recommendations
+                          </h4>
+                          <ul className="space-y-3">
+                            {aiData.global.recommendations.length ? aiData.global.recommendations.map((r, i) => (
+                              <li key={i} className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+                                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 mt-0.5" />
+                                {r}
+                              </li>
+                            )) : <li className="text-xs text-slate-400 italic">No recommendations at this time.</li>}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Per-Tag Analysis Cards */}
+                    {Object.entries(aiData.tags || {}).map(([tag, result]) => (
+                      <div key={tag} className="bg-white dark:bg-surface-dark rounded-3xl border border-slate-200 dark:border-white/5 p-7 shadow-sm space-y-6">
+                        {/* Tag header */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
+                            <Badge className={cn(
+                              "text-[9px] font-black uppercase border-none px-2.5 rounded-full",
+                              result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
+                              result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                              "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                            )}>
+                              {result.sentiment}
+                            </Badge>
+                            {result.score !== undefined && (
+                              <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[9px] font-black uppercase border-none px-2.5 rounded-full">
+                                Score: {result.score}%
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Summary */}
+                        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed border-l-4 border-indigo-500/30 pl-4">{result.summary}</p>
+
+                        {/* Strengths / Weaknesses / Actions */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-4">
+                            <p className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                              <TrendingUp className="h-3 w-3" /> Strengths
+                            </p>
+                            <ul className="space-y-2">
+                              {result.strengths.length ? result.strengths.map((s, i) => (
+                                <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
+                                </li>
+                              )) : <li className="text-xs text-slate-400 italic">None identified</li>}
+                            </ul>
+                          </div>
+                          <div className="rounded-xl bg-red-500/5 border border-red-500/15 p-4">
+                            <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                              <TrendingDown className="h-3 w-3" /> Weaknesses
+                            </p>
+                            <ul className="space-y-2">
+                              {result.weaknesses.length ? result.weaknesses.map((w, i) => (
+                                <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
+                                </li>
+                              )) : <li className="text-xs text-slate-400 italic">None identified</li>}
+                            </ul>
+                          </div>
+                          <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-4">
+                            <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                              <Zap className="h-3 w-3" /> Action Items
+                            </p>
+                            <ul className="space-y-2">
+                              {result.action_items.length ? result.action_items.map((a, i) => (
+                                <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                  <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
+                                </li>
+                              )) : <li className="text-xs text-slate-400 italic">None identified</li>}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
