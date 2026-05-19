@@ -16,6 +16,8 @@ import {
   ArrowLeft,
   MailCheck,
   Clock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -103,6 +105,8 @@ export default function RegisterForm() {
   const [otpEmail, setOtpEmail] = useState('');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const timer = useCountdown(OTP_COUNTDOWN);
 
   // ── Step 1: Account form ──────────────────────────────────────────────────
@@ -389,7 +393,24 @@ export default function RegisterForm() {
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                   </div>
-                  <input type="password" placeholder="••••••••" autoComplete="new-password" className={inputClass} {...step1Form.register('password')} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    className={`${inputClass} pr-12`}
+                    {...step1Form.register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5" />
+                    ) : (
+                      <Eye className="size-5" />
+                    )}
+                  </button>
                 </div>
                 {step1Form.formState.errors.password && (
                   <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.password.message}</p>
@@ -401,7 +422,24 @@ export default function RegisterForm() {
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                   </div>
-                  <input type="password" placeholder="••••••••" autoComplete="new-password" className={inputClass} {...step1Form.register('confirmPassword')} />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    className={`${inputClass} pr-12`}
+                    {...step1Form.register('confirmPassword')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="size-5" />
+                    ) : (
+                      <Eye className="size-5" />
+                    )}
+                  </button>
                 </div>
                 {step1Form.formState.errors.confirmPassword && (
                   <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.confirmPassword.message}</p>

@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
+import { Mail, Lock, LogIn, Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { loginSchema, type LoginFormData } from '../schemas/auth.schema';
@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 export default function LoginForm() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const { isLoading, isError, errorMessage } = useAppSelector(
     (s) => s.auth,
   );
@@ -84,12 +85,23 @@ export default function LoginForm() {
               <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
             </div>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               autoComplete="current-password"
-              className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm"
+              className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-12 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm"
               {...register('password')}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            >
+              {showPassword ? (
+                <EyeOff className="size-5" />
+              ) : (
+                <Eye className="size-5" />
+              )}
+            </button>
           </div>
           {errors.password && (
             <p className="text-xs text-red-500 ml-1">
