@@ -243,7 +243,19 @@ export default function CourseTasksView() {
  variant="outline"
  className="font-mono text-[10px] border-white/10 text-slate-500 uppercase"
  >
- Deadline: {new Date(task.deadline).toLocaleDateString()}
+ {(() => {
+   try {
+     const d = new Date(task.deadline);
+     const diff = d.getTime() - Date.now();
+     if (diff < 0) return `Expired: ${d.toLocaleDateString()}`;
+     const dDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+     const dHrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+     const dMin = Math.floor((diff / 1000 / 60) % 60);
+     if (dDays > 0) return `Deadline: ${dDays}d ${dHrs}h remaining`;
+     if (dHrs > 0) return `Deadline: ${dHrs}h ${dMin}m remaining`;
+     return `Deadline: ${dMin}m remaining`;
+   } catch { return `Deadline: ${task.deadline}`; }
+ })()}
  </Badge>
  <span className="text-[10px] text-slate-600 uppercase font-black">
  {task.status === 'ACTIVE' ? (
