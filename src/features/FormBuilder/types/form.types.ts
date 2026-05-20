@@ -29,7 +29,7 @@ export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT" | "COURSE";
 export type FormSettings = {
   title: string;
   description: string;
-  category: "GENERAL" | "SPECIALIZED";
+  category: "GENERAL" | "SPECIALIZED" | "QUIZ";
   evaluator_roles: FormRole[];
   subject_role: FormRole;
   is_anonymous: boolean;

@@ -9,11 +9,12 @@ import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
 import { BookOpen, Loader2, ArrowRight, Clock, Building2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/shared/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SubmitTaskModal } from '@/features/TaskManagement/components/SubmitTaskModal';
 
 export default function StudentDashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
@@ -139,7 +140,14 @@ export default function StudentDashboardPage() {
                 </div>
                 <div className="shrink-0">
                   <Button 
-                    onClick={() => setTaskToSubmit(task.id || task._id || '')}
+                    onClick={() => {
+                      const taskId = task.id || task._id || '';
+                      if (task.task_type === 'QUIZ') {
+                        navigate(`/dashboard/submit-quiz/${taskId}`);
+                      } else {
+                        setTaskToSubmit(taskId);
+                      }
+                    }}
                     className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors flex items-center gap-2 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)]"
                   >
                     Submit Now <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

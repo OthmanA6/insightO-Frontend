@@ -11,6 +11,8 @@ export interface Task {
     course_id?: string;
     specific_users?: string[];
   };
+  task_type?: 'ATTACHMENT' | 'QUIZ';
+  form_id?: string;
   attachments?: {
     url: string;
     fileName?: string;
@@ -31,6 +33,8 @@ export interface CreateTaskPayload {
     course_id?: string;
     specific_users?: string[];
   };
+  task_type?: 'ATTACHMENT' | 'QUIZ';
+  form_id?: string;
   attachments?: {
     url: string;
     fileName?: string;

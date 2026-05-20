@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
  ClipboardList, Plus, Search, MoreVertical, Edit3, Trash2, 
- Calendar, Users, Target, Clock, AlertCircle, CheckCircle2,
+ Users, Target, Clock, CheckCircle2,
  Filter, Download, ArrowUpRight, Loader2
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
@@ -13,9 +13,10 @@ import {
  DropdownMenuItem, 
  DropdownMenuTrigger 
 } from '@/shared/components/ui/dropdown-menu';
-import { cn } from '@/shared/lib/utils';
+
 import { toast } from 'sonner';
 import { TaskModal } from '../components/TaskModal';
+import { TaskTypeSelectorModal } from '../components/TaskTypeSelectorModal';
 import * as taskApi from '../api/taskApi';
 import type { Task, CreateTaskPayload } from '../api/taskApi';
 
@@ -23,7 +24,9 @@ export default function TaskManagementPage() {
  const [tasks, setTasks] = useState<Task[]>([]);
  const [isLoading, setIsLoading] = useState(true);
  const [searchQuery, setSearchQuery] = useState('');
- const [isModalOpen, setIsModalOpen] = useState(false);
+
+ const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+ const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
  const fetchTasks = async () => {
@@ -51,17 +54,20 @@ export default function TaskManagementPage() {
 
  const handleSave = async (payload: CreateTaskPayload) => {
  try {
+ let savedTask;
  if (editingTask) {
- await taskApi.updateTask(editingTask.id || editingTask._id!, payload);
+ savedTask = await taskApi.updateTask(editingTask.id || editingTask._id!, payload);
  toast.success('Task architecture updated');
  } else {
- await taskApi.createTask(payload);
+ savedTask = await taskApi.createTask(payload);
  toast.success('New task provisioned successfully');
  }
  fetchTasks();
- setIsModalOpen(false);
+ setIsTaskModalOpen(false);
+ return savedTask;
  } catch (error: any) {
  toast.error(error.response?.data?.message || 'Operation failed');
+ throw error;
  }
  };
 
@@ -94,7 +100,7 @@ export default function TaskManagementPage() {
  <Download className="mr-2 h-4 w-4"/> Export Report
  </Button>
  <Button 
- onClick={() => { setEditingTask(null); setIsModalOpen(true); }}
+ onClick={() => setIsSelectorOpen(true)}
  className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
  >
  <Plus className="h-5 w-5"/>
@@ -163,7 +169,7 @@ export default function TaskManagementPage() {
  </DropdownMenuTrigger>
  <DropdownMenuContent align="end"className="bg-[#0a0a0f] border-white/5 min-w-[160px]">
  <DropdownMenuItem 
- onClick={() => { setEditingTask(task); setIsModalOpen(true); }}
+ onClick={() => { setEditingTask(task); setIsTaskModalOpen(true); }}
  className="flex items-center gap-2 hover:bg-[#1a1d29] font-bold py-3 text-indigo-400 cursor-pointer"
  >
  <Edit3 className="h-4 w-4"/> Edit Details
@@ -222,12 +228,17 @@ export default function TaskManagementPage() {
  ))}
  </div>
 
- <TaskModal 
- open={isModalOpen} 
- onClose={() => setIsModalOpen(false)} 
- task={editingTask}
- onSave={handleSave}
- />
+ <TaskTypeSelectorModal 
+    open={isSelectorOpen} 
+    onClose={() => setIsSelectorOpen(false)} 
+    onSelectAttachment={() => setIsTaskModalOpen(true)} 
+  />
+  <TaskModal 
+    open={isTaskModalOpen} 
+    onClose={() => setIsTaskModalOpen(false)} 
+    task={editingTask}
+    onSave={handleSave}
+  />
  </div>
  );
 }

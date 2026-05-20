@@ -26,6 +26,7 @@ export interface TaskSubmission {
   } | string;
   content: string;
   attachments?: TaskSubmissionAttachment[];
+  form_answers?: { question_id: string; value: any }[];
   ai_evaluation?: {
     suggested_grade?: number;
     feedback?: string;
@@ -38,8 +39,9 @@ export interface TaskSubmission {
 }
 
 export interface CreateTaskSubmissionPayload {
-  content: string;
+  content?: string;
   attachments?: TaskSubmissionAttachment[];
+  form_answers?: { question_id: string; value: any }[];
 }
 
 export interface FinalizeGradePayload {

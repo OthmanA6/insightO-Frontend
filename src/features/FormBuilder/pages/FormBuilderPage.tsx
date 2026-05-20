@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import {
   DndContext,
   closestCenter,
@@ -62,6 +62,7 @@ import * as formApi from "../api/formApi"
 import * as departmentApi from "@/shared/api/departmentApi"
 import * as courseApi from "@/shared/api/courseApi"
 import * as userAdminApi from "@/shared/api/userAdminApi"
+import * as taskApi from "@/features/TaskManagement/api/taskApi"
 import { uploadFile } from "@/shared/api/utilityApi"
 import type { Department } from "@/shared/api/departmentApi"
 import type { Course } from "@/shared/api/courseApi"
@@ -106,10 +107,12 @@ const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }
 export default function FormBuilderPage() {
   const navigate = useNavigate()
   const { formId } = useParams<{ formId: string }>()
+  const [searchParams] = useSearchParams()
+  const taskId = searchParams.get('taskId')
   const [isLoading, setIsLoading] = useState(!!formId)
 
   // ─── Form Settings State ───
-  const [category, setCategory] = useState<"GENERAL" | "SPECIALIZED">("SPECIALIZED")
+  const [category, setCategory] = useState<"GENERAL" | "SPECIALIZED" | "QUIZ">(taskId ? "QUIZ" : "SPECIALIZED")
   const [formTitle, setFormTitle] = useState("New Evaluation Template")
   const [formDescription, setFormDescription] = useState("Provide feedback for the academic quarter.")
   const [evaluatorRoles, setEvaluatorRoles] = useState<FormRole[]>(["STUDENT"])
@@ -343,6 +346,11 @@ export default function FormBuilderPage() {
 
       const currentFormId = formId || form._id || form.id;
 
+      // Link form to task if taskId is present
+      if (taskId) {
+        await taskApi.updateTask(taskId, { form_id: currentFormId });
+      }
+
       // 2. Sync Questions
       for (const q of questions) {
         const payload: any = {
@@ -368,11 +376,16 @@ export default function FormBuilderPage() {
 
       if (formId) {
         toast.success("Form Architecture Updated!")
-        navigate("/dashboard/forms-surveys")
+        navigate(taskId ? "/dashboard/tasks" : "/dashboard/forms-surveys")
       } else {
-        toast.success("Form Architecture Published!")
-        setGeneratedFormId(currentFormId)
-        setIsShareOpen(true)
+        if (taskId) {
+          toast.success("Quiz linked to Task successfully")
+          navigate("/dashboard/tasks")
+        } else {
+          toast.success("Form Architecture Published!")
+          setGeneratedFormId(currentFormId)
+          setIsShareOpen(true)
+        }
       }
     } catch (err: any) {
       console.error("Publishing Error:", err)
@@ -389,7 +402,7 @@ export default function FormBuilderPage() {
     )
   }
 
-  const handleCategoryChange = (newCategory: "GENERAL" | "SPECIALIZED") => {
+  const handleCategoryChange = (newCategory: "GENERAL" | "SPECIALIZED" | "QUIZ") => {
     if (newCategory === category) return
     setCategory(newCategory)
 
@@ -706,198 +719,212 @@ export default function FormBuilderPage() {
                   className="space-y-8"
                 >
                   <div className="space-y-6">
-                    {/* Category Selector */}
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Form Category</Label>
-                      <div className="flex bg-[#0f111a] p-1 rounded-xl border border-white/5">
-                        <button
-                          onClick={() => handleCategoryChange("GENERAL")}
-                          className={cn(
-                            "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
-                            category === "GENERAL" ? "bg-indigo-600 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
-                          )}
-                        >
-                          General
-                        </button>
-                        <button
-                          onClick={() => handleCategoryChange("SPECIALIZED")}
-                          className={cn(
-                            "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
-                            category === "SPECIALIZED" ? "bg-amber-500 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
-                          )}
-                        >
-                          Academic
-                        </button>
-                      </div>
-                    </div>
-                    {category === "GENERAL" ? (
-                      <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                        <div className="space-y-3">
-                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Contextual Description</Label>
-                          <textarea
-                            value={formDescription}
-                            onChange={(e) => setFormDescription(e.target.value)}
-                            className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-medium rounded-xl p-3 outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none custom-scrollbar"
-                            placeholder="Describe the purpose of this data collection..."
-                          />
-                        </div>
-                      </div>
-                    ) : (
+                    {/* Category Selector & Target Entities hidden for Quiz Builder */}
+                    {!taskId && (
                       <>
                         <div className="space-y-3">
-                          <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.department ? "text-red-400" : "text-slate-500")}>Academic Department</Label>
-                          <select
-                            value={departmentId}
-                            onChange={(e) => {
-                              setDepartmentId(e.target.value);
-                              if (e.target.value) setValidationErrors(prev => ({ ...prev, department: false }));
-                            }}
-                            className={cn(
-                              "w-full bg-[#0f111a] border text-white text-xs font-bold rounded-xl p-3 outline-none transition-all focus:border-indigo-500",
-                              validationErrors.department ? "border-red-500/50" : "border-white/10"
-                            )}
-                          >
-                            <option value="">Select Target Entity</option>
-                            {departments.map(dept => (
-                              <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-3">
-                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Subject Entity</Label>
-                          <select
-                            value={subjectRole}
-                            onChange={(e) => {
-                              setSubjectRole(e.target.value as FormRole);
-                              setCourseId("");
-                              setInstructorId("");
-                            }}
-                            className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
-                          >
-                            <option value="INSTRUCTOR">Instructor</option>
-                            <option value="COURSE">Course</option>
-                            <option value="ADMIN">Administrator</option>
-                            <option value="HOD">Head of Department</option>
-                          </select>
-                        </div>
-
-                        {/* Cascading Logic: Select Course -> Select Instructor */}
-                        <AnimatePresence>
-                          {subjectRole === "COURSE" && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              className="space-y-6 overflow-hidden"
+                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Form Category</Label>
+                          <div className="flex bg-[#0f111a] p-1 rounded-xl border border-white/5">
+                            <button
+                              onClick={() => handleCategoryChange("GENERAL")}
+                              className={cn(
+                                "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
+                                category === "GENERAL" ? "bg-indigo-600 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
+                              )}
+                              disabled={!!taskId}
                             >
-                              <div className="space-y-3">
-                                <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.course ? "text-red-400" : "text-slate-500")}>Select Course</Label>
-                                <div className="relative">
-                                  <select 
-                                    value={courseId}
-                                    onChange={(e) => {
-                                      const newCourseId = e.target.value;
-                                      setCourseId(newCourseId);
-                                      const selectedCourse = courses.find(c => (c._id || c.id) === newCourseId);
-                                      const instId = selectedCourse?.instructorId 
-                                        ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
-                                        : null;
-                                        
-                                      if (instId) {
-                                        setInstructorId(instId);
-                                        setValidationErrors(prev => ({ ...prev, course: false, instructor: false }));
-                                      } else {
-                                        setInstructorId("");
-                                        if (newCourseId) setValidationErrors(prev => ({ ...prev, course: false }));
-                                      }
-                                    }}
-                                    className={cn(
-                                      "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
-                                      validationErrors.course ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
-                                    )}
-                                  >
-                                    <option value="" disabled hidden>Choose Course...</option>
-                                    {courses.filter(c => { 
-                                      if(!departmentId) return true; 
-                                      const raw = c.departmentId || (c as any).department_id; 
-                                      const cId = typeof raw === 'object' && raw !== null ? raw._id || raw.id : raw; 
-                                      return cId === departmentId; 
-                                    }).map(course => (
-                                      <option key={course._id || course.id} value={course._id || course.id}>{course.name}</option>
-                                    ))}
-                                  </select>
-                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
-                                </div>
-                              </div>
+                              General
+                            </button>
+                            <button
+                              onClick={() => handleCategoryChange("SPECIALIZED")}
+                              className={cn(
+                                "flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all",
+                                category === "SPECIALIZED" ? "bg-amber-500 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"
+                              )}
+                              disabled={!!taskId}
+                            >
+                              Academic
+                            </button>
+                            {category === "QUIZ" && (
+                              <button
+                                className="flex-1 py-2 px-3 rounded-lg text-[9px] font-black uppercase transition-all bg-emerald-500 text-white shadow-lg"
+                                disabled
+                              >
+                                Quiz Task
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        {category === "GENERAL" ? (
+                          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+                            <div className="space-y-3">
+                              <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Contextual Description</Label>
+                              <textarea
+                                value={formDescription}
+                                onChange={(e) => setFormDescription(e.target.value)}
+                                className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-medium rounded-xl p-3 outline-none focus:border-indigo-500 transition-all min-h-[100px] resize-none custom-scrollbar"
+                                placeholder="Describe the purpose of this data collection..."
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="space-y-3">
+                              <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.department ? "text-red-400" : "text-slate-500")}>Academic Department</Label>
+                              <select
+                                value={departmentId}
+                                onChange={(e) => {
+                                  setDepartmentId(e.target.value);
+                                  if (e.target.value) setValidationErrors(prev => ({ ...prev, department: false }));
+                                }}
+                                className={cn(
+                                  "w-full bg-[#0f111a] border text-white text-xs font-bold rounded-xl p-3 outline-none transition-all focus:border-indigo-500",
+                                  validationErrors.department ? "border-red-500/50" : "border-white/10"
+                                )}
+                              >
+                                <option value="">Select Target Entity</option>
+                                {departments.map(dept => (
+                                  <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
+                                ))}
+                              </select>
+                            </div>
 
-                              <AnimatePresence>
-                                {courseId && (
-                                  <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="space-y-3 overflow-hidden"
-                                  >
-                                    <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.instructor ? "text-red-400" : "text-slate-500")}>Target Instructor</Label>
+                            <div className="space-y-3">
+                              <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Subject Entity</Label>
+                              <select
+                                value={subjectRole}
+                                onChange={(e) => {
+                                  setSubjectRole(e.target.value as FormRole);
+                                  setCourseId("");
+                                  setInstructorId("");
+                                }}
+                                className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
+                              >
+                                <option value="INSTRUCTOR">Instructor</option>
+                                <option value="COURSE">Course</option>
+                                <option value="ADMIN">Administrator</option>
+                                <option value="HOD">Head of Department</option>
+                              </select>
+                            </div>
+
+                            {/* Cascading Logic: Select Course -> Select Instructor */}
+                            <AnimatePresence>
+                              {subjectRole === "COURSE" && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="space-y-6 overflow-hidden"
+                                >
+                                  <div className="space-y-3">
+                                    <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.course ? "text-red-400" : "text-slate-500")}>Select Course</Label>
                                     <div className="relative">
                                       <select 
-                                        value={instructorId}
+                                        value={courseId}
                                         onChange={(e) => {
-                                          setInstructorId(e.target.value);
-                                          if (e.target.value) setValidationErrors(prev => ({ ...prev, instructor: false }));
-                                        }}
-                                        className={cn(
-                                          "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
-                                          validationErrors.instructor ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
-                                        )}
-                                      >
-                                        <option value="" disabled hidden>Select Instructor...</option>
-                                        {(() => {
-                                          const selectedCourse = courses.find(c => (c._id || c.id) === courseId);
+                                          const newCourseId = e.target.value;
+                                          setCourseId(newCourseId);
+                                          const selectedCourse = courses.find(c => (c._id || c.id) === newCourseId);
                                           const instId = selectedCourse?.instructorId 
                                             ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
                                             : null;
                                             
-                                          const filteredInstructors = instId
-                                            ? instructors.filter(inst => ((inst as any)._id || inst.id) === instId)
-                                            : instructors;
-                                            
-                                          return filteredInstructors.map(inst => (
-                                            <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
-                                              {inst.firstName} {inst.lastName}
-                                            </option>
-                                          ));
-                                        })()}
+                                          if (instId) {
+                                            setInstructorId(instId);
+                                            setValidationErrors(prev => ({ ...prev, course: false, instructor: false }));
+                                          } else {
+                                            setInstructorId("");
+                                            if (newCourseId) setValidationErrors(prev => ({ ...prev, course: false }));
+                                          }
+                                        }}
+                                        className={cn(
+                                          "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                          validationErrors.course ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
+                                        )}
+                                      >
+                                        <option value="" disabled hidden>Choose Course...</option>
+                                        {courses.filter(c => { 
+                                          if(!departmentId) return true; 
+                                          const raw = c.departmentId || (c as any).department_id; 
+                                          const cId = typeof raw === 'object' && raw !== null ? raw._id || raw.id : raw; 
+                                          return cId === departmentId; 
+                                        }).map(course => (
+                                          <option key={course._id || course.id} value={course._id || course.id}>{course.name}</option>
+                                        ))}
                                       </select>
                                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
                                     </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                                  </div>
 
-                        <div className="space-y-3">
-                          <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Evaluator Audience</Label>
-                          <div className="grid grid-cols-2 gap-2">
-                            {["STUDENT", "INSTRUCTOR", "HOD"].map(role => (
-                              <button
-                                key={role}
-                                onClick={() => toggleRole(role as FormRole)}
-                                className={cn(
-                                  "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
-                                  evaluatorRoles.includes(role as FormRole)
-                                    ? "bg-indigo-600 border-indigo-500 text-white"
-                                    : "bg-[#0f111a] border-white/5 text-slate-500 hover:text-slate-300"
-                                )}
-                              >
-                                {role}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                                  <AnimatePresence>
+                                    {courseId && (
+                                      <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="space-y-3 overflow-hidden"
+                                      >
+                                        <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.instructor ? "text-red-400" : "text-slate-500")}>Target Instructor</Label>
+                                        <div className="relative">
+                                          <select 
+                                            value={instructorId}
+                                            onChange={(e) => {
+                                              setInstructorId(e.target.value);
+                                              if (e.target.value) setValidationErrors(prev => ({ ...prev, instructor: false }));
+                                            }}
+                                            className={cn(
+                                              "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                              validationErrors.instructor ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
+                                            )}
+                                          >
+                                            <option value="" disabled hidden>Select Instructor...</option>
+                                            {(() => {
+                                              const selectedCourse = courses.find(c => (c._id || c.id) === courseId);
+                                              const instId = selectedCourse?.instructorId 
+                                                ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
+                                                : null;
+                                                
+                                              const filteredInstructors = instId
+                                                ? instructors.filter(inst => ((inst as any)._id || inst.id) === instId)
+                                                : instructors;
+                                                
+                                              return filteredInstructors.map(inst => (
+                                                <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
+                                                  {inst.firstName} {inst.lastName}
+                                                </option>
+                                              ));
+                                            })()}
+                                          </select>
+                                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+
+                            <div className="space-y-3">
+                              <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Evaluator Audience</Label>
+                              <div className="grid grid-cols-2 gap-2">
+                                {["STUDENT", "INSTRUCTOR", "HOD"].map(role => (
+                                  <button
+                                    key={role}
+                                    onClick={() => toggleRole(role as FormRole)}
+                                    className={cn(
+                                      "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
+                                      evaluatorRoles.includes(role as FormRole)
+                                        ? "bg-indigo-600 border-indigo-500 text-white"
+                                        : "bg-[#0f111a] border-white/5 text-slate-500 hover:text-slate-300"
+                                    )}
+                                  >
+                                    {role}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </>
                     )}
 

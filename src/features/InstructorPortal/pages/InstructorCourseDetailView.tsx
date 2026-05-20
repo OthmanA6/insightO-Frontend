@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useAuth } from '@/features/auth/hooks/useAuth';
 import * as courseApi from '@/shared/api/courseApi';
 import * as taskApi from '@/features/TaskManagement/api/taskApi';
 import { getTaskSubmissions } from '@/shared/api/taskSubmissionApi';
@@ -8,6 +7,7 @@ import type { Course } from '@/shared/api/courseApi';
 import type { Task } from '@/features/TaskManagement/api/taskApi';
 import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
 import { TaskModal } from '@/features/TaskManagement/components/TaskModal';
+import { TaskTypeSelectorModal } from '@/features/TaskManagement/components/TaskTypeSelectorModal';
 import { BreadcrumbNav } from '@/shared/components/ui/BreadcrumbNav';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { Button } from '@/shared/components/ui/button';
@@ -20,13 +20,13 @@ import { toast } from 'sonner';
 
 export default function InstructorCourseDetailView() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { user } = useAuth();
   
   const [course, setCourse] = useState<Course | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,34 +54,19 @@ export default function InstructorCourseDetailView() {
 
   const handleCreateTask = async (payload: taskApi.CreateTaskPayload) => {
     try {
-      await taskApi.createTask(payload);
+      const savedTask = await taskApi.createTask(payload);
       toast.success('Task created successfully');
       // Refresh tasks
       const allTasks = await taskApi.getTasks();
       setTasks(allTasks.filter(t => t.target?.course_id === courseId));
+      return savedTask;
     } catch (error) {
       toast.error('Failed to create task');
       throw error;
     }
   };
 
-  // Extract unique students who have submitted
-  const uniqueStudentMap = new Map<string, any>();
-  submissions.forEach(sub => {
-    const student = (sub.submitter_id) as any;
-    if (student && student._id) {
-      if (!uniqueStudentMap.has(student._id)) {
-        uniqueStudentMap.set(student._id, {
-          id: student._id,
-          name: `${student.firstName} ${student.lastName}`,
-          email: student.email,
-          submissions: []
-        });
-      }
-      uniqueStudentMap.get(student._id).submissions.push(sub);
-    }
-  });
-  const students = Array.from(uniqueStudentMap.values());
+
 
   if (isLoading) {
     return (
@@ -126,7 +111,7 @@ export default function InstructorCourseDetailView() {
           </div>
 
           <Button 
-            onClick={() => setIsTaskModalOpen(true)}
+            onClick={() => setIsSelectorOpen(true)}
             className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all flex items-center gap-2"
           >
             <Plus className="h-5 w-5" /> Provision Task
@@ -271,6 +256,12 @@ export default function InstructorCourseDetailView() {
         </TabsContent>
       </Tabs>
 
+      <TaskTypeSelectorModal
+        open={isSelectorOpen}
+        onClose={() => setIsSelectorOpen(false)}
+        onSelectAttachment={() => setIsTaskModalOpen(true)}
+        courseId={courseId}
+      />
       {isTaskModalOpen && (
         <TaskModal 
           open={isTaskModalOpen}

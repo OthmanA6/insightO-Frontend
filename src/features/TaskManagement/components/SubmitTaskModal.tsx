@@ -1,12 +1,16 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Modal } from '@/shared/components/ui/Modal';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Loader2, UploadCloud, FileText, CheckCircle2, X } from 'lucide-react';
+import { Loader2, UploadCloud, FileText, CheckCircle2, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/shared/api/axiosInstance';
 import { submitTask } from '@/shared/api/taskSubmissionApi';
+import * as taskApi from '@/features/TaskManagement/api/taskApi';
+import * as formApi from '@/features/FormBuilder/api/formApi';
+import type { Task } from '@/features/TaskManagement/api/taskApi';
+import type { Form, Question } from '@/features/FormBuilder/types/form.types';
 
 interface SubmitTaskModalProps {
  taskId: string;
@@ -21,6 +25,38 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  const [isUploading, setIsUploading] = useState(false);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const fileInputRef = useRef<HTMLInputElement>(null);
+
+ const [task, setTask] = useState<Task | null>(null);
+ const [form, setForm] = useState<Form | null>(null);
+ const [isLoadingTask, setIsLoadingTask] = useState(false);
+ const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
+
+ useEffect(() => {
+   if (open && taskId) {
+     const fetchData = async () => {
+       setIsLoadingTask(true);
+       try {
+         const fetchedTask = await taskApi.getTaskById(taskId);
+         setTask(fetchedTask);
+         if (fetchedTask.task_type === 'QUIZ' && fetchedTask.form_id) {
+           const fetchedForm = await formApi.getForm(fetchedTask.form_id);
+           setForm(fetchedForm);
+         }
+       } catch (error) {
+         toast.error('Failed to load task details');
+       } finally {
+         setIsLoadingTask(false);
+       }
+     };
+     fetchData();
+   } else {
+     setTask(null);
+     setForm(null);
+     setContent('');
+     setAttachments([]);
+     setFormAnswers({});
+   }
+ }, [open, taskId]);
 
  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
  const file = e.target.files?.[0];
@@ -50,31 +86,50 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  };
 
  const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- if (!content.trim() && attachments.length === 0) {
- toast.error('Please provide some content or attach a file.');
- return;
- }
+   e.preventDefault();
 
- setIsSubmitting(true);
- try {
- const validAttachments = attachments.map(a => ({ url: a.url, fileName: a.fileName, size: a.size }));
- const payload: any = {};
- if (content.trim()) payload.content = content.trim();
- if (validAttachments.length > 0) payload.attachments = validAttachments;
+   if (task?.task_type === 'QUIZ') {
+     if (form) {
+       for (const q of form.questions) {
+         const qId = q.id || q._id!;
+         if (q.required && (formAnswers[qId] === undefined || formAnswers[qId] === '')) {
+           toast.error(`Please answer the required question: "${q.label}"`);
+           return;
+         }
+       }
+     }
+   } else {
+     if (!content.trim() && attachments.length === 0) {
+       toast.error('Please provide some content or attach a file.');
+       return;
+     }
+   }
 
- await submitTask(taskId, payload);
- toast.success('Task submitted successfully');
- setContent('');
- setAttachments([]);
- onSuccess?.();
- onClose();
- } catch (error: any) {
- const errorMessage = error.response?.data?.message || error.response?.data?.errors?.[0]?.message || error.message || 'Failed to submit task';
- toast.error(errorMessage);
- } finally {
- setIsSubmitting(false);
- }
+   setIsSubmitting(true);
+   try {
+     const validAttachments = attachments.map(a => ({ url: a.url, fileName: a.fileName, size: a.size }));
+     const payload: any = {};
+     
+     if (task?.task_type === 'QUIZ') {
+       payload.form_answers = Object.entries(formAnswers).map(([question_id, value]) => ({ question_id, value }));
+     } else {
+       if (content.trim()) payload.content = content.trim();
+       if (validAttachments.length > 0) payload.attachments = validAttachments;
+     }
+
+     await submitTask(taskId, payload);
+     toast.success('Task submitted successfully');
+     setContent('');
+     setAttachments([]);
+     setFormAnswers({});
+     onSuccess?.();
+     onClose();
+   } catch (error: any) {
+     const errorMessage = error.response?.data?.message || error.response?.data?.errors?.[0]?.message || error.message || 'Failed to submit task';
+     toast.error(errorMessage);
+   } finally {
+     setIsSubmitting(false);
+   }
  };
 
  return (
@@ -94,74 +149,182 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  />
  
  <Modal.Body className="p-6 md:p-8 space-y-6">
+ {isLoadingTask ? (
+   <div className="flex items-center justify-center py-12">
+     <Loader2 className="h-8 w-8 animate-spin text-primary" />
+   </div>
+ ) : (
  <form onSubmit={handleSubmit} className="space-y-8">
  
- <div className="space-y-2">
- <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Submission Content</Label>
- <Textarea
- value={content}
- onChange={(e) => setContent(e.target.value)}
- placeholder="Write your response, findings, or notes here..."
- className="bg-card border-border text-foreground min-h-[160px] rounded-2xl focus:ring-primary p-4"
- />
- </div>
+ {task?.task_type === 'QUIZ' ? (
+   !form ? (
+     <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
+       <AlertTriangle className="h-10 w-10 text-amber-500 mb-4 opacity-80" />
+       <h3 className="text-lg font-bold text-white">Quiz Under Construction</h3>
+       <p className="text-sm text-slate-400 mt-2">The instructor has not published the questions for this quiz yet.</p>
+     </div>
+   ) : (
+     <div className="space-y-8">
+       {form?.questions.map((q, idx) => {
+       const qId = q.id || q._id!;
+       return (
+         <div key={qId} className="space-y-3 bg-card border border-border p-5 rounded-2xl">
+           <Label className="text-sm font-bold text-foreground flex items-center gap-2">
+             {idx + 1}. {q.label}
+             {q.required && <span className="text-destructive">*</span>}
+           </Label>
+           
+           {q.type === 'short_text' && (
+             <input 
+               type="text" 
+               className="w-full bg-background border border-border text-foreground text-sm rounded-xl p-3 outline-none focus:border-primary"
+               value={formAnswers[qId] || ''}
+               onChange={e => setFormAnswers(prev => ({ ...prev, [qId]: e.target.value }))}
+             />
+           )}
+           {q.type === 'long_text' && (
+             <Textarea 
+               className="w-full bg-background border border-border text-foreground text-sm rounded-xl p-3 outline-none focus:border-primary min-h-[100px]"
+               value={formAnswers[qId] || ''}
+               onChange={e => setFormAnswers(prev => ({ ...prev, [qId]: e.target.value }))}
+             />
+           )}
+           {q.type === 'multiple_choice' && q.options && (
+             <div className="space-y-2 mt-2">
+               {q.options.map((opt, oIdx) => (
+                 <label key={oIdx} className="flex items-center gap-3 cursor-pointer">
+                   <input 
+                     type="radio" 
+                     name={`q_${qId}`}
+                     className="accent-primary w-4 h-4"
+                     checked={formAnswers[qId] === opt}
+                     onChange={() => setFormAnswers(prev => ({ ...prev, [qId]: opt }))}
+                   />
+                   <span className="text-sm text-foreground">{opt}</span>
+                 </label>
+               ))}
+             </div>
+           )}
+           {q.type === 'checkbox' && q.options && (
+             <div className="space-y-2 mt-2">
+               {q.options.map((opt, oIdx) => {
+                 const currentAns = Array.isArray(formAnswers[qId]) ? formAnswers[qId] : [];
+                 return (
+                   <label key={oIdx} className="flex items-center gap-3 cursor-pointer">
+                     <input 
+                       type="checkbox" 
+                       className="accent-primary w-4 h-4 rounded"
+                       checked={currentAns.includes(opt)}
+                       onChange={(e) => {
+                         if (e.target.checked) {
+                           setFormAnswers(prev => ({ ...prev, [qId]: [...currentAns, opt] }));
+                         } else {
+                           setFormAnswers(prev => ({ ...prev, [qId]: currentAns.filter((a: string) => a !== opt) }));
+                         }
+                       }}
+                     />
+                     <span className="text-sm text-foreground">{opt}</span>
+                   </label>
+                 );
+               })}
+             </div>
+           )}
+           {q.type === 'linear_scale' && q.scale && (
+             <div className="flex items-center gap-2 mt-2 flex-wrap">
+               {Array.from({ length: q.scale.max - q.scale.min + 1 }).map((_, i) => {
+                 const val = q.scale!.min + i;
+                 return (
+                   <button
+                     key={val}
+                     type="button"
+                     onClick={() => setFormAnswers(prev => ({ ...prev, [qId]: val }))}
+                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors border ${
+                       formAnswers[qId] === val 
+                         ? 'bg-primary text-primary-foreground border-primary shadow-lg' 
+                         : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                     }`}
+                   >
+                     {val}
+                   </button>
+                 );
+               })}
+             </div>
+           )}
+         </div>
+       );
+     })}
+     </div>
+   )
+ ) : (
+   <>
+     <div className="space-y-2">
+       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Submission Content</Label>
+       <Textarea
+         value={content}
+         onChange={(e) => setContent(e.target.value)}
+         placeholder="Write your response, findings, or notes here..."
+         className="bg-card border-border text-foreground min-h-[160px] rounded-2xl focus:ring-primary p-4"
+       />
+     </div>
 
- <div className="space-y-3">
- <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Attachments (Optional)</Label>
- 
- <div 
- onClick={() => !isUploading && fileInputRef.current?.click()}
- className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${
- isUploading 
- ? 'border-primary/50 bg-primary/5 cursor-wait' 
- : 'border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer'
- }`}
- >
- <input 
- type="file"
- className="hidden"
- ref={fileInputRef} 
- onChange={handleFileUpload} 
- accept=".pdf,.png,.jpg,.jpeg,.txt,.js,.ts,.py,.cpp,.java,.html,.css,.json"
- />
- 
- <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
- {isUploading ? <Loader2 className="h-6 w-6 animate-spin"/> : <UploadCloud className="h-6 w-6"/>}
- </div>
- <div className="text-center">
- <p className="text-sm font-bold text-foreground">
- {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
- </p>
- <p className="text-xs text-muted-foreground mt-1">PDF, TXT, PNG, JPG (Max 10MB)</p>
- </div>
- </div>
+     <div className="space-y-3">
+       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Attachments (Optional)</Label>
+       
+       <div 
+         onClick={() => !isUploading && fileInputRef.current?.click()}
+         className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${
+           isUploading 
+             ? 'border-primary/50 bg-primary/5 cursor-wait' 
+             : 'border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer'
+         }`}
+       >
+         <input 
+           type="file"
+           className="hidden"
+           ref={fileInputRef} 
+           onChange={handleFileUpload} 
+           accept=".pdf,.png,.jpg,.jpeg,.txt,.js,.ts,.py,.cpp,.java,.html,.css,.json"
+         />
+         
+         <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+           {isUploading ? <Loader2 className="h-6 w-6 animate-spin"/> : <UploadCloud className="h-6 w-6"/>}
+         </div>
+         <div className="text-center">
+           <p className="text-sm font-bold text-foreground">
+             {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
+           </p>
+           <p className="text-xs text-muted-foreground mt-1">PDF, TXT, PNG, JPG (Max 10MB)</p>
+         </div>
+       </div>
 
- {attachments.length > 0 && (
- <div className="space-y-2 mt-2">
- {attachments.map((att, idx) => (
- <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
- <div className="flex items-center gap-3 min-w-0">
- <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
- <FileText className="h-4 w-4"/>
- </div>
- <div className="flex flex-col min-w-0">
- <span className="text-xs font-bold text-foreground truncate">{att.fileName || 'Attachment'}</span>
- {att.size && <span className="text-[10px] text-muted-foreground font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
- </div>
- </div>
- <Button
- type="button"
- variant="ghost"
- onClick={() => removeAttachment(idx)}
- className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
- >
- <X className="h-4 w-4"/>
- </Button>
- </div>
- ))}
- </div>
+       {attachments.length > 0 && (
+         <div className="space-y-2 mt-2">
+           {attachments.map((att, idx) => (
+             <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
+               <div className="flex items-center gap-3 min-w-0">
+                 <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                   <FileText className="h-4 w-4"/>
+                 </div>
+                 <div className="flex flex-col min-w-0">
+                   <span className="text-xs font-bold text-foreground truncate">{att.fileName || 'Attachment'}</span>
+                   {att.size && <span className="text-[10px] text-muted-foreground font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                 </div>
+               </div>
+               <Button
+                 type="button"
+                 variant="ghost"
+                 onClick={() => removeAttachment(idx)}
+                 className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+               >
+                 <X className="h-4 w-4"/>
+               </Button>
+             </div>
+           ))}
+         </div>
+       )}
+     </div>
+   </>
  )}
- </div>
 
  <div className="pt-6 border-t border-border flex justify-end gap-3">
  <Button variant="ghost"type="button"onClick={onClose} className="h-12 px-6 rounded-xl text-muted-foreground">
@@ -169,7 +332,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  </Button>
  <Button 
  type="submit"
- disabled={isSubmitting || (!content.trim() && attachments.length === 0)}
+ disabled={isSubmitting || (task?.task_type !== 'QUIZ' && !content.trim() && attachments.length === 0) || (task?.task_type === 'QUIZ' && !form)}
  className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold transition-[border-color,background-color] flex items-center gap-2"
  >
  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin"/> : <CheckCircle2 className="h-4 w-4"/>}
@@ -178,6 +341,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  </div>
  
  </form>
+ )}
  </Modal.Body>
  </Modal>
  );

@@ -9,13 +9,14 @@ import { BookOpen, Loader2, ArrowRight, Clock, Building2, CheckCircle2, Search, 
 import { format } from 'date-fns';
 import { Button } from '@/shared/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SubmitTaskModal } from '@/features/TaskManagement/components/SubmitTaskModal';
 
 type ViewMode = 'GRID' | 'LIST';
 type TaskFilter = 'ALL' | 'PENDING' | 'SUBMITTED' | 'GRADED';
 
 export default function StudentCoursesAndTasksPage() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
@@ -283,7 +284,13 @@ export default function StudentCoursesAndTasksPage() {
                     <div className="mt-6 relative z-10">
                       {isPending && (
                         <Button 
-                          onClick={() => setTaskToSubmit(taskId || '')}
+                          onClick={() => {
+                            if (task.task_type === 'QUIZ') {
+                              navigate(`/dashboard/submit-quiz/${taskId}`);
+                            } else {
+                              setTaskToSubmit(taskId || '');
+                            }
+                          }}
                           className="w-full h-10 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
                         >
                           Submit Assignment <ArrowRight className="h-3.5 w-3.5 ml-1" />
@@ -341,7 +348,13 @@ export default function StudentCoursesAndTasksPage() {
                           <td className="px-6 py-4 text-right">
                             {isPending && (
                               <Button 
-                                onClick={() => setTaskToSubmit(taskId || '')}
+                                onClick={() => {
+                                  if (task.task_type === 'QUIZ') {
+                                    navigate(`/dashboard/submit-quiz/${taskId}`);
+                                  } else {
+                                    setTaskToSubmit(taskId || '');
+                                  }
+                                }}
                                 size="sm"
                                 className="h-8 rounded-lg text-[10px] px-3"
                               >

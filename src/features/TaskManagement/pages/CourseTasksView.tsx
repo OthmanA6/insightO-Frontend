@@ -17,6 +17,7 @@ import {
 
 import { toast } from 'sonner';
 import { TaskModal } from '../components/TaskModal';
+import { TaskTypeSelectorModal } from '../components/TaskTypeSelectorModal';
 import { BreadcrumbNav } from '@/shared/components/ui/BreadcrumbNav';
 import * as taskApi from '../api/taskApi';
 import * as departmentApi from '@/shared/api/departmentApi';
@@ -33,7 +34,8 @@ export default function CourseTasksView() {
  const [tasks, setTasks] = useState<Task[]>([]);
  const [isLoading, setIsLoading] = useState(true);
  const [searchQuery, setSearchQuery] = useState('');
- const [isModalOpen, setIsModalOpen] = useState(false);
+ const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+ const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
  // Context names for breadcrumb
@@ -106,17 +108,20 @@ export default function CourseTasksView() {
  };
 
  try {
+ let savedTask;
  if (editingTask) {
- await taskApi.updateTask(editingTask.id || editingTask._id!, enrichedPayload);
+ savedTask = await taskApi.updateTask(editingTask.id || editingTask._id!, enrichedPayload);
  toast.success('Task architecture updated');
  } else {
- await taskApi.createTask(enrichedPayload);
+ savedTask = await taskApi.createTask(enrichedPayload);
  toast.success('New task provisioned successfully');
  }
  fetchTasks();
- setIsModalOpen(false);
+ setIsTaskModalOpen(false);
+ return savedTask;
  } catch (error: any) {
  toast.error(error.response?.data?.message || 'Operation failed');
+ throw error;
  }
  };
 
@@ -171,7 +176,7 @@ export default function CourseTasksView() {
  <Button
  onClick={() => {
  setEditingTask(null);
- setIsModalOpen(true);
+ setIsSelectorOpen(true);
  }}
  className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
  >
@@ -276,7 +281,7 @@ export default function CourseTasksView() {
  <DropdownMenuItem
  onClick={() => {
  setEditingTask(task);
- setIsModalOpen(true);
+ setIsTaskModalOpen(true);
  }}
  className="flex items-center gap-2 hover:bg-[#1a1d29] font-bold py-3 text-indigo-400 cursor-pointer"
  >
@@ -359,9 +364,16 @@ export default function CourseTasksView() {
  )}
  </div>
 
+ <TaskTypeSelectorModal
+ open={isSelectorOpen}
+ onClose={() => setIsSelectorOpen(false)}
+ onSelectAttachment={() => setIsTaskModalOpen(true)}
+ courseId={courseId}
+ departmentId={departmentId}
+ />
  <TaskModal
- open={isModalOpen}
- onClose={() => setIsModalOpen(false)}
+ open={isTaskModalOpen}
+ onClose={() => setIsTaskModalOpen(false)}
  task={editingTask}
  onSave={handleSave}
  contextDepartmentId={departmentId}

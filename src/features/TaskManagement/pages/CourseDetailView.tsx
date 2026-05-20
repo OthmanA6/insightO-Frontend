@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import * as courseApi from '@/shared/api/courseApi';
 import * as taskApi from '@/features/TaskManagement/api/taskApi';
 import type { Course } from '@/shared/api/courseApi';
@@ -12,6 +12,7 @@ import { BreadcrumbNav } from '@/shared/components/ui/BreadcrumbNav';
 
 export default function CourseDetailView() {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const [course, setCourse] = useState<Course | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +155,14 @@ export default function CourseDetailView() {
 
                 <div className="pt-6 mt-6 border-t border-white/10">
                   <Button 
-                    onClick={() => setTaskToSubmit(task.id || task._id || '')}
+                    onClick={() => {
+                      const taskId = task.id || task._id || '';
+                      if (task.task_type === 'QUIZ') {
+                        navigate(`/dashboard/submit-quiz/${taskId}`);
+                      } else {
+                        setTaskToSubmit(taskId);
+                      }
+                    }}
                     className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
                   >
                     Submit Assignment <ArrowRight className="h-4 w-4" />

@@ -19,6 +19,9 @@ import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCy
 import GlobalAnalyticsPage from '@/features/Analytics/pages/GlobalAnalyticsPage'
 import CourseTasksView from '@/features/TaskManagement/pages/CourseTasksView'
 import TaskSubmissionsPage from '@/features/TaskManagement/pages/TaskSubmissionsPage'
+import QuizBuilderPage from '@/features/TaskManagement/pages/QuizBuilderPage'
+import SubmitQuizPage from '@/features/TaskManagement/pages/SubmitQuizPage'
+import InstructorGradingPage from '@/features/TaskManagement/pages/InstructorGradingPage'
 import { ProtectedRoute } from '@/shared/components/layout/ProtectedRoute'
 import StudentDashboardPage from '@/features/StudentPortal/pages/StudentDashboardPage'
 import StudentCoursesAndTasksPage from '@/features/StudentPortal/pages/StudentCoursesAndTasksPage'
@@ -71,6 +74,7 @@ function App() {
             <Route path="student-evaluations" element={<MySubmissionsPage />} />
             <Route path="student-surveys" element={<StudentSurveysPage />} />
             <Route path="student-courses/:courseId" element={<CourseDetailView />} />
+            <Route path="submit-quiz/:taskId" element={<SubmitQuizPage />} />
           </Route>
 
           {/* Instructor routes */}
@@ -78,11 +82,13 @@ function App() {
             <Route path="courses" element={<InstructorCourseManagement />} />
             <Route path="courses/:courseId" element={<InstructorCourseDetailView />} />
             <Route path="courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
+            <Route path="courses/:courseId/tasks/:taskId/submissions/:submissionId/grade" element={<InstructorGradingPage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'HOD', 'INSTRUCTOR']} />}>
             <Route path="forms-surveys" element={<FormsSurveysPage />} />
             <Route path="builder" element={<Navigate to="/builder" replace />} />
+            <Route path="quiz-builder" element={<QuizBuilderPage />} />
             <Route path="users" element={<UserManagementPage />} />
 
             {/* ── Hierarchical Department ➔ Course ➔ Task ➔ Submissions ── */}
@@ -90,6 +96,7 @@ function App() {
             <Route path="departments/:departmentId" element={<DepartmentDetailPage />} />
             <Route path="departments/:departmentId/courses/:courseId" element={<CourseTasksView />} />
             <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
+            <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId/submissions/:submissionId/grade" element={<InstructorGradingPage />} />
 
             <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
             <Route path="analytics" element={<GlobalAnalyticsPage />} />

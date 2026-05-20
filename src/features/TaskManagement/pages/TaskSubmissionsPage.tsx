@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
  FileText, User, Clock, CheckCircle2, AlertCircle,
  Loader2, Download, Star, MessageSquare, Paperclip,
@@ -13,9 +13,10 @@ import * as departmentApi from '@/shared/api/departmentApi';
 import * as courseApi from '@/shared/api/courseApi';
 import * as taskApi from '@/features/TaskManagement/api/taskApi';
 import * as taskSubmissionApi from '@/shared/api/taskSubmissionApi';
+import * as formApi from '@/features/FormBuilder/api/formApi';
 import type { Task } from '@/features/TaskManagement/api/taskApi';
+import type { Form } from '@/features/FormBuilder/types/form.types';
 import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
-import { InstructorGradingModal } from '@/features/TaskManagement/components/InstructorGradingModal';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
 export default function TaskSubmissionsPage() {
@@ -25,14 +26,13 @@ export default function TaskSubmissionsPage() {
  taskId: string;
  }>();
 
+ const navigate = useNavigate();
  const { user } = useAuth();
  const [task, setTask] = useState<Task | null>(null);
+ const [form, setForm] = useState<Form | null>(null);
  const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
  const [isLoading, setIsLoading] = useState(true);
  
- // Modal State
- const [gradingSubmission, setGradingSubmission] = useState<TaskSubmission | null>(null);
-
  // Breadcrumb context
  const [departmentName, setDepartmentName] = useState('');
  const [courseName, setCourseName] = useState('');
@@ -59,7 +59,7 @@ export default function TaskSubmissionsPage() {
 
  useEffect(() => {
  const fetchData = async () => {
- if (!taskId) return;
+ if (!taskId || taskId === 'undefined' || taskId.startsWith(':')) return;
  setIsLoading(true);
  try {
  const [taskData, submissionsData] = await Promise.all([
@@ -68,6 +68,10 @@ export default function TaskSubmissionsPage() {
  ]);
  setTask(taskData);
  setSubmissions(submissionsData);
+ if (taskData.task_type === 'QUIZ' && taskData.form_id) {
+   const formData = await formApi.getForm(taskData.form_id);
+   setForm(formData);
+ }
  } catch (error) {
  toast.error('Failed to load task submissions');
  } finally {
@@ -76,24 +80,6 @@ export default function TaskSubmissionsPage() {
  };
  fetchData();
  }, [taskId]);
-
- const handleFinalizeGrade = async (submissionId: string, grade: number, feedback: string) => {
- try {
- await taskSubmissionApi.finalizeGrade(submissionId, {
- final_grade: grade,
- instructor_feedback: feedback,
- });
- toast.success('Evaluation Finalized');
- // Refresh submissions
- if (taskId) {
- const updated = await taskSubmissionApi.getTaskSubmissions(taskId);
- setSubmissions(updated);
- }
- } catch (error: any) {
- toast.error(error.response?.data?.message || 'Failed to finalize grade');
- throw error;
- }
- };
 
  const getStatusColor = (status: string) => {
  switch (status) {
@@ -251,11 +237,31 @@ export default function TaskSubmissionsPage() {
  </p>
 
  {/* Submitted content */}
- <div className="mt-4 p-4 rounded-2xl bg-[#0f111a] border border-white/5">
- <p className="text-sm text-slate-300 leading-relaxed">
- {sub.content || 'No content provided.'}
- </p>
- </div>
+ {task?.task_type === 'QUIZ' && sub.form_answers && sub.form_answers.length > 0 ? (
+   <div className="mt-4 space-y-4 p-5 rounded-2xl bg-[#0f111a] border border-white/5">
+     <div className="flex items-center gap-2 mb-2">
+       <div className="h-2 w-2 rounded-full bg-indigo-500" />
+       <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Quiz Responses</span>
+     </div>
+     {sub.form_answers.map((ans, i) => {
+       const qLabel = form?.questions.find((q) => String(q.id || q._id) === String(ans.question_id))?.label || `Question ${i + 1}`;
+       return (
+         <div key={i} className="space-y-1">
+           <p className="text-xs font-bold text-slate-400">{qLabel}</p>
+           <p className="text-sm text-slate-200">
+             {Array.isArray(ans.value) ? ans.value.join(', ') : String(ans.value)}
+           </p>
+         </div>
+       );
+     })}
+   </div>
+ ) : (
+   <div className="mt-4 p-4 rounded-2xl bg-[#0f111a] border border-white/5">
+     <p className="text-sm text-slate-300 leading-relaxed">
+       {sub.content || 'No content provided.'}
+     </p>
+   </div>
+ )}
 
  {/* Attachments */}
  {sub.attachments && sub.attachments.length > 0 && (
@@ -299,13 +305,13 @@ export default function TaskSubmissionsPage() {
 
  {/* Grades */}
  <div className="space-y-2 text-right">
- {sub.ai_grade !== undefined && sub.ai_grade !== null && (
+ {sub.ai_evaluation?.suggested_grade !== undefined && sub.ai_evaluation?.suggested_grade !== null && (
  <div className="flex items-center gap-2">
  <Star className="h-3.5 w-3.5 text-amber-400"/>
  <span className="text-xs font-bold text-slate-400">
  AI Grade:{' '}
  <span className="text-amber-400 font-black">
- {sub.ai_grade}
+ {sub.ai_evaluation.suggested_grade}
  </span>
  </span>
  </div>
@@ -343,7 +349,13 @@ export default function TaskSubmissionsPage() {
  ?"text-slate-400 border-white/10 hover:bg-[#1a1d29] hover:text-slate-200"
  :"text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
  )}
- onClick={() => setGradingSubmission(sub)}
+  onClick={() => {
+    const subId = sub.id || sub._id;
+    const targetUrl = departmentId
+      ? `/dashboard/departments/${departmentId}/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`
+      : `/dashboard/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`;
+    navigate(targetUrl);
+  }}
  >
  <Star className="mr-1.5 h-3.5 w-3.5"/>
  {sub.status === 'FINALIZED' ? 'Update Evaluation' : 'Finalize Grade'}
@@ -357,14 +369,7 @@ export default function TaskSubmissionsPage() {
  )}
  </div>
 
- {gradingSubmission && (
- <InstructorGradingModal 
- open={!!gradingSubmission}
- onClose={() => setGradingSubmission(null)}
- submission={gradingSubmission}
- onFinalize={handleFinalizeGrade}
- />
- )}
+  {/* Modal state has been migrated to standalone InstructorGradingPage */}
  </div>
  );
 }
