@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom"
 import { 
   LayoutDashboard, FileText, BarChart3, Settings, 
-  Users, Building2, Calendar, ShieldCheck, BookOpen, ClipboardCheck, FileQuestion
+  Users, Building2, Calendar, ShieldCheck, BookOpen, ClipboardCheck, FileQuestion, Zap
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { buttonVariants } from "@/shared/components/ui/button"
@@ -39,6 +39,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       title: "System",
       items: [
         { name: "Security & Logs", href: "/dashboard/settings", icon: ShieldCheck },
+        { name: "AI Token Usage", href: "/dashboard/ai-usage-dashboard", icon: Zap },
         { name: "Settings", href: "/dashboard/settings", icon: Settings },
       ]
     }
@@ -62,6 +63,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       items: [
         { name: "Command Center", href: "/dashboard", icon: LayoutDashboard },
         { name: "My Courses", href: "/dashboard/courses", icon: BookOpen },
+        { name: "AI Quota", href: "/dashboard/ai-usage-dashboard", icon: Zap },
       ]
     }
   ];

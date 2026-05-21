@@ -33,6 +33,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import InstructorDashboardPage from '@/features/InstructorPortal/pages/InstructorDashboardPage'
 import InstructorCourseManagement from '@/features/InstructorPortal/pages/InstructorCourseManagement'
 import InstructorCourseDetailView from '@/features/InstructorPortal/pages/InstructorCourseDetailView'
+import AiUsageDashboardPage from '@/features/AIUsage/pages/AiUsageDashboardPage'
 
 function DashboardRouter() {
   const { user } = useAuth();
@@ -100,6 +101,7 @@ function App() {
 
             <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
             <Route path="analytics" element={<GlobalAnalyticsPage />} />
+            <Route path="ai-usage-dashboard" element={<AiUsageDashboardPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="forms-results/:formId" element={<FormsResultsPage />} />
           </Route>
