@@ -83,7 +83,7 @@ export default function QuizBuilderPage() {
 
   const [isPublishing, setIsPublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"Saved" | "Saving..." | "Error">("Saved")
-  
+
   // AI Generator state
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState("")
@@ -207,8 +207,8 @@ export default function QuizBuilderPage() {
         title,
         description,
         category: 'QUIZ',
-        evaluator_roles: ['STUDENT'],
-        subject_role: 'INSTRUCTOR',
+        // evaluator_roles: ['STUDENT'],
+        // subject_role: 'INSTRUCTOR',
         is_anonymous: false,
         is_active: true,
         course_id: contextCourseId || undefined,
@@ -360,129 +360,129 @@ export default function QuizBuilderPage() {
         <div className="flex-1 bg-[#0a0a0f] overflow-y-auto custom-scrollbar relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-[#0a0a0f] to-[#0a0a0f] pointer-events-none" />
           <div className="max-w-3xl mx-auto py-12 px-6 relative z-10 space-y-8">
-            
+
             {/* Task Metadata UI Block */}
             <div className="p-8 rounded-3xl bg-[#13151f] border border-indigo-500/20 shadow-2xl space-y-6">
-               <h2 className="text-xl font-black text-white flex items-center gap-2 mb-4">
-                 <Settings className="h-5 w-5 text-indigo-400" /> Task Specification
-               </h2>
-               <div className="space-y-4">
+              <h2 className="text-xl font-black text-white flex items-center gap-2 mb-4">
+                <Settings className="h-5 w-5 text-indigo-400" /> Task Specification
+              </h2>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Task Title</Label>
+                  <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Context / Description</Label>
+                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="bg-[#0f111a] border-white/10 text-white rounded-xl" />
+                </div>
+
+                {/* Delivery Target Tabs UI (Migrated from TaskModal) */}
+                <div className="flex flex-col gap-4 mt-4">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Delivery Target</Label>
+                  <Tabs value={targetType} onValueChange={(v) => setTargetType(v as any)} className="w-full">
+                    <TabsList className={`grid w-full bg-[#0f111a] p-1 rounded-xl h-12 border border-white/5 ${contextCourseId ? 'grid-cols-1' : contextDepartmentId ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                      {(!contextDepartmentId || contextCourseId) && (
+                        <TabsTrigger value="COURSE" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
+                          <BookOpen className="h-3.5 w-3.5" /> Course
+                        </TabsTrigger>
+                      )}
+                      {!contextCourseId && (
+                        <TabsTrigger value="DEPARTMENT" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
+                          <Building2 className="h-3.5 w-3.5" /> Dept
+                        </TabsTrigger>
+                      )}
+                      {!contextCourseId && (
+                        <TabsTrigger value="SPECIFIC" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
+                          <Users className="h-3.5 w-3.5" /> Specific
+                        </TabsTrigger>
+                      )}
+                    </TabsList>
+                  </Tabs>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6">
+                  {targetType === 'COURSE' && (
+                    <div className="flex items-center gap-4 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-indigo-400/80">
+                      <BookOpen className="h-5 w-5" />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Course Bound Delivery</span>
+                        <span className="text-sm font-bold text-slate-200">
+                          Target: {contextCourseId ? (contextCourseName || 'Loading...') : 'Inherited from View Context'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {targetType === 'DEPARTMENT' && (
+                    <div className="flex flex-col gap-2.5">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Select Department</Label>
+                      <div className="relative">
+                        <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500 pointer-events-none z-10" />
+                        <select
+                          value={deptId}
+                          onChange={(e) => setDeptId(e.target.value)}
+                          disabled={isDeptLocked}
+                          className="w-full h-12 pl-11 pr-10 rounded-xl bg-[#0f111a] border border-white/10 text-white text-sm font-medium appearance-none outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                        >
+                          <option value="">-- Choose Department --</option>
+                          {departments.map((d) => (
+                            <option key={d.id} value={d.id}>{d.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                  {targetType === 'SPECIFIC' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                          <Input
+                            value={studentSearch}
+                            onChange={(e) => setStudentSearch(e.target.value)}
+                            placeholder="Search student directory..."
+                            className="bg-[#0f111a] border-white/10 text-white h-11 pl-11 rounded-xl"
+                          />
+                        </div>
+                        {selectedUserIds.length > 0 && (
+                          <Button variant="ghost" size="sm" onClick={() => setSelectedUserIds([])} className="text-xs text-red-400 hover:bg-red-400/10">Clear {selectedUserIds.length}</Button>
+                        )}
+                      </div>
+                      <ScrollArea className="max-h-60 rounded-xl border border-white/5 bg-[#0f111a]/50 p-2">
+                        {isLoadingUsers ? (
+                          <div className="flex items-center justify-center gap-3 py-10"><Loader2 className="h-4 w-4 animate-spin" /></div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {filteredStudents.map((s) => (
+                              <div
+                                key={s.id}
+                                onClick={() => toggleStudent(s.id)}
+                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${selectedUserIds.includes(s.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-transparent border-white/5'}`}
+                              >
+                                <Checkbox checked={selectedUserIds.includes(s.id)} className="data-[state=checked]:bg-indigo-600" />
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs font-bold text-white truncate">{s.firstName} {s.lastName}</span>
+                                  <span className="text-[9px] font-medium text-slate-500 truncate">{s.email}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </ScrollArea>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                   <div className="flex flex-col gap-2">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Task Title</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl" />
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Submission Deadline</Label>
+                    <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} onClick={(e) => (e.currentTarget as any).showPicker?.()} className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500" required />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Context / Description</Label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="bg-[#0f111a] border-white/10 text-white rounded-xl" />
-                  </div>
-                  
-                  {/* Delivery Target Tabs UI (Migrated from TaskModal) */}
-                  <div className="flex flex-col gap-4 mt-4">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Delivery Target</Label>
-                      <Tabs value={targetType} onValueChange={(v) => setTargetType(v as any)} className="w-full">
-                          <TabsList className={`grid w-full bg-[#0f111a] p-1 rounded-xl h-12 border border-white/5 ${contextCourseId ? 'grid-cols-1' : contextDepartmentId ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                              {(!contextDepartmentId || contextCourseId) && (
-                                  <TabsTrigger value="COURSE" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
-                                      <BookOpen className="h-3.5 w-3.5" /> Course
-                                  </TabsTrigger>
-                              )}
-                              {!contextCourseId && (
-                                  <TabsTrigger value="DEPARTMENT" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
-                                      <Building2 className="h-3.5 w-3.5" /> Dept
-                                  </TabsTrigger>
-                              )}
-                              {!contextCourseId && (
-                                  <TabsTrigger value="SPECIFIC" className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2">
-                                      <Users className="h-3.5 w-3.5" /> Specific
-                                  </TabsTrigger>
-                              )}
-                          </TabsList>
-                      </Tabs>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 gap-6">
-                      {targetType === 'COURSE' && (
-                          <div className="flex items-center gap-4 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-indigo-400/80">
-                              <BookOpen className="h-5 w-5" />
-                              <div className="flex flex-col">
-                                  <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Course Bound Delivery</span>
-                                  <span className="text-sm font-bold text-slate-200">
-                                      Target: {contextCourseId ? (contextCourseName || 'Loading...') : 'Inherited from View Context'}
-                                  </span>
-                              </div>
-                          </div>
-                      )}
-                      {targetType === 'DEPARTMENT' && (
-                          <div className="flex flex-col gap-2.5">
-                              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Select Department</Label>
-                              <div className="relative">
-                                  <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500 pointer-events-none z-10" />
-                                  <select
-                                      value={deptId}
-                                      onChange={(e) => setDeptId(e.target.value)}
-                                      disabled={isDeptLocked}
-                                      className="w-full h-12 pl-11 pr-10 rounded-xl bg-[#0f111a] border border-white/10 text-white text-sm font-medium appearance-none outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                                  >
-                                      <option value="">-- Choose Department --</option>
-                                      {departments.map((d) => (
-                                          <option key={d.id} value={d.id}>{d.name}</option>
-                                      ))}
-                                  </select>
-                              </div>
-                          </div>
-                      )}
-                      {targetType === 'SPECIFIC' && (
-                          <div className="space-y-4">
-                              <div className="flex items-center justify-between gap-4">
-                                  <div className="relative flex-1">
-                                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                                      <Input
-                                          value={studentSearch}
-                                          onChange={(e) => setStudentSearch(e.target.value)}
-                                          placeholder="Search student directory..."
-                                          className="bg-[#0f111a] border-white/10 text-white h-11 pl-11 rounded-xl"
-                                      />
-                                  </div>
-                                  {selectedUserIds.length > 0 && (
-                                      <Button variant="ghost" size="sm" onClick={() => setSelectedUserIds([])} className="text-xs text-red-400 hover:bg-red-400/10">Clear {selectedUserIds.length}</Button>
-                                  )}
-                              </div>
-                              <ScrollArea className="max-h-60 rounded-xl border border-white/5 bg-[#0f111a]/50 p-2">
-                                  {isLoadingUsers ? (
-                                      <div className="flex items-center justify-center gap-3 py-10"><Loader2 className="h-4 w-4 animate-spin"/></div>
-                                  ) : (
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                          {filteredStudents.map((s) => (
-                                              <div
-                                                  key={s.id}
-                                                  onClick={() => toggleStudent(s.id)}
-                                                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${selectedUserIds.includes(s.id) ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-transparent border-white/5'}`}
-                                              >
-                                                  <Checkbox checked={selectedUserIds.includes(s.id)} className="data-[state=checked]:bg-indigo-600" />
-                                                  <div className="flex flex-col min-w-0">
-                                                      <span className="text-xs font-bold text-white truncate">{s.firstName} {s.lastName}</span>
-                                                      <span className="text-[9px] font-medium text-slate-500 truncate">{s.email}</span>
-                                                  </div>
-                                              </div>
-                                          ))}
-                                      </div>
-                                  )}
-                              </ScrollArea>
-                          </div>
-                      )}
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                     <div className="flex flex-col gap-2">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Submission Deadline</Label>
-                        <Input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} onClick={(e) => (e.currentTarget as any).showPicker?.()} className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500" required />
-                     </div>
-                  </div>
-                  <div className="flex flex-col gap-2 mt-4">
-                     <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">AI Grading Rubric <span className="text-red-400">*</span></Label>
-                     <Textarea value={rubric} onChange={(e) => setRubric(e.target.value)} placeholder="Provide specific instructions for the AI evaluator (e.g., 'Check for logical consistency, award points if...')" rows={4} className="bg-[#0f111a] border-white/10 text-white rounded-xl resize-none focus:ring-indigo-500" required />
-                  </div>
-               </div>
+                </div>
+                <div className="flex flex-col gap-2 mt-4">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">AI Grading Rubric <span className="text-red-400">*</span></Label>
+                  <Textarea value={rubric} onChange={(e) => setRubric(e.target.value)} placeholder="Provide specific instructions for the AI evaluator (e.g., 'Check for logical consistency, award points if...')" rows={4} className="bg-[#0f111a] border-white/10 text-white rounded-xl resize-none focus:ring-indigo-500" required />
+                </div>
+              </div>
             </div>
 
             {/* Questions Canvas */}
@@ -497,7 +497,7 @@ export default function QuizBuilderPage() {
                         question={q}
                         isActive={activeId === q.id}
                         isSelected={false}
-                        onSelect={() => {}}
+                        onSelect={() => { }}
                         onActivate={setActiveId}
                         onDelete={deleteQuestion}
                         onUpdate={updateQuestion}
@@ -524,9 +524,9 @@ export default function QuizBuilderPage() {
         {/* Right Sidebar - Field Specs */}
         <aside className="w-80 shrink-0 border-l border-white/5 bg-[#1e1b2e] flex flex-col hidden xl:flex z-10">
           <div className="flex border-b border-white/5 p-2 bg-[#13151f]">
-             <div className="flex-1 rounded-lg bg-[#2a2d3d] text-white flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all shadow-sm">
-                <Settings className="h-4 w-4" /> Field Specs
-             </div>
+            <div className="flex-1 rounded-lg bg-[#2a2d3d] text-white flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all shadow-sm">
+              <Settings className="h-4 w-4" /> Field Specs
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">

@@ -30,8 +30,8 @@ export type FormSettings = {
   title: string;
   description: string;
   category: "GENERAL" | "SPECIALIZED" | "QUIZ";
-  evaluator_roles: FormRole[];
-  subject_role: FormRole;
+  evaluator_roles?: FormRole[];
+  subject_role?: FormRole;
   is_anonymous: boolean;
   is_active: boolean;
   department_id?: string;

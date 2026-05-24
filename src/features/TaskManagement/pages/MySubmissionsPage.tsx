@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { getMySubmissions } from '@/shared/api/taskSubmissionApi';
 import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
-import { Loader2, ClipboardCheck, Sparkles, AlertCircle, CheckCircle2, Clock, FileText } from 'lucide-react';
+import { Loader2, ClipboardCheck, Sparkles, AlertCircle, CheckCircle2, Clock, FileText, Download } from 'lucide-react';
+import { SystemFileViewer } from '@/shared/components/ui/SystemFileViewer';
+import { Modal } from '@/shared/components/ui/Modal';
 import { format } from 'date-fns';
 
 export default function MySubmissionsPage() {
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<{ url: string; name: string } | null>(null);
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -71,14 +74,9 @@ export default function MySubmissionsPage() {
                     
                     {/* Status Badge */}
                     <div className="shrink-0">
-                      {sub.status === 'SUBMITTED' && (
+                      {(sub.status === 'SUBMITTED' || sub.status === 'AI_GRADED') && (
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs">
                           <AlertCircle className="h-3.5 w-3.5" /> Under Review
-                        </div>
-                      )}
-                      {sub.status === 'AI_GRADED' && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 font-bold text-xs">
-                          <Sparkles className="h-3.5 w-3.5" /> AI Reviewed
                         </div>
                       )}
                       {sub.status === 'FINALIZED' && (
@@ -100,38 +98,34 @@ export default function MySubmissionsPage() {
                   {sub.attachments && sub.attachments.length > 0 && (
                     <div className="flex flex-wrap gap-3">
                       {sub.attachments.map((att, idx) => (
-                        <a 
-                          key={idx} 
-                          href={att.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10 hover:border-primary/30 text-xs font-bold text-primary transition-colors"
-                        >
-                          <FileText className="h-3.5 w-3.5" /> {att.fileName || 'Attachment'}
-                        </a>
+                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10 hover:border-primary/30 transition-colors">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedFile({ url: att.url, name: att.fileName || 'Attachment' });
+                            }}
+                            className="flex items-center gap-2 text-xs font-bold text-emerald-500 hover:text-emerald-400 cursor-pointer"
+                            title="Smart View"
+                          >
+                            <FileText className="h-3.5 w-3.5" />
+                            {att.fileName || 'Attachment'}
+                          </button>
+                          <div className="w-px h-3.5 bg-primary/20 mx-1"></div>
+                          <a
+                            href={new URL(att.url, import.meta.env.VITE_API_URL || 'http://localhost:5000').href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary hover:text-primary/70 transition-colors"
+                            title="Download"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </a>
+                        </div>
                       ))}
                     </div>
                   )}
 
                   {/* Evaluation Sections */}
-                  {sub.status === 'AI_GRADED' && sub.ai_evaluation && (
-                    <div className="mt-4 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent border border-blue-500/20 p-6 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 p-6 opacity-5">
-                        <Sparkles className="h-24 w-24 text-blue-500" />
-                      </div>
-                      <div className="relative z-10 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-black uppercase tracking-widest text-blue-500 flex items-center gap-2">
-                            <Sparkles className="h-4 w-4" /> AI Evaluation
-                          </h4>
-                          <span className="text-sm font-black text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-lg">
-                            Score: {sub.ai_evaluation.suggested_grade}/100
-                          </span>
-                        </div>
-                        <p className="text-sm text-foreground/80 italic">"{sub.ai_evaluation.feedback}"</p>
-                      </div>
-                    </div>
-                  )}
 
                   {sub.status === 'FINALIZED' && (
                     <div className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/20 p-6 relative overflow-hidden">
@@ -162,6 +156,17 @@ export default function MySubmissionsPage() {
           })}
         </div>
       )}
+      {/* File Viewer Modal */}
+      <Modal
+        open={!!selectedFile}
+        onClose={() => setSelectedFile(null)}
+        title={selectedFile?.name || 'File Viewer'}
+        size="7xl"
+      >
+        {selectedFile && (
+          <SystemFileViewer fileUrl={selectedFile.url} fileName={selectedFile.name} />
+        )}
+      </Modal>
     </div>
   );
 }

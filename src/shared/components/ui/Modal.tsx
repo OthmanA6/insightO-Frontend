@@ -20,9 +20,9 @@ export interface ModalProps {
   className?: string
   /**
    * Maximum width of the panel.
-   * @default 'max-w-lg'
+   * @default 'md'
    */
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '7xl' | 'full'
 }
 
 // ─── Size map ────────────────────────────────────────────────────────────────
@@ -32,6 +32,7 @@ const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
   md:   'max-w-lg',
   lg:   'max-w-2xl',
   xl:   'max-w-4xl',
+  '7xl': 'max-w-7xl',
   full: 'max-w-full mx-4',
 }
 
