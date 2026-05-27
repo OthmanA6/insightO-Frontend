@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -9,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
   Search, Plus, MoreHorizontal, Shield, Mail, UserCheck,
-  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle
+  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle, User
 } from 'lucide-react';
 import { UserConfigurationModal } from '../components/UserConfigurationModal';
 import * as userAdminApi from '@/shared/api/userAdminApi';
@@ -326,7 +327,7 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                       <AvatarFallback className="bg-indigo-500/20 text-indigo-400 font-bold">{user.firstName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="font-bold text-slate-200">{user.firstName} {user.lastName}</span>
+                      <Link to={`/dashboard/users/${user.id}/profile`} className="font-bold text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">{user.firstName} {user.lastName}</Link>
                       <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                         <Mail className="h-3 w-3" /> {user.email}
                       </span>
@@ -394,6 +395,11 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-[#1e1b2e] border-white/10 text-slate-300">
                         <DropdownMenuLabel>User Management</DropdownMenuLabel>
+                        <DropdownMenuItem asChild className="hover:bg-indigo-600 hover:text-white cursor-pointer gap-2">
+                          <Link to={`/dashboard/users/${user.id}/profile`}>
+                            <User className="h-3.5 w-3.5" /> View Profile
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="hover:bg-indigo-600 hover:text-white cursor-pointer gap-2">
                           <Shield className="h-3.5 w-3.5" /> Edit Permissions
                         </DropdownMenuItem>

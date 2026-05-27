@@ -34,7 +34,8 @@ import InstructorDashboardPage from '@/features/InstructorPortal/pages/Instructo
 import InstructorCourseManagement from '@/features/InstructorPortal/pages/InstructorCourseManagement'
 import InstructorCourseDetailView from '@/features/InstructorPortal/pages/InstructorCourseDetailView'
 import AiUsageDashboardPage from '@/features/AIUsage/pages/AiUsageDashboardPage'
-
+import { UserDirectoryPage } from '@/features/UserManagement/components/UserDirectoryPage'
+import UserProfileViewPage from '@/features/UserManagement/pages/UserProfileViewPage'
 function DashboardRouter() {
   const { user } = useAuth();
   if (user?.role === 'STUDENT') {
@@ -68,6 +69,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route index element={<DashboardRouter />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="users/:userId/profile" element={<UserProfileViewPage />} />
           
           {/* Student routes */}
           <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
@@ -91,6 +93,7 @@ function App() {
             <Route path="builder" element={<Navigate to="/builder" replace />} />
             <Route path="quiz-builder" element={<QuizBuilderPage />} />
             <Route path="users" element={<UserManagementPage />} />
+            <Route path="directory" element={<UserDirectoryPage />} />
 
             {/* ── Hierarchical Department ➔ Course ➔ Task ➔ Submissions ── */}
             <Route path="departments" element={<DepartmentManagementPage />} />

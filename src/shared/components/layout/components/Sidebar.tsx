@@ -63,6 +63,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       items: [
         { name: "Command Center", href: "/dashboard", icon: LayoutDashboard },
         { name: "My Courses", href: "/dashboard/courses", icon: BookOpen },
+        { name: "Students Directory", href: "/dashboard/directory", icon: Users },
         { name: "AI Quota", href: "/dashboard/ai-usage-dashboard", icon: Zap },
       ]
     }

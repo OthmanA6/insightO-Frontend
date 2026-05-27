@@ -280,7 +280,7 @@ export default function InstructorGradingPage() {
             </div>
 
             {/* AI Co-Pilot Row */}
-            {aiEvaluation && (
+            {aiEvaluation && submission.status !== 'FINALIZED' && (
               <div className="bg-indigo-500/5 border border-indigo-500/10 p-2.5 rounded-xl flex items-center justify-between animate-in fade-in duration-300">
                 <div className="flex items-center gap-2">
                   <BrainCircuit className="h-4 w-4 text-indigo-400 shrink-0" />
@@ -310,6 +310,16 @@ export default function InstructorGradingPage() {
               </div>
             )}
 
+            {submission.status === 'FINALIZED' && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center gap-3 animate-in fade-in duration-300">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+                <div>
+                  <h4 className="text-sm font-bold text-emerald-400">Evaluation Finalized</h4>
+                  <p className="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-0.5">This submission has been graded.</p>
+                </div>
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmitEvaluation} className="space-y-4">
               <div className="space-y-1.5">
@@ -326,8 +336,9 @@ export default function InstructorGradingPage() {
                     value={grade}
                     onChange={(e) => setGrade(e.target.value)}
                     placeholder="e.g. 90"
-                    className="bg-[#0a0a0f] border-white/10 text-white h-10 pl-10 rounded-lg focus:ring-emerald-500 text-xs"
+                    className="bg-[#0a0a0f] border-white/10 text-white h-10 pl-10 rounded-lg focus:ring-emerald-500 text-xs disabled:opacity-70"
                     required
+                    disabled={submission.status === 'FINALIZED'}
                   />
                 </div>
               </div>
@@ -340,19 +351,22 @@ export default function InstructorGradingPage() {
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder="Provide detailed feedback to the student..."
-                    className="w-full bg-[#0a0a0f]/80 border border-white/10 rounded-xl text-white pl-10 pr-3.5 pt-3 pb-3 focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[100px] resize-y text-xs custom-scrollbar"
+                    className="w-full bg-[#0a0a0f]/80 border border-white/10 rounded-xl text-white pl-10 pr-3.5 pt-3 pb-3 focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[100px] resize-y text-xs custom-scrollbar disabled:opacity-70"
+                    disabled={submission.status === 'FINALIZED'}
                   />
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting || !grade}
-                className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
-              >
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                Finalize Evaluation
-              </Button>
+              {submission.status !== 'FINALIZED' && (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !grade}
+                  className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
+                >
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                  Finalize Evaluation
+                </Button>
+              )}
             </form>
           </div>
         </div>
