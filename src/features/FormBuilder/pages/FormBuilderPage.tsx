@@ -140,7 +140,7 @@ export default function FormBuilderPage() {
   const [isCopied, setIsCopied] = useState(false)
   const [previewUploads, setPreviewUploads] = useState<Record<string, { name: string, url: string, loading: boolean }>>({})
   const [previewAnswers, setPreviewAnswers] = useState<Record<string, any>>({})
-  
+
   // AI Generator state
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState("")
@@ -154,10 +154,10 @@ export default function FormBuilderPage() {
 
   // Derived share link
   const effectiveFormId = formId || generatedFormId;
-  const shareUrl = effectiveFormId 
-    ? (category === "GENERAL" 
-        ? `${window.location.origin}/public/form/${effectiveFormId}`
-        : `${window.location.origin}/dashboard/forms/${effectiveFormId}`)
+  const shareUrl = effectiveFormId
+    ? (category === "GENERAL"
+      ? `${window.location.origin}/public/form/${effectiveFormId}`
+      : `${window.location.origin}/dashboard/forms/${effectiveFormId}`)
     : `${window.location.origin}/form/preview`;
 
   useEffect(() => {
@@ -271,25 +271,25 @@ export default function FormBuilderPage() {
     const errors: Record<string, boolean> = {}
     if (category === "SPECIALIZED") {
       if (!departmentId) errors.department = true
+
       if (subjectRole === "COURSE") {
         if (!courseId) errors.course = true
-        if (!instructorId) errors.instructor = true
+        if (!instructorId) errors.instructor = true // الكورس دايما مربوط بدكتور
+      }
+
+      if (subjectRole === "INSTRUCTOR") {
+        if (!instructorId) errors.instructor = true // لازم نختار الدكتور
       }
     }
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors)
-      setActiveId('title') // Focus on properties to show cues
-      return
-    }
-    setValidationErrors({})
-    if (questions.length === 0) {
-      toast.error("Please add at least one question")
+      setActiveId('title')
       return
     }
 
     // ─── Backend Compliance Validation ───
-    const actualSubjectRole = subjectRole === "COURSE" ? "INSTRUCTOR" : subjectRole;
+    const actualSubjectRole = subjectRole;
     if (evaluatorRoles.includes(actualSubjectRole)) {
       toast.error(`Conflict: Evaluator roles cannot include the Subject role (${actualSubjectRole}).`)
       return
@@ -329,18 +329,19 @@ export default function FormBuilderPage() {
           is_anonymous: isAnonymous
         })
       } else {
-        // 1. Create the Form
+        // 1. Create the Form (تعديل الـ Payload هنا)
         form = await formApi.createForm({
           title: formTitle,
           description: formDescription,
           category: category,
           evaluator_roles: evaluatorRoles,
-          subject_role: actualSubjectRole,
+          subject_role: actualSubjectRole as FormRole,
           is_anonymous: isAnonymous,
           is_active: isActive,
           department_id: category === "SPECIALIZED" && departmentId ? departmentId : undefined,
           course_id: category === "SPECIALIZED" && subjectRole === "COURSE" && courseId ? courseId : undefined,
-          instructor_id: category === "SPECIALIZED" && subjectRole === "COURSE" && instructorId ? instructorId : undefined,
+          // هنبعت الـ instructor_id لو كنا بنقيم كورس أو دكتور بشكل مباشر
+          instructor_id: category === "SPECIALIZED" && ["COURSE", "INSTRUCTOR"].includes(subjectRole) && instructorId ? instructorId : undefined,
         })
       }
 
@@ -789,6 +790,7 @@ export default function FormBuilderPage() {
                               </select>
                             </div>
 
+                            {/* Subject Entity Selection */}
                             <div className="space-y-3">
                               <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Subject Entity</Label>
                               <select
@@ -800,35 +802,35 @@ export default function FormBuilderPage() {
                                 }}
                                 className="w-full bg-[#0f111a] border border-white/10 text-white text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
                               >
-                                <option value="INSTRUCTOR">Instructor</option>
+                                <option value="DEPARTMENT">Department</option>
                                 <option value="COURSE">Course</option>
-                                <option value="ADMIN">Administrator</option>
+                                <option value="INSTRUCTOR">Instructor</option>
                                 <option value="HOD">Head of Department</option>
                               </select>
                             </div>
 
-                            {/* Cascading Logic: Select Course -> Select Instructor */}
+                            {/* 1. Cascading Logic: Select Course -> Select Instructor */}
                             <AnimatePresence>
                               {subjectRole === "COURSE" && (
                                 <motion.div
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: "auto" }}
                                   exit={{ opacity: 0, height: 0 }}
-                                  className="space-y-6 overflow-hidden"
+                                  className="space-y-6 overflow-hidden mt-4"
                                 >
                                   <div className="space-y-3">
                                     <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.course ? "text-red-400" : "text-slate-500")}>Select Course</Label>
                                     <div className="relative">
-                                      <select 
+                                      <select
                                         value={courseId}
                                         onChange={(e) => {
                                           const newCourseId = e.target.value;
                                           setCourseId(newCourseId);
                                           const selectedCourse = courses.find(c => (c._id || c.id) === newCourseId);
-                                          const instId = selectedCourse?.instructorId 
+                                          const instId = selectedCourse?.instructorId
                                             ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
                                             : null;
-                                            
+
                                           if (instId) {
                                             setInstructorId(instId);
                                             setValidationErrors(prev => ({ ...prev, course: false, instructor: false }));
@@ -843,11 +845,11 @@ export default function FormBuilderPage() {
                                         )}
                                       >
                                         <option value="" disabled hidden>Choose Course...</option>
-                                        {courses.filter(c => { 
-                                          if(!departmentId) return true; 
-                                          const raw = c.departmentId || (c as any).department_id; 
-                                          const cId = typeof raw === 'object' && raw !== null ? raw._id || raw.id : raw; 
-                                          return cId === departmentId; 
+                                        {courses.filter(c => {
+                                          if (!departmentId) return true;
+                                          const raw = c.departmentId || (c as any).department_id;
+                                          const cId = typeof raw === 'object' && raw !== null ? raw._id || raw.id : raw;
+                                          return cId === departmentId;
                                         }).map(course => (
                                           <option key={course._id || course.id} value={course._id || course.id}>{course.name}</option>
                                         ))}
@@ -866,7 +868,7 @@ export default function FormBuilderPage() {
                                       >
                                         <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.instructor ? "text-red-400" : "text-slate-500")}>Target Instructor</Label>
                                         <div className="relative">
-                                          <select 
+                                          <select
                                             value={instructorId}
                                             onChange={(e) => {
                                               setInstructorId(e.target.value);
@@ -880,14 +882,14 @@ export default function FormBuilderPage() {
                                             <option value="" disabled hidden>Select Instructor...</option>
                                             {(() => {
                                               const selectedCourse = courses.find(c => (c._id || c.id) === courseId);
-                                              const instId = selectedCourse?.instructorId 
+                                              const instId = selectedCourse?.instructorId
                                                 ? (typeof selectedCourse.instructorId === 'object' ? (selectedCourse.instructorId as any)._id || (selectedCourse.instructorId as any).id : selectedCourse.instructorId)
                                                 : null;
-                                                
+
                                               const filteredInstructors = instId
                                                 ? instructors.filter(inst => ((inst as any)._id || inst.id) === instId)
                                                 : instructors;
-                                                
+
                                               return filteredInstructors.map(inst => (
                                                 <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
                                                   {inst.firstName} {inst.lastName}
@@ -900,6 +902,51 @@ export default function FormBuilderPage() {
                                       </motion.div>
                                     )}
                                   </AnimatePresence>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+
+                            {/* 2. Cascading Logic: Select Instructor Directly */}
+                            <AnimatePresence>
+                              {subjectRole === "INSTRUCTOR" && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="space-y-3 overflow-hidden mt-4"
+                                >
+                                  <Label className={cn("text-[10px] uppercase font-black tracking-widest ml-1 transition-colors", validationErrors.instructor ? "text-red-400" : "text-slate-500")}>
+                                    Target Instructor
+                                  </Label>
+                                  <div className="relative">
+                                    <select
+                                      value={instructorId}
+                                      onChange={(e) => {
+                                        setInstructorId(e.target.value);
+                                        if (e.target.value) setValidationErrors(prev => ({ ...prev, instructor: false }));
+                                      }}
+                                      className={cn(
+                                        "w-full bg-slate-800/80 text-white text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                        validationErrors.instructor ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/10"
+                                      )}
+                                    >
+                                      <option value="" disabled hidden>Select Instructor...</option>
+                                      {instructors.filter(inst => {
+                                        // الفلترة الذكية: بنجيب الدكاترة اللي ليهم كورسات مربوطة بالقسم اللي اخترناه فوق
+                                        return courses.some(c => {
+                                          const cDept = typeof c.departmentId === 'object' ? (c.departmentId as any)._id || (c.departmentId as any).id : c.departmentId;
+                                          const cInst = typeof c.instructorId === 'object' ? (c.instructorId as any)._id || (c.instructorId as any).id : c.instructorId;
+                                          const instId = (inst as any)._id || inst.id;
+                                          return cDept === departmentId && cInst === instId;
+                                        });
+                                      }).map(inst => (
+                                        <option key={(inst as any)._id || inst.id} value={(inst as any)._id || inst.id}>
+                                          {inst.firstName} {inst.lastName}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 pointer-events-none" />
+                                  </div>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -956,78 +1003,78 @@ export default function FormBuilderPage() {
                 <div className="space-y-8 animate-in fade-in">
                   <div className="p-4 rounded-2xl bg-[#0f111a] border border-white/5 flex flex-col gap-2">
                     <span className="text-[9px] font-black text-slate-600 uppercase">Field Classification</span>
-                  <div className="flex items-center gap-3">
-                    <Lock className="h-3.5 w-3.5 text-indigo-500" />
-                    <span className="text-xs font-black text-white uppercase tracking-wider">{activeQuestion.type.replace('_', ' ')}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black text-slate-200">Mandatory Data</span>
-                      <span className="text-[9px] font-bold text-slate-600 uppercase">Require field completion</span>
+                    <div className="flex items-center gap-3">
+                      <Lock className="h-3.5 w-3.5 text-indigo-500" />
+                      <span className="text-xs font-black text-white uppercase tracking-wider">{activeQuestion.type.replace('_', ' ')}</span>
                     </div>
-                    <Switch checked={activeQuestion.required} onCheckedChange={(val) => updateQuestion(activeQuestion.id!, { required: val })} />
                   </div>
 
-                  {activeQuestion.type === "linear_scale" && (
-                    <div className="space-y-3">
-                      <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Scale Amplitude (1-10)</Label>
-                      <Input
-                        type="number" min={1} max={10}
-                        value={activeQuestion.scale?.max || 5}
-                        onChange={(e) => updateQuestion(activeQuestion.id!, { scale: { min: 1, max: Number(e.target.value) } })}
-                        className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl font-black text-center"
-                      />
-                    </div>
-                  )}
-
-                  {(activeQuestion.type === "multiple_choice" || activeQuestion.type === "checkbox") && (
-                    <div className="space-y-4">
-                      <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Choice Options</Label>
-                      <div className="space-y-2">
-                        {activeQuestion.options?.map((opt, idx) => (
-                          <div key={idx} className="flex gap-2">
-                            <Input
-                              value={opt}
-                              onChange={(e) => {
-                                const next = [...(activeQuestion.options || [])]
-                                next[idx] = e.target.value
-                                updateQuestion(activeQuestion.id!, { options: next })
-                              }}
-                              className="bg-[#0f111a] border-white/10 text-white h-9 rounded-lg text-xs"
-                            />
-                            <button
-                              onClick={() => updateQuestion(activeQuestion.id!, { options: activeQuestion.options?.filter((_, i) => i !== idx) })}
-                              className="p-2 text-slate-600 hover:text-red-400"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <Button
-                          variant="ghost" size="sm"
-                          onClick={() => updateQuestion(activeQuestion.id!, { options: [...(activeQuestion.options || []), `New Option`] })}
-                          className="w-full text-[9px] uppercase font-black tracking-widest text-indigo-500 hover:bg-indigo-500/5"
-                        >
-                          + Add New Path
-                        </Button>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-slate-200">Mandatory Data</span>
+                        <span className="text-[9px] font-bold text-slate-600 uppercase">Require field completion</span>
                       </div>
+                      <Switch checked={activeQuestion.required} onCheckedChange={(val) => updateQuestion(activeQuestion.id!, { required: val })} />
                     </div>
-                  )}
-                </div>
 
-                <div className="pt-8 border-t border-white/5">
-                  <Button
-                    variant="ghost"
-                    onClick={() => deleteQuestion(activeId!)}
-                    className="w-full py-6 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/20 text-red-400 text-xs font-black transition-all flex items-center justify-center gap-3 uppercase tracking-widest"
-                  >
-                    <Trash2 className="h-4 w-4" /> Purge Data Point
-                  </Button>
+                    {activeQuestion.type === "linear_scale" && (
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Scale Amplitude (1-10)</Label>
+                        <Input
+                          type="number" min={1} max={10}
+                          value={activeQuestion.scale?.max || 5}
+                          onChange={(e) => updateQuestion(activeQuestion.id!, { scale: { min: 1, max: Number(e.target.value) } })}
+                          className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl font-black text-center"
+                        />
+                      </div>
+                    )}
+
+                    {(activeQuestion.type === "multiple_choice" || activeQuestion.type === "checkbox") && (
+                      <div className="space-y-4">
+                        <Label className="text-[10px] uppercase font-black text-slate-500 tracking-widest ml-1">Choice Options</Label>
+                        <div className="space-y-2">
+                          {activeQuestion.options?.map((opt, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <Input
+                                value={opt}
+                                onChange={(e) => {
+                                  const next = [...(activeQuestion.options || [])]
+                                  next[idx] = e.target.value
+                                  updateQuestion(activeQuestion.id!, { options: next })
+                                }}
+                                className="bg-[#0f111a] border-white/10 text-white h-9 rounded-lg text-xs"
+                              />
+                              <button
+                                onClick={() => updateQuestion(activeQuestion.id!, { options: activeQuestion.options?.filter((_, i) => i !== idx) })}
+                                className="p-2 text-slate-600 hover:text-red-400"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                          <Button
+                            variant="ghost" size="sm"
+                            onClick={() => updateQuestion(activeQuestion.id!, { options: [...(activeQuestion.options || []), `New Option`] })}
+                            className="w-full text-[9px] uppercase font-black tracking-widest text-indigo-500 hover:bg-indigo-500/5"
+                          >
+                            + Add New Path
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-8 border-t border-white/5">
+                    <Button
+                      variant="ghost"
+                      onClick={() => deleteQuestion(activeId!)}
+                      className="w-full py-6 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/20 text-red-400 text-xs font-black transition-all flex items-center justify-center gap-3 uppercase tracking-widest"
+                    >
+                      <Trash2 className="h-4 w-4" /> Purge Data Point
+                    </Button>
+                  </div>
                 </div>
-              </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-10 opacity-20">
                   <AlertTriangle className="mx-auto h-8 w-8 mb-2" />
@@ -1135,31 +1182,32 @@ export default function FormBuilderPage() {
                                 const selectedOpts = (previewAnswers[qId] as string[]) || [];
                                 const isSelected = selectedOpts.includes(opt);
                                 return (
-                                <div
-                                  key={idx}
-                                  onClick={() => {
-                                    setPreviewAnswers(prev => {
-                                      const current = (prev[qId] as string[]) || [];
-                                      const next = current.includes(opt) ? current.filter(o => o !== opt) : [...current, opt];
-                                      return { ...prev, [qId]: next };
-                                    })
-                                  }}
-                                  className={cn(
-                                    "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
-                                    isSelected
-                                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
-                                      : "border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-slate-500"
-                                  )}
-                                >
-                                  <div className={cn(
-                                    "h-4 w-4 rounded-sm border-2 transition-all flex items-center justify-center",
-                                    isSelected ? "border-indigo-500 bg-indigo-500" : "border-slate-400 dark:border-white/20"
-                                  )}>
-                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                  <div
+                                    key={idx}
+                                    onClick={() => {
+                                      setPreviewAnswers(prev => {
+                                        const current = (prev[qId] as string[]) || [];
+                                        const next = current.includes(opt) ? current.filter(o => o !== opt) : [...current, opt];
+                                        return { ...prev, [qId]: next };
+                                      })
+                                    }}
+                                    className={cn(
+                                      "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
+                                      isSelected
+                                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
+                                        : "border-slate-200 dark:border-white/5 bg-white/50 dark:bg-white/[0.02] text-slate-500"
+                                    )}
+                                  >
+                                    <div className={cn(
+                                      "h-4 w-4 rounded-sm border-2 transition-all flex items-center justify-center",
+                                      isSelected ? "border-indigo-500 bg-indigo-500" : "border-slate-400 dark:border-white/20"
+                                    )}>
+                                      {isSelected && <Check className="h-3 w-3 text-white" />}
+                                    </div>
+                                    <span className="text-sm font-medium">{opt}</span>
                                   </div>
-                                  <span className="text-sm font-medium">{opt}</span>
-                                </div>
-                              )})}
+                                )
+                              })}
                             </div>
                           )}
                           {q.type === 'linear_scale' && (
@@ -1290,8 +1338,8 @@ export default function FormBuilderPage() {
       </Modal>
 
       {/* AI Generate Prompt Modal */}
-      <Modal 
-        open={isAIModalOpen} 
+      <Modal
+        open={isAIModalOpen}
         onClose={() => !isAIGenerating && setIsAIModalOpen(false)}
         title={
           <div className="flex items-center gap-3">
