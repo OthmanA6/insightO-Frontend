@@ -366,7 +366,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                         <Tooltip
                           contentStyle={{ backgroundColor: '#0f111a', border: '1px solid #1e293b', color: '#f8fafc', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                           labelStyle={{ color: '#818cf8', fontWeight: 'bold', marginBottom: '8px', fontSize: '12px' }}
-                          formatter={(value: number, name: string) => [
+                          formatter={(value: any, name: string) => [
                             <span className={name === 'final' ? 'text-emerald-400 font-bold' : 'text-indigo-400 font-bold'}>{value}</span>,
                             <span className="text-slate-400">{name === 'final' ? 'Final Grade' : 'AI Grade'}</span>
                           ]}
@@ -408,7 +408,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                         <Tooltip
                           cursor={{ fill: '#334155', opacity: 0.4 }}
                           contentStyle={{ backgroundColor: '#0f111a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }}
-                          formatter={(value: number) => [`${value}%`, 'Mastery']}
+                          formatter={(value: any) => [`${value}%`, 'Mastery']}
                           labelFormatter={(label, payload) => payload?.[0]?.payload?.fullConcept || label}
                         />
                         <Bar dataKey="mastery" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={24} />

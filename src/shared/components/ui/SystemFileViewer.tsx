@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -128,7 +128,7 @@ export function SystemFileViewer({ fileUrl, fileName }: SystemFileViewerProps) {
             config={{ 
             header: { disableHeader: true },
             pdfVerticalScrollByDefault: true,
-            pdfZoom: { defaultZoom: 1.0 }
+            pdfZoom: { defaultZoom: 1.0, zoomJump: 0.1 }
           }}
             style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
             className="w-full h-full"
