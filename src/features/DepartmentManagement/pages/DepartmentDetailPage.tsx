@@ -14,6 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import { EntityInsightsView } from '@/components/EntityInsightsView';
 import { cn } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 import { BreadcrumbNav } from '@/shared/components/ui/BreadcrumbNav';
@@ -198,8 +200,25 @@ export default function DepartmentDetailPage() {
         </div>
       </div>
 
-      {/* Department Info Card */}
-      {department && (
+      <Tabs defaultValue="insights" className="w-full">
+        <TabsList className="bg-[#13151f] border border-white/5 p-1 mb-8 flex w-fit rounded-2xl">
+          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+            Analysis & Insights
+          </TabsTrigger>
+          <TabsTrigger value="management" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+            Courses & Management
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="insights" className="mt-0 outline-none">
+          <div className="rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0f111a] shadow-2xl relative">
+            <EntityInsightsView entityType="DEPARTMENT" entityId={departmentId!} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="management" className="mt-0 outline-none space-y-8">
+          {/* Department Info Card */}
+          {department && (
         <div className="p-6 rounded-3xl bg-[#13151f] border border-white/5">
           <p className="text-sm text-slate-400 leading-relaxed italic">
             "{department.description || 'No description provided for this academic entity.'}"
@@ -462,6 +481,8 @@ export default function DepartmentDetailPage() {
           })
         )}
       </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Course Creation Modal */}
       <CourseModal

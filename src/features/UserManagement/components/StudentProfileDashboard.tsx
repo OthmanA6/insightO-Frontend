@@ -7,7 +7,7 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   ResponsiveContainer, Tooltip, Legend
 } from 'recharts';
-
+import { EntityInsightsView } from '@/components/EntityInsightsView'; // تأكد إن المسار صح حسب مشروعك
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
@@ -131,28 +131,49 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
       {!isStudent ? (
         // INSTRUCTOR or HOD View
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
-            <div>
-              <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Role Type</span>
-              <h4 className="text-2xl font-black text-white capitalize">{data.user.role.toLowerCase()}</h4>
-              <p className="text-xs text-slate-400 mt-1">Managing courses and departmental tasks.</p>
+        <div className="space-y-6">
+          {/* كروت المعلومات الأساسية */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
+              <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+              <div>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Role Type</span>
+                <h4 className="text-2xl font-black text-white capitalize">{data.user.role.toLowerCase()}</h4>
+                <p className="text-xs text-slate-400 mt-1">Managing courses and departmental tasks.</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <Briefcase className="w-6 h-6" />
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-              <Briefcase className="w-6 h-6" />
+
+            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
+              <div className="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+              <div>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Assigned Courses</span>
+                <h4 className="text-2xl font-black text-white">{data.profile?.teachingCourses?.length || 0}</h4>
+                <p className="text-xs text-slate-400 mt-1">Active courses being managed.</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <BookOpen className="w-6 h-6" />
+              </div>
             </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-            <div>
-              <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Assigned Courses</span>
-              <h4 className="text-2xl font-black text-white">{data.profile?.teachingCourses?.length || 0}</h4>
-              <p className="text-xs text-slate-400 mt-1">Active courses being managed.</p>
+          {/* AI Insights Tab - ده الجديد اللي هيعرض الكيرف وتحليل الدكتور */}
+          <div className="mt-8">
+            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+              <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                <BrainCircuit className="h-5 w-5 text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-white">Performance Insights</h3>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Comparative analysis based on student surveys</p>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-              <BookOpen className="w-6 h-6" />
+
+            {/* زرعنا الكومبوننت الجوكر هنا وباصينا الـ userId الحقيقي */}
+            <div className="rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0f111a] shadow-2xl relative">
+              <EntityInsightsView entityType="INSTRUCTOR" entityId={userId} />
             </div>
           </div>
         </div>

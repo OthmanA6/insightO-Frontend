@@ -10,6 +10,8 @@ import { BookOpen, Loader2, ArrowRight, Clock, Building2, Target, CheckCircle2, 
 import { format } from 'date-fns';
 import { Button } from '@/shared/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import { EntityInsightsView } from '@/components/EntityInsightsView';
 
 export default function InstructorDashboardPage() {
   const { user } = useAuth();
@@ -138,8 +140,25 @@ export default function InstructorDashboardPage() {
         </div>
       </section>
 
-      {/* Middle Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <Tabs defaultValue="insights" className="w-full">
+        <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-white/10 p-1 mb-8 flex w-fit rounded-2xl shadow-xl">
+          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+            Performance & Insights
+          </TabsTrigger>
+          <TabsTrigger value="courses" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+            Active Courses & Tasks
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="insights" className="mt-0 outline-none">
+          <div className="rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#0f111a] shadow-2xl relative">
+            <EntityInsightsView entityType="INSTRUCTOR" entityId={user?.id || user?._id || ""} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="courses" className="mt-0 outline-none space-y-8">
+          {/* Middle Split */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Column - Recent Modules (50%) */}
         <section className="lg:col-span-5 space-y-6">
@@ -243,6 +262,8 @@ export default function InstructorDashboardPage() {
         </section>
 
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
