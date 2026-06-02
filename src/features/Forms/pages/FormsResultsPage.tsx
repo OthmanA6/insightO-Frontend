@@ -12,8 +12,8 @@ import { getFormSubmissions } from "@/shared/api/submissionApi"
 import type { Submission } from "@/shared/api/submissionApi"
 import type { Form, Question } from "@/features/FormBuilder/types/form.types"
 import { toast } from "sonner"
-import { analyzeFormDeep } from "@/features/Forms/api/formAiApi"
-import type { FormDeepAnalysisPayload } from "@/features/Forms/api/formAiApi"
+import { analyzeFormDeep, analyzeForm } from "@/features/Forms/api/formAiApi"
+import type { FormDeepAnalysisPayload, FormAnalysisPayload } from "@/features/Forms/api/formAiApi"
 
 type TabKey = "summary" | "questions" | "individual" | "ai"
 
@@ -30,6 +30,9 @@ export default function FormsResultsPage() {
   const [aiData, setAiData] = useState<FormDeepAnalysisPayload | null>(null)
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [aiTokenError, setAiTokenError] = useState(false)
+  // Summary card AI state
+  const [summaryAiData, setSummaryAiData] = useState<FormAnalysisPayload | null>(null)
+  const [summaryAiLoading, setSummaryAiLoading] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,11 +87,20 @@ export default function FormsResultsPage() {
     return { answers, total: answers.length }
   }
 
-  const aiInsights = useMemo(() => {
-    if (!submissions.length) return "No data available for analysis."
-    const total = submissions.length
-    return `Overall engagement is stable with ${total} responses. The most discussed topic is "${form?.title}". Preliminary data suggests high satisfaction in core metrics.`
-  }, [submissions, form])
+  // Auto-fetch basic AI analysis for summary card
+  const handleGenerateSummaryAi = async () => {
+    if (!formId || !submissions.length) return
+    setSummaryAiLoading(true)
+    try {
+      const result = await analyzeForm(formId)
+      setSummaryAiData(result)
+    } catch (err: any) {
+      console.error("Summary AI error:", err)
+      toast.error("Failed to generate AI summary")
+    } finally {
+      setSummaryAiLoading(false)
+    }
+  }
 
   const handleGenerateAudit = async () => {
     if (!formId) return
@@ -235,46 +247,86 @@ export default function FormsResultsPage() {
                       Waiting for initial data streams to initialize strategic pattern recognition core.
                     </p>
                   </div>
-                ) : (
-                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[320px] shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
-                    {/* Sophisticated Background Effects */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-purple-500/10 transition-colors duration-700"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full -ml-20 -mb-20"></div>
-                    
-                    <div className="flex flex-col md:flex-row items-start gap-8 relative z-10">
+                ) : !summaryAiData && !summaryAiLoading ? (
+                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[200px] shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -mr-20 -mt-20"></div>
+                    <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
                       <div className="relative">
                         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-xl shadow-purple-500/30">
                           <Brain className="h-8 w-8 text-white" />
                         </div>
-                        <div className="absolute -bottom-2 -right-2 bg-emerald-500 h-5 w-5 rounded-full border-4 border-white dark:border-[#1a1625] flex items-center justify-center">
-                          <div className="h-1.5 w-1.5 bg-white rounded-full animate-ping"></div>
-                        </div>
                       </div>
-                      
-                      <div className="space-y-4 flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
-                          <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-full">Neural Core Active</Badge>
-                        </div>
-                        
-                        <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                          {aiInsights}
-                        </p>
-                        
-                        <div className="pt-4 flex flex-wrap gap-6 items-center border-t border-slate-100 dark:border-white/5">
-                          <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Confidence: 98.4%</span>
+                      <div className="flex-1 space-y-3">
+                        <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Generate an AI-powered summary of all {submissions.length} responses to uncover sentiment patterns and key takeaways.</p>
+                      </div>
+                      <button
+                        onClick={handleGenerateSummaryAi}
+                        className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-black uppercase tracking-widest shadow-xl shadow-purple-500/20 hover:opacity-90 transition-all hover:-translate-y-0.5"
+                      >
+                        <Sparkles className="h-5 w-5" /> Generate Summary
+                      </button>
+                    </div>
+                  </div>
+                ) : summaryAiLoading ? (
+                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[200px] flex flex-col items-center justify-center text-center animate-gradient-border overflow-hidden">
+                    <Loader2 className="h-10 w-10 animate-spin text-purple-500 mb-4" />
+                    <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Analyzing {submissions.length} responses...</p>
+                  </div>
+                ) : summaryAiData ? (
+                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-purple-500/10 transition-colors duration-700"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full -ml-20 -mb-20"></div>
+                    
+                    <div className="flex flex-col gap-6 relative z-10">
+                      <div className="flex flex-col md:flex-row items-start gap-6">
+                        <div className="relative">
+                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-xl shadow-purple-500/30">
+                            <Brain className="h-8 w-8 text-white" />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-purple-500"></div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Analysis Latency: 12ms</span>
+                          <div className="absolute -bottom-2 -right-2 bg-emerald-500 h-5 w-5 rounded-full border-4 border-white dark:border-[#1a1625] flex items-center justify-center">
+                            <div className="h-1.5 w-1.5 bg-white rounded-full animate-ping"></div>
                           </div>
                         </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
+                            <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-full">Neural Core Active</Badge>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleGenerateSummaryAi}
+                          className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase tracking-widest hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-all"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5" /> Refresh
+                        </button>
+                      </div>
+
+                      {/* Per-tag summaries */}
+                      <div className="space-y-4">
+                        {Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
+                          <div key={tag} className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
+                              <Badge className={cn(
+                                "text-[8px] font-black uppercase border-none px-2 rounded-full",
+                                result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
+                                result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                              )}>
+                                {result.sentiment}
+                              </Badge>
+                              {result.score !== undefined && (
+                                <span className="text-[9px] font-black text-purple-500 uppercase">Score: {result.score}%</span>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{result.summary}</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Key Performance Metrics</h3>
@@ -423,10 +475,6 @@ export default function FormsResultsPage() {
                           <div className="space-y-6">
                             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/5 pb-4 mb-4">
                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Verbatim Responses</h4>
-                               <div className="flex gap-2">
-                                  <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[8px] font-black uppercase">Positive</Badge>
-                                  <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[8px] font-black uppercase">Constructive</Badge>
-                               </div>
                             </div>
                             <div className="space-y-4">
                               {(getQuestionStats(selectedQuestion).answers as any[] || []).map((ans, i) => (
@@ -570,100 +618,83 @@ export default function FormsResultsPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Left: Sentiment Vectors */}
-                  <div className="bg-white dark:bg-surface-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 shadow-sm">
-                    <h3 className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-8 border-b border-slate-200 dark:border-white/5 pb-4">Extracted Sentiment Vectors</h3>
-                    <div className="space-y-8">
-                      {[
-                        { label: "Positive Sentiment", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "positive").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 82, textColor: "text-green-600 dark:text-green-400", barClass: "bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
-                        { label: "Constructive Feedback", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "neutral").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 14, textColor: "text-amber-600 dark:text-amber-400", barClass: "bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
-                        { label: "Critical Indicators", pct: aiData ? Math.round((Object.values(aiData.tags || {}).filter(t => t.sentiment === "negative").length / Math.max(Object.keys(aiData.tags || {}).length, 1)) * 100) : 4, textColor: "text-red-600 dark:text-red-400", barClass: "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]", suffix: aiData ? "of tags" : "Magnitude" },
-                      ].map((item) => (
-                        <div key={item.label}>
-                          <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2">
-                            <span className="text-slate-900 dark:text-white">{item.label}</span>
-                            <span className={item.textColor}>{item.pct}% {item.suffix}</span>
-                          </div>
-                          <div className="h-3 w-full bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
-                            <div className={`h-full ${item.barClass} rounded-full transition-all duration-700`} style={{ width: `${item.pct}%` }}></div>
-                          </div>
+                {/* AI STATE: INITIAL / NO DATA */}
+                {!aiData && !isAiLoading && (
+                  <div className="max-w-4xl mx-auto w-full animate-in fade-in zoom-in-95 duration-500">
+                    <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden shadow-2xl group border border-purple-500/30 text-center">
+                      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+                      <Lightbulb className="absolute -right-20 -bottom-20 opacity-10 h-96 w-96 text-white pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                      
+                      <div className="relative z-10 space-y-8 flex flex-col items-center">
+                        <div className="h-20 w-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl mb-2">
+                          <Brain className="h-10 w-10 text-white" />
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right: Gradient card with roadmap + button */}
-                  <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-8 relative overflow-hidden shadow-2xl group">
-                    <Lightbulb className="absolute right-[-40px] bottom-[-40px] opacity-10 h-64 w-64 text-white pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-                    <h3 className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-8 border-b border-white/20 pb-4 relative z-10">AI Deployment Roadmap</h3>
-                    <ul className="space-y-6 relative z-10">
-                      {(aiData
-                        ? [
-                            { title: "Strategic Summary", text: aiData.global?.overall_summary || "Cross-category analysis complete." },
-                            { title: "Key Problem", text: aiData.global?.key_problems?.[0] || "No critical issues detected." },
-                            { title: "Top Recommendation", text: aiData.global?.recommendations?.[0] || "Continue monitoring response patterns." },
-                          ]
-                        : [
-                            { title: "Strategic Resource Allocation", text: "82% of respondents emphasize specific operational bottlenecks. Reallocating bandwidth to Section B could yield a 15% efficiency boost." },
-                            { title: "Communication Synthesis", text: "Sentiment analysis indicates a decoupling between internal updates and execution. Implement a bi-weekly synchronization protocol." },
-                            { title: "Predictive Retention", text: "Neutral sentiment trends in the Junior tier suggest a potential 12% attrition risk if engagement benchmarks aren't met by Q4." },
-                          ]
-                      ).map((item, i) => (
-                        <li key={i} className="flex items-start gap-4">
-                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-white border border-white/30 backdrop-blur-md">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                          </div>
-                          <p className="text-sm text-white/90 font-medium leading-relaxed">
-                            <strong className="text-white font-black block mb-1 uppercase tracking-wider text-xs">{item.title}</strong> {item.text}
+                        
+                        <div className="space-y-4">
+                          <h3 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                            Generate Deep AI Insights
+                          </h3>
+                          <p className="text-indigo-100/90 font-medium leading-relaxed max-w-2xl mx-auto text-lg">
+                            Activate our advanced neural engine to synthesize qualitative responses, extract sentiment vectors, and reveal actionable operational intelligence from your survey data.
                           </p>
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={handleGenerateAudit}
-                      disabled={isAiLoading || !submissions.length}
-                      className="w-full py-4 rounded-2xl bg-white text-indigo-700 text-sm font-black uppercase tracking-widest shadow-xl hover:bg-slate-50 transition-all relative z-10 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isAiLoading ? (
-                        <><Loader2 className="h-5 w-5 animate-spin" /> Generating Audit...</>
-                      ) : (
-                        <><Sparkles className="h-5 w-5" /> Generate Comprehensive Audit</>
-                      )}
-                    </button>
-                    {!submissions.length && (
-                      <p className="text-center text-white/50 text-xs font-bold uppercase tracking-widest mt-3 relative z-10">No submissions available to analyze</p>
-                    )}
-                  </div>
-                </div>
-
-
-                {/* Re-run button after result is shown */}
-                {aiData && (
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleGenerateAudit}
-                      disabled={isAiLoading}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-black uppercase tracking-widest hover:bg-purple-700 transition-all disabled:opacity-50"
-                    >
-                      <RefreshCw className={cn("h-3.5 w-3.5", isAiLoading && "animate-spin")} />
-                      {isAiLoading ? "Re-generating..." : "Re-run Audit"}
-                    </button>
+                        </div>
+                        
+                        <div className="pt-8 w-full max-w-md mx-auto">
+                          <button
+                            onClick={handleGenerateAudit}
+                            disabled={!submissions.length}
+                            className="w-full py-5 rounded-2xl bg-white text-indigo-700 text-base font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] transition-all hover:-translate-y-1 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-3 relative overflow-hidden"
+                          >
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent -translate-x-full hover:animate-[shimmer_1.5s_infinite]"></span>
+                            <Sparkles className="h-6 w-6" /> Generate Comprehensive Audit
+                          </button>
+                        </div>
+                        
+                        {!submissions.length && (
+                          <p className="text-white/60 text-xs font-bold uppercase tracking-widest bg-black/20 px-4 py-2 rounded-full inline-flex mt-4 backdrop-blur-sm border border-white/10">
+                            Insufficient data: Waiting for submissions
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* Loading skeleton */}
-                {isAiLoading && !aiData && (
-                  <div className="space-y-4">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="h-32 rounded-2xl bg-purple-500/10 animate-pulse" />
-                    ))}
+                {/* AI STATE: LOADING */}
+                {isAiLoading && (
+                  <div className="flex flex-col items-center justify-center py-20 md:py-32 space-y-8 animate-in fade-in duration-500">
+                    <div className="relative">
+                      <div className="h-32 w-32 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/40 z-10 relative">
+                        <Brain className="h-14 w-14 text-white animate-pulse" />
+                      </div>
+                      <div className="absolute inset-0 rounded-full border-4 border-purple-500/30 animate-ping opacity-75"></div>
+                      <div className="absolute -inset-4 rounded-full border-2 border-indigo-500/20 animate-ping opacity-50" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="absolute -inset-8 rounded-full border border-purple-500/10 animate-ping opacity-25" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                    <div className="text-center space-y-3">
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
+                        Synthesizing Intelligence
+                      </h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
+                        Processing {submissions.length} response vectors...
+                      </p>
+                    </div>
                   </div>
                 )}
 
                 {/* ── Real AI Results ── */}
                 {aiData && !isAiLoading && (
-                  <div className="space-y-8">
+                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="flex justify-end mb-4">
+                      <button
+                        onClick={handleGenerateAudit}
+                        disabled={isAiLoading}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-black uppercase tracking-widest hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-all"
+                      >
+                        <RefreshCw className="h-4 w-4" /> Re-run Audit
+                      </button>
+                    </div>
 
                     {/* Global Summary Banner */}
                     {aiData.global && (

@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock, Share2 } from "lucide-react"
+import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock, Share2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
@@ -22,9 +22,26 @@ export default function FormsSurveysPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<TabKey>("all")
   const [query, setQuery] = useState("")
-  const [forms, setForms] = useState<Form[]>([])
+  const [forms, setForms] = useState<(Form & { responsesCount?: number })[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [totalResponses, setTotalResponses] = useState<number | null>(null)
+
+  const [sortField, setSortField] = useState<"date" | "status" | "questions" | "responses">("date")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+
+  const handleSort = (field: "date" | "status" | "questions" | "responses") => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("desc")
+    }
+  }
+
+  const SortIcon = ({ field }: { field: "date" | "status" | "questions" | "responses" }) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 ml-1 opacity-40 group-hover:opacity-100 transition-opacity" />
+    return sortOrder === "asc" ? <ArrowUp className="h-3 w-3 ml-1 text-indigo-400" /> : <ArrowDown className="h-3 w-3 ml-1 text-indigo-400" />
+  }
 
   const fetchForms = async () => {
     setIsLoading(true)
@@ -34,12 +51,21 @@ export default function FormsSurveysPage() {
 
       // Aggregate total responses across all forms
       const counts = await Promise.allSettled(
-        data.map((f) => getFormSubmissions(f.id))
+        data.map((f) => getFormSubmissions(f._id || f.id))
       )
-      const total = counts.reduce((sum, r) => {
-        if (r.status === "fulfilled") return sum + r.value.length
-        return sum
-      }, 0)
+      
+      let total = 0
+      const enrichedForms = data.map((f, index) => {
+        const countResult = counts[index]
+        const responsesCount = countResult.status === "fulfilled" ? countResult.value.length : 0
+        total += responsesCount
+        return { ...f, responsesCount }
+      })
+
+      // Sort enrichedForms by createdAt date descending
+      enrichedForms.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+
+      setForms(enrichedForms)
       setTotalResponses(total)
     } catch (error) {
       toast.error("Failed to load forms and surveys")
@@ -76,7 +102,7 @@ export default function FormsSurveysPage() {
 
   const visibleRows = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return forms.filter((row) => {
+    const filtered = forms.filter((row) => {
       const matchesTab =
         tab === "all" ||
         (tab === "active" && row.is_active) ||
@@ -89,7 +115,21 @@ export default function FormsSurveysPage() {
 
       return matchesTab && matchesQuery
     })
-  }, [tab, query, forms])
+
+    return filtered.sort((a, b) => {
+      let cmp = 0
+      if (sortField === "date") {
+        cmp = new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      } else if (sortField === "status") {
+        cmp = (b.is_active ? 1 : 0) - (a.is_active ? 1 : 0)
+      } else if (sortField === "questions") {
+        cmp = (b.questions?.length || 0) - (a.questions?.length || 0)
+      } else if (sortField === "responses") {
+        cmp = (b.responsesCount || 0) - (a.responsesCount || 0)
+      }
+      return sortOrder === "desc" ? cmp : -cmp
+    })
+  }, [tab, query, forms, sortField, sortOrder])
 
   return (
     <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-300 max-w-7xl mx-auto">
@@ -191,17 +231,26 @@ export default function FormsSurveysPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.02] text-[10px] uppercase tracking-widest text-slate-500 font-black">
-                  <th className="px-8 py-5">Form Architecture</th>
+                  <th className="px-8 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('date')}>
+                    <div className="flex items-center">Form Architecture <SortIcon field="date" /></div>
+                  </th>
                   <th className="px-6 py-5">Targeting</th>
-                  <th className="px-6 py-5">Status</th>
-                  <th className="px-6 py-5">Engagement</th>
+                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('status')}>
+                    <div className="flex items-center">Status <SortIcon field="status" /></div>
+                  </th>
+                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('questions')}>
+                    <div className="flex items-center">Questions <SortIcon field="questions" /></div>
+                  </th>
+                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('responses')}>
+                    <div className="flex items-center">Responses <SortIcon field="responses" /></div>
+                  </th>
                   <th className="px-6 py-5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-8 py-20 text-center">
+                    <td colSpan={6} className="px-8 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
                         <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Synchronizing Survey Data...</p>
@@ -210,7 +259,7 @@ export default function FormsSurveysPage() {
                   </tr>
                 ) : visibleRows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-8 py-20 text-center">
+                    <td colSpan={6} className="px-8 py-20 text-center">
                       <div className="flex flex-col items-center gap-4 opacity-20">
                         <ClipboardList className="h-16 w-16 text-slate-500" />
                         <p className="text-lg font-bold text-slate-500">No forms found matching your criteria</p>
@@ -246,7 +295,7 @@ export default function FormsSurveysPage() {
                             {row.subject_role} Subject
                           </Badge>
                           <div className="flex flex-wrap gap-1">
-                            {row.evaluator_roles.map(role => (
+                            {row.evaluator_roles?.map(role => (
                               <span key={role} className="text-[8px] font-bold text-slate-500 uppercase">{role}</span>
                             ))}
                           </div>
@@ -263,7 +312,11 @@ export default function FormsSurveysPage() {
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-black text-white">{row.questions?.length ?? 0}</span>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase">Questions</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl font-black text-emerald-400">{row.responsesCount ?? 0}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
