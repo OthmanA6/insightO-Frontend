@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { 
-  Download, Sparkles, ArrowUp, Brain, Star, 
+import {
+  Download, Sparkles, ArrowUp, Brain, Star,
   ChevronLeft, ChevronRight, User, Calendar, Network, Lightbulb, CheckCircle2, ArrowLeft, Loader2, FileText, Meh,
   AlertTriangle, TrendingUp, TrendingDown, Zap, RefreshCw
 } from "lucide-react"
@@ -57,13 +57,13 @@ export default function FormsResultsPage() {
 
   // Helper to get answers for a specific question
   const getQuestionStats = (question: Question) => {
-    const answers = submissions.flatMap(s => 
+    const answers = submissions.flatMap(s =>
       s.answers.filter(a => {
         const qId = (a.question_id as any)?._id || (a.question_id as any);
         const targetId = question._id || question.id;
         return qId === targetId;
       })
-      .map(a => a.value)
+        .map(a => a.value)
     )
 
     if (question.type === 'linear_scale') {
@@ -74,7 +74,7 @@ export default function FormsResultsPage() {
       })
       return { counts, total: answers.length }
     }
-    
+
     if (question.type === 'multiple_choice') {
       const counts: Record<string, number> = {}
       answers.forEach(val => {
@@ -152,8 +152,8 @@ export default function FormsResultsPage() {
       <header className="sticky top-0 z-20 flex flex-col justify-center border-b border-slate-200 bg-white/90 dark:border-white/10 dark:bg-bg-dark/90 backdrop-blur-md px-4 py-4 md:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate("/dashboard/forms-surveys")} 
+            <button
+              onClick={() => navigate("/dashboard/forms-surveys")}
               className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
               title="Back to Dashboard"
             >
@@ -164,7 +164,7 @@ export default function FormsResultsPage() {
                 <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{form.title}</h2>
                 <span className={cn(
                   "inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border",
-                  form.is_active 
+                  form.is_active
                     ? "bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20"
                     : "bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10"
                 )}>
@@ -182,7 +182,7 @@ export default function FormsResultsPage() {
             </button>
           </div>
         </div>
-        
+
         <div className="flex gap-6 border-b border-slate-200 dark:border-white/10 overflow-x-auto no-scrollbar">
           {[
             { id: 'summary', label: 'Summary' },
@@ -190,7 +190,7 @@ export default function FormsResultsPage() {
             { id: 'individual', label: 'Individual' },
             { id: 'ai', label: 'AI Deep Dive', icon: Sparkles, color: 'text-purple-600 dark:text-purple-300' },
           ].map((tab) => (
-            <button 
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabKey)}
               className={cn(
@@ -210,7 +210,7 @@ export default function FormsResultsPage() {
       <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-32">
         <div className="mx-auto max-w-7xl h-full">
           <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col gap-10 h-full">
-            
+
             {/* SUMMARY TAB */}
             {activeTab === "summary" && (
               <>
@@ -277,7 +277,7 @@ export default function FormsResultsPage() {
                   <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-purple-500/10 transition-colors duration-700"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full -ml-20 -mb-20"></div>
-                    
+
                     <div className="flex flex-col gap-6 relative z-10">
                       <div className="flex flex-col md:flex-row items-start gap-6">
                         <div className="relative">
@@ -311,8 +311,8 @@ export default function FormsResultsPage() {
                               <Badge className={cn(
                                 "text-[8px] font-black uppercase border-none px-2 rounded-full",
                                 result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
-                                result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                                "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                  result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                    "bg-amber-500/10 text-amber-600 dark:text-amber-400"
                               )}>
                                 {result.sentiment}
                               </Badge>
@@ -335,33 +335,33 @@ export default function FormsResultsPage() {
                     return (
                       <div key={idx} className="rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-surface-dark p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                           <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black">{idx + 1}</span>
-                           {q.label}
+                          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black">{idx + 1}</span>
+                          {q.label}
                         </h3>
                         {q.type === 'linear_scale' ? (
                           <div className="space-y-4">
-                             {[5, 4, 3, 2, 1].map((rating) => {
-                               const count = stats.counts[rating] || 0
-                               const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0
-                               return (
-                                 <div key={rating} className="flex items-center gap-4 text-xs font-bold">
-                                   <span className="w-12 text-right text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1">
-                                     {rating} <Star className={cn("h-3.5 w-3.5", rating >= 4 ? "text-yellow-500 fill-yellow-500" : "text-slate-300 dark:text-slate-600")} />
-                                   </span>
-                                   <div className="flex-1 h-2 bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
-                                     <div 
-                                       className={cn("h-full rounded-full transition-all duration-1000", rating >= 4 ? "bg-indigo-500" : "bg-slate-400")} 
-                                       style={{ width: `${percentage}%` }}
-                                     ></div>
-                                   </div>
-                                   <span className="w-10 text-right text-slate-900 dark:text-white">{Math.round(percentage)}%</span>
-                                 </div>
-                               )
-                             })}
+                            {[5, 4, 3, 2, 1].map((rating) => {
+                              const count = stats.counts[rating] || 0
+                              const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0
+                              return (
+                                <div key={rating} className="flex items-center gap-4 text-xs font-bold">
+                                  <span className="w-12 text-right text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1">
+                                    {rating} <Star className={cn("h-3.5 w-3.5", rating >= 4 ? "text-yellow-500 fill-yellow-500" : "text-slate-300 dark:text-slate-600")} />
+                                  </span>
+                                  <div className="flex-1 h-2 bg-slate-100 dark:bg-bg-dark rounded-full overflow-hidden">
+                                    <div
+                                      className={cn("h-full rounded-full transition-all duration-1000", rating >= 4 ? "bg-indigo-500" : "bg-slate-400")}
+                                      style={{ width: `${percentage}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="w-10 text-right text-slate-900 dark:text-white">{Math.round(percentage)}%</span>
+                                </div>
+                              )
+                            })}
                           </div>
                         ) : (
                           <div className="p-4 rounded-xl bg-slate-50 dark:bg-bg-dark border border-slate-200 dark:border-white/5">
-                             <p className="text-xs text-slate-500 italic">Quantitative analysis restricted to scale-based inquiries. Qualitative synthesis available in Question Deep Dive.</p>
+                            <p className="text-xs text-slate-500 italic">Quantitative analysis restricted to scale-based inquiries. Qualitative synthesis available in Question Deep Dive.</p>
                           </div>
                         )}
                       </div>
@@ -474,7 +474,7 @@ export default function FormsResultsPage() {
                         ) : (
                           <div className="space-y-6">
                             <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/5 pb-4 mb-4">
-                               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Verbatim Responses</h4>
+                              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Verbatim Responses</h4>
                             </div>
                             <div className="space-y-4">
                               {(getQuestionStats(selectedQuestion).answers as any[] || []).map((ans, i) => (
@@ -482,7 +482,7 @@ export default function FormsResultsPage() {
                                   <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic mb-3">"{ans}"</p>
                                   <div className="flex items-center gap-3">
                                     <div className="flex -space-x-2">
-                                       <div className="h-5 w-5 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] text-white font-bold ring-2 ring-white dark:ring-surface-dark">A</div>
+                                      <div className="h-5 w-5 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] text-white font-bold ring-2 ring-white dark:ring-surface-dark">A</div>
                                     </div>
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anonymous Participant</span>
                                   </div>
@@ -490,8 +490,8 @@ export default function FormsResultsPage() {
                               ))}
                               {getQuestionStats(selectedQuestion).total === 0 && (
                                 <div className="text-center py-10 opacity-20">
-                                   <Meh className="h-10 w-10 mx-auto mb-2" />
-                                   <p className="text-xs font-bold uppercase tracking-widest">No verbatim data provided</p>
+                                  <Meh className="h-10 w-10 mx-auto mb-2" />
+                                  <p className="text-xs font-bold uppercase tracking-widest">No verbatim data provided</p>
                                 </div>
                               )}
                             </div>
@@ -508,14 +508,14 @@ export default function FormsResultsPage() {
             {activeTab === "individual" && (
               <>
                 <div className="flex items-center justify-between bg-white dark:bg-surface-dark p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                  <button 
+                  <button
                     disabled={selectedSubmissionIndex === 0}
                     onClick={() => setSelectedSubmissionIndex(prev => prev - 1)}
                     className="h-12 w-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-bg-dark border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-indigo-500 disabled:opacity-30 transition-all"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
-                  
+
                   <div className="text-center">
                     <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1 uppercase tracking-tight">Response Node #{submissions.length - selectedSubmissionIndex}</h3>
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -525,7 +525,7 @@ export default function FormsResultsPage() {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     disabled={selectedSubmissionIndex === submissions.length - 1}
                     onClick={() => setSelectedSubmissionIndex(prev => prev + 1)}
                     className="h-12 w-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-bg-dark border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-indigo-500 disabled:opacity-30 transition-all"
@@ -538,7 +538,7 @@ export default function FormsResultsPage() {
                   <div className="space-y-6">
                     <div className="flex items-start gap-4 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 rounded-2xl p-6 shadow-sm shadow-purple-500/5">
                       <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/20">
-                         <Brain className="h-5 w-5" />
+                        <Brain className="h-5 w-5" />
                       </div>
                       <div>
                         <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-[0.2em] block mb-2">Cognitive Response Analysis</span>
@@ -550,15 +550,15 @@ export default function FormsResultsPage() {
 
                     <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-white/10 rounded-3xl p-8 md:p-10 space-y-10 shadow-2xl overflow-hidden relative">
                       <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none">
-                         <FileText className="h-40 w-40" />
+                        <FileText className="h-40 w-40" />
                       </div>
                       {form.questions.map((q, i) => {
                         const answer = currentSubmission.answers.find(a => (a.question_id as any)._id === q.id || (a.question_id as any) === q.id)
                         return (
                           <div key={i} className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
-                               <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black">{i + 1}</span>
-                               <p className="text-xs font-black text-slate-500 uppercase tracking-widest">{q.label}</p>
+                              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black">{i + 1}</span>
+                              <p className="text-xs font-black text-slate-500 uppercase tracking-widest">{q.label}</p>
                             </div>
                             <div className="pl-9">
                               {q.type === 'linear_scale' ? (
@@ -591,10 +591,10 @@ export default function FormsResultsPage() {
                     </div>
                   </div>
                 ) : (
-                   <div className="flex flex-col items-center justify-center py-20 opacity-20">
-                      <Meh className="h-16 w-16 mb-4" />
-                      <p className="text-xl font-black uppercase tracking-widest">Zero Data Points Found</p>
-                   </div>
+                  <div className="flex flex-col items-center justify-center py-20 opacity-20">
+                    <Meh className="h-16 w-16 mb-4" />
+                    <p className="text-xl font-black uppercase tracking-widest">Zero Data Points Found</p>
+                  </div>
                 )}
               </>
             )}
@@ -625,12 +625,12 @@ export default function FormsResultsPage() {
                       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
                       <Lightbulb className="absolute -right-20 -bottom-20 opacity-10 h-96 w-96 text-white pointer-events-none group-hover:scale-110 transition-transform duration-700" />
                       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-                      
+
                       <div className="relative z-10 space-y-8 flex flex-col items-center">
                         <div className="h-20 w-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl mb-2">
                           <Brain className="h-10 w-10 text-white" />
                         </div>
-                        
+
                         <div className="space-y-4">
                           <h3 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
                             Generate Deep AI Insights
@@ -639,7 +639,7 @@ export default function FormsResultsPage() {
                             Activate our advanced neural engine to synthesize qualitative responses, extract sentiment vectors, and reveal actionable operational intelligence from your survey data.
                           </p>
                         </div>
-                        
+
                         <div className="pt-8 w-full max-w-md mx-auto">
                           <button
                             onClick={handleGenerateAudit}
@@ -650,7 +650,7 @@ export default function FormsResultsPage() {
                             <Sparkles className="h-6 w-6" /> Generate Comprehensive Audit
                           </button>
                         </div>
-                        
+
                         {!submissions.length && (
                           <p className="text-white/60 text-xs font-bold uppercase tracking-widest bg-black/20 px-4 py-2 rounded-full inline-flex mt-4 backdrop-blur-sm border border-white/10">
                             Insufficient data: Waiting for submissions
@@ -761,8 +761,8 @@ export default function FormsResultsPage() {
                             <Badge className={cn(
                               "text-[9px] font-black uppercase border-none px-2.5 rounded-full",
                               result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
-                              result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                              "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                  "bg-amber-500/10 text-amber-600 dark:text-amber-400"
                             )}>
                               {result.sentiment}
                             </Badge>
