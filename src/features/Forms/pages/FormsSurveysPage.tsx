@@ -53,7 +53,7 @@ export default function FormsSurveysPage() {
       const counts = await Promise.allSettled(
         data.map((f) => getFormSubmissions(f._id || f.id))
       )
-      
+
       let total = 0
       const enrichedForms = data.map((f, index) => {
         const countResult = counts[index]
@@ -132,7 +132,7 @@ export default function FormsSurveysPage() {
   }, [tab, query, forms, sortField, sortOrder])
 
   return (
-    <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-300 max-w-7xl mx-auto">
+    <div className="flex-1 space-y-6 p-4 md:p-8 animate-in fade-in zoom-in-95 duration-300 max-w-[1400px] mx-auto w-full">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
@@ -231,26 +231,26 @@ export default function FormsSurveysPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.02] text-[10px] uppercase tracking-widest text-slate-500 font-black">
-                  <th className="px-8 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('date')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('date')}>
                     <div className="flex items-center">Form Architecture <SortIcon field="date" /></div>
                   </th>
-                  <th className="px-6 py-5">Targeting</th>
-                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('status')}>
+                  <th className="px-4 py-4 whitespace-nowrap">Targeting</th>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('status')}>
                     <div className="flex items-center">Status <SortIcon field="status" /></div>
                   </th>
-                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('questions')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('questions')}>
                     <div className="flex items-center">Questions <SortIcon field="questions" /></div>
                   </th>
-                  <th className="px-6 py-5 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none" onClick={() => handleSort('responses')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('responses')}>
                     <div className="flex items-center">Responses <SortIcon field="responses" /></div>
                   </th>
-                  <th className="px-6 py-5 text-right">Actions</th>
+                  <th className="px-4 py-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-8 py-20 text-center">
+                    <td colSpan={6} className="px-4 py-16 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
                         <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Synchronizing Survey Data...</p>
@@ -259,7 +259,7 @@ export default function FormsSurveysPage() {
                   </tr>
                 ) : visibleRows.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-8 py-20 text-center">
+                    <td colSpan={6} className="px-4 py-16 text-center">
                       <div className="flex flex-col items-center gap-4 opacity-20">
                         <ClipboardList className="h-16 w-16 text-slate-500" />
                         <p className="text-lg font-bold text-slate-500">No forms found matching your criteria</p>
@@ -269,7 +269,7 @@ export default function FormsSurveysPage() {
                 ) : (
                   visibleRows.map((row) => (
                     <tr key={row.id} className="group hover:bg-white/[0.02] transition-colors">
-                      <td className="px-8 py-6">
+                      <td className="px-4 py-4 w-[35%]">
                         <div className="flex items-center gap-4">
                           <div className={cn(
                             "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-lg transition-transform group-hover:scale-110 duration-300",
@@ -289,7 +289,7 @@ export default function FormsSurveysPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 py-4 w-[25%]">
                         <div className="flex flex-col gap-1.5">
                           <Badge variant="outline" className="w-fit bg-indigo-500/5 text-indigo-400 border-indigo-500/20 px-2 py-0 font-black text-[9px] uppercase tracking-widest">
                             {row.subject_role} Subject
@@ -301,7 +301,7 @@ export default function FormsSurveysPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <Badge
                           variant={row.is_active ? "success" : "secondary"}
                           className="font-black px-3 py-1 text-[10px] uppercase tracking-widest rounded-lg"
@@ -309,30 +309,30 @@ export default function FormsSurveysPage() {
                           {row.is_active ? 'Active' : 'Closed'}
                         </Badge>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-black text-white">{row.questions?.length ?? 0}</span>
+                          <span className="text-lg font-black text-white">{row.questions?.length ?? 0}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-black text-emerald-400">{row.responsesCount ?? 0}</span>
+                          <span className="text-lg font-black text-emerald-400">{row.responsesCount ?? 0}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-4 py-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => navigate(`/dashboard/forms-results/${row._id || row.id}`)}
-                            className="h-10 px-4 rounded-xl text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold flex items-center gap-2"
+                            className="h-9 px-3 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-bold flex items-center gap-1.5 text-xs"
                           >
-                            <BarChart3 className="h-4 w-4" /> Results
+                            <BarChart3 className="h-3.5 w-3.5" /> Results
                           </Button>
 
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-white/5 text-slate-400">
+                              <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg hover:bg-white/5 text-slate-400">
                                 <MoreVertical className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
