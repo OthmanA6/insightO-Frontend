@@ -94,38 +94,9 @@ export default function FormsResultsPage() {
       const result = await analyzeForm(formId)
       setSummaryAiData(result)
     } catch (err: any) {
-      console.error("Summary AI error:", err)
-      toast.info("Using mock data due to AI backend error")
-
-      // Fallback to mock data if the backend AI fails
-      setSummaryAiData({
-        tags: {
-          "General Experience": {
-            summary: "Participants expressed high satisfaction with the overall experience. The interface was perceived as intuitive, and the content was highly relevant.",
-            sentiment: "positive",
-            strengths: ["Intuitive design", "Relevant content", "Engaging platform"],
-            weaknesses: ["Some loading delays"],
-            action_items: ["Optimize loading speed"],
-            score: 88
-          },
-          "System Performance": {
-            summary: "While mostly stable, several participants noted occasional timeouts during peak hours which affected their workflow.",
-            sentiment: "neutral",
-            strengths: ["Stable during off-peak"],
-            weaknesses: ["Timeouts during peak hours", "Slow image loading"],
-            action_items: ["Scale server infrastructure", "Implement image caching"],
-            score: 65
-          },
-          "Customer Support": {
-            summary: "A few users mentioned that response times from support were longer than expected, leading to minor frustrations.",
-            sentiment: "negative",
-            strengths: ["Friendly staff"],
-            weaknesses: ["Long response times", "Lack of 24/7 support"],
-            action_items: ["Hire more support staff", "Implement a chatbot system"],
-            score: 42
-          }
-        }
-      })
+      console.log("Summary AI error:", err)
+      const errMsg = err?.response?.data?.message || err?.message || "Failed to generate summary"
+      toast.error(errMsg)
     } finally {
       setSummaryAiLoading(false)
     }
@@ -322,6 +293,9 @@ export default function FormsResultsPage() {
                             <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
                             <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-full">Neural Core Active</Badge>
                           </div>
+                          <pre className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-200 overflow-auto w-full font-mono mt-4">
+                            {JSON.stringify(summaryAiData, null, 2)}
+                          </pre>
                         </div>
                         <button
                           onClick={handleGenerateSummaryAi}
@@ -333,8 +307,16 @@ export default function FormsResultsPage() {
 
                       {/* Per-tag summaries */}
                       <div className="space-y-4">
-                        {Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
-                          <div key={tag} className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+                        {Object.entries(summaryAiData.tags || {}).length === 0 ? (
+                          <div className="text-center py-6 text-slate-500 dark:text-slate-400">
+                            <p className="text-xs font-bold uppercase tracking-widest mb-2">No category summaries generated</p>
+                            <pre className="text-[10px] bg-slate-100 dark:bg-black/30 p-4 rounded-xl text-left overflow-x-auto font-mono">
+                              {JSON.stringify(summaryAiData, null, 2)}
+                            </pre>
+                          </div>
+                        ) : (
+                          Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
+                            <div key={tag} className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                             <div className="flex items-center gap-3 mb-2">
                               <span className="px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
                               <Badge className={cn(
@@ -350,8 +332,55 @@ export default function FormsResultsPage() {
                               )}
                             </div>
                             <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{result.summary}</p>
+
+                            {/* Strengths / Weaknesses / Action Items */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                              {result.strengths?.length > 0 && (
+                                <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-3">
+                                  <p className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                    <TrendingUp className="h-3 w-3" /> Strengths
+                                  </p>
+                                  <ul className="space-y-1.5">
+                                    {result.strengths.map((s, i) => (
+                                      <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {result.weaknesses?.length > 0 && (
+                                <div className="rounded-xl bg-red-500/5 border border-red-500/15 p-3">
+                                  <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                    <TrendingDown className="h-3 w-3" /> Weaknesses
+                                  </p>
+                                  <ul className="space-y-1.5">
+                                    {result.weaknesses.map((w, i) => (
+                                      <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {result.action_items?.length > 0 && (
+                                <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-3">
+                                  <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                    <Zap className="h-3 w-3" /> Action Items
+                                  </p>
+                                  <ul className="space-y-1.5">
+                                    {result.action_items.map((a, i) => (
+                                      <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                        <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        ))}
+                        ))
+                        )}
                       </div>
                     </div>
                   </div>
