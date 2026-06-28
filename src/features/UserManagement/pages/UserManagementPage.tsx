@@ -161,22 +161,22 @@ export default function UserManagementPage() {
         </div>
         <div className="flex gap-2 w-full sm:w-auto items-center">
           {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2 mr-2 p-1.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 animate-in slide-in-from-right-2">
+            <div className="flex items-center gap-2 me-2 p-1.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 animate-in slide-in-from-right-2">
               <span className="text-[10px] font-bold text-indigo-400 px-2 uppercase tracking-widest">{selectedIds.length} Selected</span>
               <div className="flex gap-1">
                 <Button variant="ghost" size="sm" onClick={() => handleBulkAction('activate')} className="h-8 text-emerald-400 hover:bg-emerald-500/10 px-3">
-                  <UserCheck className="h-3.5 w-3.5 mr-1" /> Activate
+                  <UserCheck className="h-3.5 w-3.5 me-1" /> Activate
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => handleBulkAction('suspend')} className="h-8 text-amber-400 hover:bg-amber-500/10 px-3">
-                  <Ban className="h-3.5 w-3.5 mr-1" /> Suspend
+                  <Ban className="h-3.5 w-3.5 me-1" /> Suspend
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => handleBulkAction('delete')} className="h-8 text-red-400 hover:bg-red-500/10 px-3">
-                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                  <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
                 </Button>
               </div>
             </div>
           )}
-          <Button variant="outline" className="flex items-center gap-2 border-white/10 hover:bg-white/5">
+          <Button variant="outline" className="flex items-center gap-2 border-panel-hover hover:bg-panel-hover">
             <Download className="h-4 w-4" /> Export
           </Button>
           <Button
@@ -192,33 +192,33 @@ export default function UserManagementPage() {
       </div>
 
       <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="bg-[#1e1b2e] border border-white/5 p-1 mb-4">
-          <TabsTrigger value="all" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+        <TabsList className="bg-panel border border-panel p-1 mb-4">
+          <TabsTrigger value="all" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">
             All Users ({usersExcludingPendingApproval.length})
           </TabsTrigger>
-          <TabsTrigger value="pending" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white relative">
+          <TabsTrigger value="pending" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content relative">
             Pending Approval ({pendingApprovalOnly.length})
             {pendingApprovalOnly.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              <span className="absolute -top-1 -end-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             )}
           </TabsTrigger>
         </TabsList>
 
-        <Card className="bg-[#1e1b2e] text-card-foreground border-white/5 shadow-xl">
-          <CardHeader className="pb-4 border-b border-white/5">
+        <Card className="bg-panel text-card-foreground border-panel shadow-xl">
+          <CardHeader className="pb-4 border-b border-panel">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                 <div className="relative w-full sm:w-64">
                   <Input
                     type="search"
                     placeholder="Search users..."
-                    className="w-full bg-[#0f111a] border-white/10 text-white placeholder:text-slate-500"
+                    className="w-full bg-app border-panel-hover text-content placeholder:text-content-muted"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    startIcon={<Search className="h-4 w-4 text-slate-400" />}
+                    startIcon={<Search className="h-4 w-4 text-content-muted" />}
                   />
                 </div>
-                <Button variant="outline" className="flex items-center gap-2 border-white/10 hover:bg-white/5 text-slate-300">
+                <Button variant="outline" className="flex items-center gap-2 border-panel-hover hover:bg-panel-hover text-content-muted">
                   <Filter className="h-4 w-4" /> Filter
                 </Button>
               </div>
@@ -227,7 +227,7 @@ export default function UserManagementPage() {
           <CardContent className="p-0">
             <TabsContent value="all" className="m-0">
               {isLoading ? (
-                <div className="p-12 flex flex-col items-center justify-center gap-4 text-slate-500">
+                <div className="p-12 flex flex-col items-center justify-center gap-4 text-content-muted">
                   <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                   <p className="text-sm font-medium">Loading synchronization data...</p>
                 </div>
@@ -245,7 +245,7 @@ export default function UserManagementPage() {
 
             <TabsContent value="pending" className="m-0">
               {isLoading ? (
-                <div className="p-12 flex flex-col items-center justify-center gap-4 text-slate-500">
+                <div className="p-12 flex flex-col items-center justify-center gap-4 text-content-muted">
                   <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                   <p className="text-sm font-medium">Fetching pending approvals...</p>
                 </div>
@@ -295,25 +295,25 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
   return (
     <div className="w-full overflow-auto custom-scrollbar">
       <table className="w-full caption-bottom text-sm">
-        <thead className="bg-[#0f111a] border-b border-white/5">
+        <thead className="bg-app border-b border-panel">
           <tr className="transition-colors">
-            <th className="h-12 px-4 text-left align-middle w-10">
+            <th className="h-12 px-4 text-start align-middle w-10">
               <Checkbox
                 checked={users.length > 0 && selectedIds.length === users.length}
                 onCheckedChange={(checked) => onSelectAll(checked as boolean)}
               />
             </th>
-            <th className="h-12 px-4 text-left align-middle font-bold text-slate-400 uppercase text-[10px] tracking-wider">User</th>
-            <th className="h-12 px-4 text-left align-middle font-bold text-slate-400 uppercase text-[10px] tracking-wider">Department</th>
-            <th className="h-12 px-4 text-left align-middle font-bold text-slate-400 uppercase text-[10px] tracking-wider">Role</th>
-            <th className="h-12 px-4 text-left align-middle font-bold text-slate-400 uppercase text-[10px] tracking-wider">Status</th>
-            <th className="h-12 px-4 align-middle font-bold text-slate-400 uppercase text-[10px] tracking-wider text-right">Actions</th>
+            <th className="h-12 px-4 text-start align-middle font-bold text-content-muted uppercase text-[10px] tracking-wider">User</th>
+            <th className="h-12 px-4 text-start align-middle font-bold text-content-muted uppercase text-[10px] tracking-wider">Department</th>
+            <th className="h-12 px-4 text-start align-middle font-bold text-content-muted uppercase text-[10px] tracking-wider">Role</th>
+            <th className="h-12 px-4 text-start align-middle font-bold text-content-muted uppercase text-[10px] tracking-wider">Status</th>
+            <th className="h-12 px-4 align-middle font-bold text-content-muted uppercase text-[10px] tracking-wider text-end">Actions</th>
           </tr>
         </thead>
         <tbody className="[&_tr:last-child]:border-0">
           {users.length > 0 ? (
             users.map((user) => (
-              <tr key={user.id} className="border-b border-white/5 transition-colors hover:bg-white/2">
+              <tr key={user.id} className="border-b border-panel transition-colors hover:bg-white/2">
                 <td className="p-4 align-middle">
                   <Checkbox
                     checked={selectedIds.includes(user.id)}
@@ -322,13 +322,13 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                 </td>
                 <td className="p-4 align-middle">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-white/10 ring-2 ring-indigo-500/10">
+                    <Avatar className="h-10 w-10 border border-panel-hover ring-2 ring-indigo-500/10">
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                       <AvatarFallback className="bg-indigo-500/20 text-indigo-400 font-bold">{user.firstName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <Link to={`/dashboard/users/${user.id}/profile`} className="font-bold text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">{user.firstName} {user.lastName}</Link>
-                      <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                      <span className="text-xs text-content-muted flex items-center gap-1 mt-0.5">
                         <Mail className="h-3 w-3" /> {user.email}
                       </span>
                     </div>
@@ -336,11 +336,11 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                 </td>
                 <td className="p-4 align-middle">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-300">{user.departmentId?.name || user.departmentId || 'Unassigned'}</span>
+                    <span className="text-xs font-bold text-content-muted">{user.departmentId?.name || user.departmentId || 'Unassigned'}</span>
                   </div>
                 </td>
                 <td className="p-4 align-middle">
-                  <div className="flex items-center gap-2 text-slate-300 font-semibold text-xs">
+                  <div className="flex items-center gap-2 text-content-muted font-semibold text-xs">
                     <Shield className="h-3.5 w-3.5 text-indigo-500" />
                     {user.role}
                   </div>
@@ -373,42 +373,42 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                       >
                         {type === 'all' ? (
                           isActiveRow ? (
-                            <UserCheck className="mr-1 h-3 w-3" />
+                            <UserCheck className="me-1 h-3 w-3" />
                           ) : (
-                            <AlertCircle className="mr-1 h-3 w-3" />
+                            <AlertCircle className="me-1 h-3 w-3" />
                           )
                         ) : (
-                          <AlertCircle className="mr-1 h-3 w-3" />
+                          <AlertCircle className="me-1 h-3 w-3" />
                         )}
                         {rowStatus}
                       </Badge>
                     );
                   })()}
                 </td>
-                <td className="p-4 align-middle text-right">
+                <td className="p-4 align-middle text-end">
                   {type === 'all' ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/5 rounded-lg">
-                          <MoreHorizontal className="h-4 w-4 text-slate-400" />
+                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-panel-hover rounded-lg">
+                          <MoreHorizontal className="h-4 w-4 text-content-muted" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#1e1b2e] border-white/10 text-slate-300">
+                      <DropdownMenuContent align="end" className="bg-panel border-panel-hover text-content-muted">
                         <DropdownMenuLabel>User Management</DropdownMenuLabel>
-                        <DropdownMenuItem asChild className="hover:bg-indigo-600 hover:text-white cursor-pointer gap-2">
+                        <DropdownMenuItem asChild className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
                           <Link to={`/dashboard/users/${user.id}/profile`}>
                             <User className="h-3.5 w-3.5" /> View Profile
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-white cursor-pointer gap-2">
+                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
                           <Shield className="h-3.5 w-3.5" /> Edit Permissions
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-white cursor-pointer gap-2">
+                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
                           <Ban className="h-3.5 w-3.5" /> Suspend Account
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-white/5" />
+                        <DropdownMenuSeparator className="bg-panel-hover" />
                         <DropdownMenuItem
-                          className="text-red-400 focus:bg-red-500 focus:text-white cursor-pointer gap-2"
+                          className="text-red-400 focus:bg-red-500 focus:text-content cursor-pointer gap-2"
                           onClick={() => onDelete(user.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Permanent Delete
@@ -422,7 +422,7 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                         className="h-8 px-3 text-[10px] font-bold bg-[#7c3aed] hover:bg-[#6d28d9] text-white shadow-md shadow-violet-500/25 border border-violet-400/20"
                         onClick={() => onApprove?.(user)}
                       >
-                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Approve
+                        <CheckCircle2 className="h-3.5 w-3.5 me-1" /> Approve
                       </Button>
                     </div>
                   )}
@@ -432,11 +432,11 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
           ) : (
             <tr>
               <td colSpan={6} className="p-16 text-center">
-                <div className="flex flex-col items-center justify-center text-slate-500">
-                  <div className="w-16 h-16 rounded-2xl bg-[#0f111a] border border-white/5 flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center text-content-muted">
+                  <div className="w-16 h-16 rounded-2xl bg-app border border-panel flex items-center justify-center mb-4">
                     <Search className="h-8 w-8 opacity-20" />
                   </div>
-                  <p className="text-lg font-bold text-white tracking-tight">Sync Complete - No Results</p>
+                  <p className="text-lg font-bold text-content tracking-tight">Sync Complete - No Results</p>
                   <p className="text-xs max-w-xs mx-auto mt-1">No users matched your current filters or synchronization parameters.</p>
                 </div>
               </td>

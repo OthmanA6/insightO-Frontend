@@ -23,9 +23,9 @@ export default function DashboardPlaceholder() {
       <div className="w-full max-w-md text-center space-y-6">
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-            <BarChart3 className="text-white size-7" />
+            <BarChart3 className="text-content size-7" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-content tracking-tight">
             insightO
           </h1>
         </div>
@@ -37,10 +37,10 @@ export default function DashboardPlaceholder() {
             </svg>
           </div>
 
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-content">
             Welcome, {user.firstName}!
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
+          <p className="text-content-muted dark:text-content-muted text-sm">
             You are signed in as{' '}
             <span className="font-semibold text-primary">{user.role}</span>.
             <br />
@@ -49,7 +49,7 @@ export default function DashboardPlaceholder() {
 
           <button
             onClick={handleLogout}
-            className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-all"
+            className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-panel-hover hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-content-muted font-bold rounded-xl transition-all"
           >
             <LogOut className="size-4" />
             Sign out

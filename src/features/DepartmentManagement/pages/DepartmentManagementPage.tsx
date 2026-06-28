@@ -89,16 +89,16 @@ export default function DepartmentManagementPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-4xl font-black tracking-tight text-content flex items-center gap-3">
             <Building2 className="h-8 w-8 text-indigo-500" />
             Departments
           </h2>
-          <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">Institutional Infrastructure</p>
+          <p className="text-content-muted font-bold uppercase text-[10px] tracking-[0.3em]">Institutional Infrastructure</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Button variant="outline" className="h-12 px-6 rounded-xl border-white/10 hover:bg-white/5 text-slate-300 font-bold">
-            <Download className="mr-2 h-4 w-4" /> Export Data
+          <Button variant="outline" className="h-12 px-6 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold">
+            <Download className="me-2 h-4 w-4" /> Export Data
           </Button>
           <Button 
             onClick={() => { setEditingDept(null); setIsModalOpen(true); }}
@@ -117,12 +117,12 @@ export default function DepartmentManagementPage() {
           { label: 'Total Enrollment', value: '770', icon: Users, color: 'text-emerald-400' },
           { label: 'Faculty Active', value: '42', icon: UserCheck, color: 'text-purple-400' },
         ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-3xl bg-[#1e1b2e] border border-white/5 shadow-2xl flex items-center justify-between group hover:border-white/10 transition-all">
+          <div key={i} className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex items-center justify-between group hover:border-panel-hover transition-all">
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
-              <h4 className="text-3xl font-black text-white mt-1">{stat.value}</h4>
+              <p className="text-[10px] font-black text-content-muted uppercase tracking-widest">{stat.label}</p>
+              <h4 className="text-3xl font-black text-content mt-1">{stat.value}</h4>
             </div>
-            <div className={cn("p-4 rounded-2xl bg-white/5", stat.color)}>
+            <div className={cn("p-4 rounded-2xl bg-panel-hover", stat.color)}>
               <stat.icon className="h-7 w-7" />
             </div>
           </div>
@@ -130,22 +130,22 @@ export default function DepartmentManagementPage() {
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#1e1b2e] p-4 rounded-3xl border border-white/5">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-panel p-4 rounded-3xl border border-panel">
         <div className="w-full lg:w-96 relative group">
           <Input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or code..."
-            className="h-12 rounded-2xl bg-[#0f111a] border-white/5 text-white pl-12 pr-4 font-bold"
+            className="h-12 rounded-2xl bg-app border-panel text-content ps-12 pe-4 font-bold"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-content-muted group-focus-within:text-indigo-500 transition-colors" />
         </div>
 
         <div className="flex items-center gap-4 w-full lg:w-auto">
-           <Button variant="ghost" className="text-slate-400 font-bold hover:text-white hover:bg-white/5">
-              <Filter className="mr-2 h-4 w-4" /> Filters
+           <Button variant="ghost" className="text-content-muted font-bold hover:text-content hover:bg-panel-hover">
+              <Filter className="me-2 h-4 w-4" /> Filters
            </Button>
-           <div className="h-8 w-px bg-white/5 mx-2 hidden lg:block"></div>
+           <div className="h-8 w-px bg-panel-hover mx-2 hidden lg:block"></div>
            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Total: {filteredDepts.length}</p>
         </div>
       </div>
@@ -155,25 +155,25 @@ export default function DepartmentManagementPage() {
         {isLoading ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Synchronizing Department Data...</p>
+            <p className="text-sm font-bold text-content-muted uppercase tracking-widest">Synchronizing Department Data...</p>
           </div>
         ) : filteredDepts.length === 0 ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4 opacity-20">
-            <Building2 className="h-16 w-16 text-slate-500" />
-            <p className="text-lg font-bold text-slate-500">No departments found matching your criteria</p>
+            <Building2 className="h-16 w-16 text-content-muted" />
+            <p className="text-lg font-bold text-content-muted">No departments found matching your criteria</p>
           </div>
         ) : (
           filteredDepts.map((dept) => (
-          <div key={resolveDeptId(dept)} className="group relative rounded-3xl bg-[#1e1b2e] border border-white/5 hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6 cursor-pointer" onClick={() => navigate(`/dashboard/departments/${resolveDeptId(dept)}`)}>
+          <div key={resolveDeptId(dept)} className="group relative rounded-3xl bg-panel border border-panel hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6 cursor-pointer" onClick={() => navigate(`/dashboard/departments/${resolveDeptId(dept)}`)}>
             <div className="flex justify-between items-start">
               <div className="flex gap-4">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5">
+                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel">
                   <Building2 className="h-8 w-8" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">{dept.name}</h3>
+                  <h3 className="text-xl font-black text-content group-hover:text-indigo-400 transition-colors">{dept.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="font-mono text-[10px] border-white/10 text-slate-500">{dept.code}</Badge>
+                    <Badge variant="outline" className="font-mono text-[10px] border-panel-hover text-content-muted">{dept.code}</Badge>
                     <span className="text-[10px] text-slate-600 uppercase font-black">Created {dept.createdAt}</span>
                   </div>
                 </div>
@@ -181,14 +181,14 @@ export default function DepartmentManagementPage() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/5" onClick={(e) => e.stopPropagation()}>
-                    <MoreVertical className="h-5 w-5 text-slate-500" />
+                  <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-panel-hover" onClick={(e) => e.stopPropagation()}>
+                    <MoreVertical className="h-5 w-5 text-content-muted" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#0a0a0f] border-white/5 min-w-[160px]">
+                <DropdownMenuContent align="end" className="bg-app border-panel min-w-[160px]">
                   <DropdownMenuItem 
                     onClick={(e) => { e.stopPropagation(); setEditingDept(dept); setIsModalOpen(true); }}
-                    className="flex items-center gap-2 hover:bg-white/5 font-bold py-3 text-indigo-400 cursor-pointer"
+                    className="flex items-center gap-2 hover:bg-panel-hover font-bold py-3 text-indigo-400 cursor-pointer"
                   >
                     <Edit3 className="h-4 w-4" /> Edit Details
                   </DropdownMenuItem>
@@ -202,18 +202,18 @@ export default function DepartmentManagementPage() {
               </DropdownMenu>
             </div>
 
-            <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 italic">
+            <p className="text-sm text-content-muted leading-relaxed line-clamp-2 italic">
               "{dept.description || 'No description provided for this academic entity.'}"
             </p>
 
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/5">
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-panel">
               <div className="flex flex-col gap-1 text-center">
                 <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Students</span>
-                <span className="text-lg font-black text-white">{dept.stats?.studentCount}</span>
+                <span className="text-lg font-black text-content">{dept.stats?.studentCount}</span>
               </div>
-              <div className="flex flex-col gap-1 text-center border-x border-white/5">
+              <div className="flex flex-col gap-1 text-center border-x border-panel">
                 <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Faculty</span>
-                <span className="text-lg font-black text-white">{dept.stats?.instructorCount}</span>
+                <span className="text-lg font-black text-content">{dept.stats?.instructorCount}</span>
               </div>
               <div className="flex flex-col gap-1 text-center">
                 <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Surveys</span>
@@ -223,12 +223,12 @@ export default function DepartmentManagementPage() {
 
             <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-black text-white">
+                <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-black text-content">
                   {dept.hodName?.charAt(0)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter leading-none">Head of Dept</span>
-                  <span className="text-[11px] font-bold text-slate-300">{dept.hodName || 'Not Appointed'}</span>
+                  <span className="text-[9px] font-black text-content-muted uppercase tracking-tighter leading-none">Head of Dept</span>
+                  <span className="text-[11px] font-bold text-content-muted">{dept.hodName || 'Not Appointed'}</span>
                 </div>
               </div>
               
@@ -237,7 +237,7 @@ export default function DepartmentManagementPage() {
                 className="h-10 px-4 rounded-xl text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-[10px] uppercase tracking-widest group/btn"
                 onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/departments/${resolveDeptId(dept)}`); }}
               >
-                View Courses <ArrowUpRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                View Courses <ArrowUpRight className="ms-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
               </Button>
             </div>
           </div>

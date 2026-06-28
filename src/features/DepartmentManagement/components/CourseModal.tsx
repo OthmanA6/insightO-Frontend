@@ -177,18 +177,18 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
       onClose={onClose}
       title=""
       size="xl"
-      className="max-w-3xl bg-[#0a0a0f] border-white/5"
+      className="max-w-3xl bg-app border-panel"
     >
       <Modal.Header
         title={
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-content tracking-tight flex items-center gap-3">
               <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                 <BookOpen className="h-5 w-5 text-indigo-400" />
               </div>
               {course ? 'Edit Course' : 'Create New Course'}
             </h2>
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">
+            <p className="text-content-muted text-[10px] font-bold uppercase tracking-widest mt-1">
               Academic Program Configuration
             </p>
           </div>
@@ -201,27 +201,27 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
           {/* ── Name & Code ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
                 Course Name
               </Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Introduction to Programming"
-                className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
-                startIcon={<BookOpen className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
+                startIcon={<BookOpen className="h-4 w-4 text-content-muted" />}
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
                 Course Code
               </Label>
               <Input
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
                 placeholder="e.g. CS101"
-                className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl font-mono focus:ring-indigo-500"
-                startIcon={<Code className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-12 rounded-xl font-mono focus:ring-indigo-500"
+                startIcon={<Code className="h-4 w-4 text-content-muted" />}
               />
             </div>
           </div>
@@ -229,13 +229,13 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
           {/* ── Instructor Dropdown & Credits ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
                 Instructor
               </Label>
               <div className="relative">
-                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none z-10" />
+                <GraduationCap className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted pointer-events-none z-10" />
                 {isLoadingUsers ? (
-                  <div className="flex items-center gap-3 h-12 px-4 pl-11 rounded-xl bg-[#0f111a] border border-white/10 text-slate-500 text-sm">
+                  <div className="flex items-center gap-3 h-12 px-4 ps-11 rounded-xl bg-app border border-panel-hover text-content-muted text-sm">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Loading...
                   </div>
@@ -244,31 +244,31 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                     <select
                       value={instructorId}
                       onChange={(e) => setInstructorId(e.target.value)}
-                      className="w-full h-12 pl-11 pr-10 rounded-xl bg-[#0f111a] border border-white/10 text-white text-sm font-medium appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                      className="w-full h-12 ps-11 pe-10 rounded-xl bg-app border border-panel-hover text-content text-sm font-medium appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                     >
-                      <option value="" className="bg-[#0f111a] text-slate-400">
+                      <option value="" className="bg-app text-content-muted">
                         — Select Instructor —
                       </option>
                       {instructors.map((user) => {
                         const uid = resolveUserId(user);
                         const inDept = resolveUserDeptId(user) === departmentId;
                         return (
-                          <option key={uid} value={uid} className="bg-[#0f111a] text-white">
+                          <option key={uid} value={uid} className="bg-app text-content">
                             {user.firstName} {user.lastName}{inDept ? ' ★' : ''} — {user.email}
                           </option>
                         );
                       })}
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+                    <ChevronDown className="absolute end-4 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted pointer-events-none" />
                   </>
                 )}
               </div>
               {!isLoadingUsers && instructors.some((u) => resolveUserDeptId(u) === departmentId) && (
-                <p className="text-[10px] text-indigo-400/60 font-bold ml-1">★ = Instructor in this department</p>
+                <p className="text-[10px] text-indigo-400/60 font-bold ms-1">★ = Instructor in this department</p>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
                 Credits
               </Label>
               <Input
@@ -280,29 +280,29 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                 placeholder="e.g. 3"
                 min={0}
                 max={12}
-                className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
-                startIcon={<Hash className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
+                startIcon={<Hash className="h-4 w-4 text-content-muted" />}
               />
             </div>
           </div>
 
           {/* ── Description ── */}
           <div className="flex flex-col gap-2">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
               Course Description
             </Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide an overview of the course curriculum and objectives..."
-              className="bg-[#0f111a] border-white/10 text-white min-h-[100px] rounded-2xl focus:ring-indigo-500 p-4"
+              className="bg-app border-panel-hover text-content min-h-[100px] rounded-2xl focus:ring-indigo-500 p-4"
             />
           </div>
 
           {/* ── Student Enrollment Multi-Select ── */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1 flex items-center gap-2">
                 <Users className="h-3.5 w-3.5" />
                 Enroll Students
               </Label>
@@ -310,7 +310,7 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
               <button
                 type="button"
                 onClick={() => setDeptFilterOn((prev) => !prev)}
-                className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+                className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg hover:bg-panel-hover"
               >
                 <div
                   className={`relative w-8 h-4.5 rounded-full transition-colors duration-200 ${
@@ -324,7 +324,7 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                     }`}
                   />
                 </div>
-                <span className={deptFilterOn ? 'text-indigo-400' : 'text-slate-500'}>
+                <span className={deptFilterOn ? 'text-indigo-400' : 'text-content-muted'}>
                   This Dept Only
                 </span>
               </button>
@@ -344,14 +344,14 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                       <button
                         type="button"
                         onClick={() => toggleStudent(sid)}
-                        className="hover:text-white transition-colors"
+                        className="hover:text-content transition-colors"
                       >
                         <X className="h-3 w-3" />
                       </button>
                     </span>
                   );
                 })}
-                <span className="text-[10px] font-black text-slate-600 uppercase self-center ml-1">
+                <span className="text-[10px] font-black text-slate-600 uppercase self-center ms-1">
                   {selectedStudentIds.size} selected
                 </span>
               </div>
@@ -359,20 +359,20 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
 
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500 pointer-events-none" />
+              <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none" />
               <input
                 type="text"
                 value={studentSearch}
                 onChange={(e) => setStudentSearch(e.target.value)}
                 placeholder="Search students by name or email..."
-                className="w-full h-10 pl-9 pr-4 rounded-xl bg-[#0f111a] border border-white/10 text-white text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                className="w-full h-10 ps-9 pe-4 rounded-xl bg-app border border-panel-hover text-content text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-600"
               />
             </div>
 
             {/* Student list */}
-            <div className="max-h-48 overflow-y-auto rounded-xl bg-[#0f111a] border border-white/5 divide-y divide-white/5 custom-scrollbar">
+            <div className="max-h-48 overflow-y-auto rounded-xl bg-app border border-panel divide-y divide-panel custom-scrollbar">
               {isLoadingUsers ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-slate-500 text-xs">
+                <div className="flex items-center justify-center gap-2 py-8 text-content-muted text-xs">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading students...
                 </div>
@@ -389,7 +389,7 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                       key={uid}
                       type="button"
                       onClick={() => toggleStudent(uid)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-start transition-colors hover:bg-panel-hover ${
                         isSelected ? 'bg-indigo-500/5' : ''
                       }`}
                     >
@@ -400,13 +400,13 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
                             : 'border-white/15 bg-transparent'
                         }`}
                       >
-                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                        {isSelected && <Check className="h-3 w-3 text-content" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-white truncate">
+                        <p className="text-xs font-bold text-content truncate">
                           {student.firstName} {student.lastName}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-mono truncate">
+                        <p className="text-[10px] text-content-muted font-mono truncate">
                           {student.email}
                         </p>
                       </div>
@@ -423,12 +423,12 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
           </div>
 
           {/* ── Actions ── */}
-          <div className="pt-4 border-t border-white/5 flex justify-end gap-3">
+          <div className="pt-4 border-t border-panel flex justify-end gap-3">
             <Button
               variant="ghost"
               type="button"
               onClick={onClose}
-              className="h-12 px-6 rounded-xl text-slate-400 hover:text-white hover:bg-white/5"
+              className="h-12 px-6 rounded-xl text-content-muted hover:text-content hover:bg-panel-hover"
             >
               Discard Changes
             </Button>

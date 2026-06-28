@@ -206,7 +206,7 @@ export default function RegisterForm() {
   };
 
   const inputClass =
-    'w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm';
+    'w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 ps-12 pe-4 outline-none transition-all text-slate-900 dark:text-content placeholder:text-content-muted shadow-sm';
 
   const busy = isSendingOtp || isVerifying || isLoading;
 
@@ -224,9 +224,9 @@ export default function RegisterForm() {
             </span>
           </div>
 
-          <div className="flex-1 h-1 mx-3 bg-slate-200 dark:bg-slate-800 rounded-full relative overflow-hidden">
+          <div className="flex-1 h-1 mx-3 bg-slate-200 dark:bg-panel-hover rounded-full relative overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-500"
+              className="absolute top-0 start-0 h-full bg-primary rounded-full transition-all duration-500"
               style={{ width: step >= 2 ? '100%' : '0%' }}
             />
           </div>
@@ -236,14 +236,14 @@ export default function RegisterForm() {
               className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-all ${
                 step >= 2
                   ? 'bg-primary text-white border-primary'
-                  : 'bg-slate-100 dark:bg-surface-dark text-slate-400 border-slate-200 dark:border-slate-700'
+                  : 'bg-slate-100 dark:bg-surface-dark text-content-muted border-slate-200 dark:border-slate-700'
               }`}
             >
               2
             </div>
             <span
               className={`text-[10px] font-bold mt-2 uppercase tracking-wider transition-all ${
-                step >= 2 ? 'text-primary' : 'text-slate-400'
+                step >= 2 ? 'text-primary' : 'text-content-muted'
               }`}
             >
               Verify
@@ -256,10 +256,10 @@ export default function RegisterForm() {
       {step === 1 && (
         <div className="animate-fade-in">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-content mb-2">
               Create your account
             </h2>
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="text-content-muted dark:text-content-muted">
               Fill in your details to join the platform.
             </p>
           </div>
@@ -268,75 +268,75 @@ export default function RegisterForm() {
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                   First Name
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <User className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input type="text" placeholder="John" className={inputClass} {...step1Form.register('firstName')} />
                 </div>
                 {step1Form.formState.errors.firstName && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.firstName.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.firstName.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                   Last Name
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <User className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input type="text" placeholder="Doe" className={inputClass} {...step1Form.register('lastName')} />
                 </div>
                 {step1Form.formState.errors.lastName && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.lastName.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                 Work Email Address
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                  <Mail className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                 </div>
                 <input type="email" placeholder="name@company.com" autoComplete="email" className={inputClass} {...step1Form.register('email')} />
               </div>
               {step1Form.formState.errors.email && (
-                <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.email.message}</p>
+                <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.email.message}</p>
               )}
             </div>
 
             {/* National ID */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                 National ID
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <IdCard className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                  <IdCard className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                 </div>
                 <input type="text" inputMode="numeric" placeholder="Enter your national ID number" className={inputClass} {...step1Form.register('nationalId')} />
               </div>
               {step1Form.formState.errors.nationalId && (
-                <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.nationalId.message}</p>
+                <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.nationalId.message}</p>
               )}
             </div>
 
             {/* Role */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                 Role
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <ShieldCheck className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                  <ShieldCheck className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                 </div>
                 <select className={`${inputClass} appearance-none cursor-pointer`} defaultValue="" {...step1Form.register('role')}>
                   <option value="" disabled>Select your role</option>
@@ -344,27 +344,27 @@ export default function RegisterForm() {
                     <option key={role} value={role}>{ROLE_LABELS[role]}</option>
                   ))}
                 </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <ChevronDown className="size-5 text-slate-400" />
+                <div className="absolute inset-y-0 end-0 pe-4 flex items-center pointer-events-none">
+                  <ChevronDown className="size-5 text-content-muted" />
                 </div>
               </div>
               {step1Form.formState.errors.role && (
-                <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.role.message}</p>
+                <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.role.message}</p>
               )}
             </div>
 
             {/* Department (conditional) */}
             {selectedRole && selectedRole !== 'ADMIN' && (
               <div className="space-y-2 animate-fade-in">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Department</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Department</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Building2 className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <Building2 className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input type="text" placeholder="Enter department ID" className={inputClass} {...step1Form.register('departmentId')} />
                 </div>
                 {step1Form.formState.errors.departmentId && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.departmentId.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.departmentId.message}</p>
                 )}
               </div>
             )}
@@ -372,15 +372,15 @@ export default function RegisterForm() {
             {/* Academic Year (conditional) */}
             {selectedRole === 'STUDENT' && (
               <div className="space-y-2 animate-fade-in">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Academic Year</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Academic Year</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <GraduationCap className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <GraduationCap className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input type="number" min={1} max={6} placeholder="e.g. 3" className={inputClass} {...step1Form.register('academicYear')} />
                 </div>
                 {step1Form.formState.errors.academicYear && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.academicYear.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.academicYear.message}</p>
                 )}
               </div>
             )}
@@ -388,22 +388,22 @@ export default function RegisterForm() {
             {/* Password Row */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Password</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Password</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <Lock className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    className={`${inputClass} pr-12`}
+                    className={`${inputClass} pe-12`}
                     {...step1Form.register('password')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    className="absolute inset-y-0 end-0 pe-4 flex items-center text-content-muted hover:text-slate-600 dark:hover:text-content transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="size-5" />
@@ -413,26 +413,26 @@ export default function RegisterForm() {
                   </button>
                 </div>
                 {step1Form.formState.errors.password && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.password.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.password.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Confirm Password</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Confirm Password</label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                    <Lock className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
                   </div>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    className={`${inputClass} pr-12`}
+                    className={`${inputClass} pe-12`}
                     {...step1Form.register('confirmPassword')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    className="absolute inset-y-0 end-0 pe-4 flex items-center text-content-muted hover:text-slate-600 dark:hover:text-content transition-colors"
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="size-5" />
@@ -442,7 +442,7 @@ export default function RegisterForm() {
                   </button>
                 </div>
                 {step1Form.formState.errors.confirmPassword && (
-                  <p className="text-xs text-red-500 ml-1">{step1Form.formState.errors.confirmPassword.message}</p>
+                  <p className="text-xs text-red-500 ms-1">{step1Form.formState.errors.confirmPassword.message}</p>
                 )}
               </div>
             </div>
@@ -451,7 +451,7 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 mt-2 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none"
+              className="w-full py-4 bg-primary hover:bg-primary-hover text-content font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 mt-2 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none"
             >
               {isSendingOtp ? (
                 <><Loader2 className="size-5 animate-spin" /> Sending verification code…</>
@@ -460,7 +460,7 @@ export default function RegisterForm() {
               )}
             </button>
 
-            <p className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
+            <p className="text-center text-sm text-slate-600 dark:text-content-muted pt-2">
               Already have an account?{' '}
               <Link to="/login" className="text-primary font-bold hover:underline">Sign in</Link>
             </p>
@@ -475,19 +475,19 @@ export default function RegisterForm() {
             <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
               <MailCheck className="size-6" />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-content mb-2">
               Check your inbox
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <p className="text-slate-600 dark:text-content-muted leading-relaxed">
               We&apos;ve sent a 6-digit secure code to{' '}
-              <strong className="text-slate-900 dark:text-white">{formData.email}</strong>.
+              <strong className="text-slate-900 dark:text-content">{formData.email}</strong>.
             </p>
           </div>
 
           <form onSubmit={step2Form.handleSubmit(onStep2Submit)} className="space-y-6">
             {/* OTP Input */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+              <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
                 Security Code
               </label>
               <input
@@ -496,20 +496,20 @@ export default function RegisterForm() {
                 maxLength={6}
                 autoFocus
                 placeholder="------"
-                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-4 px-4 text-2xl font-bold outline-none transition-all text-slate-900 dark:text-white shadow-sm text-center tracking-[0.5em]"
+                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-4 px-4 text-2xl font-bold outline-none transition-all text-slate-900 dark:text-content shadow-sm text-center tracking-[0.5em]"
                 {...step2Form.register('otp')}
               />
               {step2Form.formState.errors.otp && (
-                <p className="text-xs text-red-500 ml-1">{step2Form.formState.errors.otp.message}</p>
+                <p className="text-xs text-red-500 ms-1">{step2Form.formState.errors.otp.message}</p>
               )}
             </div>
 
             {/* Timer & Resend */}
             <div className="flex items-center justify-between px-1">
-              <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <div className="text-sm text-content-muted dark:text-content-muted flex items-center gap-1.5">
                 <Clock className="size-4" />
                 Code expires in{' '}
-                <span className="font-bold text-slate-900 dark:text-white font-mono">
+                <span className="font-bold text-slate-900 dark:text-content font-mono">
                   {timer.formatted}
                 </span>
               </div>
@@ -519,7 +519,7 @@ export default function RegisterForm() {
                 onClick={handleResend}
                 className={`text-sm font-bold transition-colors ${
                   timer.seconds > 0 || isSendingOtp
-                    ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                    ? 'text-content-muted dark:text-slate-600 cursor-not-allowed'
                     : 'text-primary hover:text-primary-hover cursor-pointer'
                 }`}
               >
@@ -536,7 +536,7 @@ export default function RegisterForm() {
                   setStep(1);
                 }}
                 disabled={busy}
-                className="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-all flex items-center gap-2 disabled:opacity-60"
+                className="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-panel-hover text-slate-700 dark:text-content-muted font-bold rounded-xl transition-all flex items-center gap-2 disabled:opacity-60"
               >
                 <ArrowLeft className="size-4" />
                 Back
@@ -544,7 +544,7 @@ export default function RegisterForm() {
               <button
                 type="submit"
                 disabled={busy}
-                className="flex-1 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none"
+                className="flex-1 py-4 bg-primary hover:bg-primary-hover text-content font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none"
               >
                 {isVerifying || isLoading ? (
                   <><Loader2 className="size-5 animate-spin" /> Verifying…</>

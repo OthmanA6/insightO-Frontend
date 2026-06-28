@@ -126,37 +126,37 @@ export default function ForgotPasswordForm() {
       {step === 1 && (
         <form onSubmit={emailForm.handleSubmit(onSendOtp)} className="space-y-5">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Forgot Password</h2>
-            <p className="text-slate-500 dark:text-slate-400">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-content mb-2">Forgot Password</h2>
+            <p className="text-content-muted dark:text-content-muted">
               Enter your email and we&apos;ll send a 6-digit OTP.
             </p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+            <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">
               Work Email Address
             </label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                <Mail className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
               </div>
               <input
                 type="email"
                 autoComplete="email"
                 placeholder="name@company.com"
-                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm"
+                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 ps-12 pe-4 outline-none transition-all text-slate-900 dark:text-content placeholder:text-content-muted shadow-sm"
                 {...emailForm.register('email')}
               />
             </div>
             {emailForm.formState.errors.email && (
-              <p className="text-xs text-red-500 ml-1">{emailForm.formState.errors.email.message}</p>
+              <p className="text-xs text-red-500 ms-1">{emailForm.formState.errors.email.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isSending}
-            className="w-full py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:pointer-events-none"
+            className="w-full py-4 bg-primary hover:bg-primary-hover text-content font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:pointer-events-none"
           >
             {isSending ? (
               <>
@@ -168,7 +168,7 @@ export default function ForgotPasswordForm() {
             )}
           </button>
 
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
+          <p className="text-center text-sm text-slate-600 dark:text-content-muted pt-2">
             Remembered your password?{' '}
             <Link to="/login" className="text-primary font-bold hover:underline">
               Sign in
@@ -180,29 +180,29 @@ export default function ForgotPasswordForm() {
       {step === 2 && (
         <form onSubmit={resetForm.handleSubmit(onResetPassword)} className="space-y-5">
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Reset Password</h2>
-            <p className="text-slate-500 dark:text-slate-400">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-content mb-2">Reset Password</h2>
+            <p className="text-content-muted dark:text-content-muted">
               Enter the OTP sent to <strong>{pendingEmail || email}</strong> and set your new password.
             </p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">OTP Code</label>
+            <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">OTP Code</label>
             <input
               type="text"
               inputMode="numeric"
               maxLength={6}
               placeholder="------"
-              className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-4 px-4 text-2xl font-bold outline-none transition-all text-slate-900 dark:text-white shadow-sm text-center tracking-[0.5em]"
+              className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-4 px-4 text-2xl font-bold outline-none transition-all text-slate-900 dark:text-content shadow-sm text-center tracking-[0.5em]"
               {...resetForm.register('otp')}
             />
             {resetForm.formState.errors.otp && (
-              <p className="text-xs text-red-500 ml-1">{resetForm.formState.errors.otp.message}</p>
+              <p className="text-xs text-red-500 ms-1">{resetForm.formState.errors.otp.message}</p>
             )}
           </div>
 
           <div className="flex items-center justify-between px-1">
-            <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <div className="text-sm text-content-muted dark:text-content-muted flex items-center gap-1.5">
               <Clock className="size-4" />
               Code expires in <span className="font-bold font-mono">{timer.formatted}</span>
             </div>
@@ -212,7 +212,7 @@ export default function ForgotPasswordForm() {
               disabled={timer.seconds > 0 || isSending}
               className={`text-sm font-bold transition-colors ${
                 timer.seconds > 0 || isSending
-                  ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                  ? 'text-content-muted dark:text-slate-600 cursor-not-allowed'
                   : 'text-primary hover:text-primary-hover cursor-pointer'
               }`}
             >
@@ -221,38 +221,38 @@ export default function ForgotPasswordForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">New Password</label>
+            <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">New Password</label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                <Lock className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
               </div>
               <input
                 type="password"
                 autoComplete="new-password"
-                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm"
+                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 ps-12 pe-4 outline-none transition-all text-slate-900 dark:text-content placeholder:text-content-muted shadow-sm"
                 {...resetForm.register('password')}
               />
             </div>
             {resetForm.formState.errors.password && (
-              <p className="text-xs text-red-500 ml-1">{resetForm.formState.errors.password.message}</p>
+              <p className="text-xs text-red-500 ms-1">{resetForm.formState.errors.password.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Confirm Password</label>
+            <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Confirm Password</label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <KeyRound className="size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
+                <KeyRound className="size-5 text-content-muted group-focus-within:text-primary transition-colors" />
               </div>
               <input
                 type="password"
                 autoComplete="new-password"
-                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 pl-12 pr-4 outline-none transition-all text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm"
+                className="w-full bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 focus:border-primary dark:focus:border-primary rounded-lg py-3.5 ps-12 pe-4 outline-none transition-all text-slate-900 dark:text-content placeholder:text-content-muted shadow-sm"
                 {...resetForm.register('confirmPassword')}
               />
             </div>
             {resetForm.formState.errors.confirmPassword && (
-              <p className="text-xs text-red-500 ml-1">{resetForm.formState.errors.confirmPassword.message}</p>
+              <p className="text-xs text-red-500 ms-1">{resetForm.formState.errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -263,7 +263,7 @@ export default function ForgotPasswordForm() {
                 dispatch(clearPendingOtpState());
                 setStep(1);
               }}
-              className="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-all flex items-center gap-2"
+              className="px-6 py-4 bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-panel-hover text-slate-700 dark:text-content-muted font-bold rounded-xl transition-all flex items-center gap-2"
             >
               <ArrowLeft className="size-4" />
               Back
@@ -271,7 +271,7 @@ export default function ForgotPasswordForm() {
             <button
               type="submit"
               disabled={isResetting}
-              className="flex-1 py-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none"
+              className="flex-1 py-4 bg-primary hover:bg-primary-hover text-content font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none"
             >
               {isResetting ? (
                 <>

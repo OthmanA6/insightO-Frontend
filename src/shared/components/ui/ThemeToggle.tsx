@@ -56,7 +56,7 @@ interface ThemeToggleProps {
  * Drop it anywhere in the layout; it is self-contained.
  *
  * @example
- * <ThemeToggle className="ml-auto" />
+ * <ThemeToggle className="ms-auto" />
  */
 export function ThemeToggle({ className, label = 'Toggle theme' }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme()
@@ -77,10 +77,10 @@ export function ThemeToggle({ className, label = 'Toggle theme' }: ThemeTogglePr
         // Background
         'bg-transparent',
         // Text / icon colour
-        'text-slate-700 dark:text-slate-300',
+        'text-slate-700 dark:text-content-muted',
         // Hover
         'hover:bg-slate-100 dark:hover:bg-surface-highlight',
-        'hover:text-slate-900 dark:hover:text-white',
+        'hover:text-slate-900 dark:hover:text-content',
         // Focus ring
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
         'focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-bg-dark',

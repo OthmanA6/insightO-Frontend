@@ -143,10 +143,10 @@ export default function InstructorGradingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#0a0a0f]">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-app">
         <div className="flex flex-col items-center gap-4 text-indigo-500">
           <Loader2 className="h-10 w-10 animate-spin" />
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Loading Submission Data...</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-content-muted">Loading Submission Data...</p>
         </div>
       </div>
     );
@@ -154,11 +154,11 @@ export default function InstructorGradingPage() {
 
   if (!task || !submission) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-[#0a0a0f]">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-[#1e1b2e]/50 backdrop-blur-md border border-white/5 shadow-2xl text-center flex flex-col items-center gap-4">
-          <AlertCircle className="h-16 w-16 text-slate-500" />
-          <h2 className="text-2xl font-black text-white">Submission Unavailable</h2>
-          <p className="text-slate-400 text-sm font-medium">Could not load the requested submission details.</p>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-app">
+        <div className="max-w-md w-full p-8 rounded-3xl bg-panel/50 backdrop-blur-md border border-panel shadow-2xl text-center flex flex-col items-center gap-4">
+          <AlertCircle className="h-16 w-16 text-content-muted" />
+          <h2 className="text-2xl font-black text-content">Submission Unavailable</h2>
+          <p className="text-content-muted text-sm font-medium">Could not load the requested submission details.</p>
           <Button onClick={() => navigate(submissionsListUrl)} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 px-8 font-bold transition-colors">
             Return to Submissions List
           </Button>
@@ -190,22 +190,22 @@ export default function InstructorGradingPage() {
     {
       stroke: 'text-indigo-500',
       glow: 'bg-indigo-500/5 shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]',
-      border: 'border-white/10 hover:border-indigo-500/30'
+      border: 'border-panel-hover hover:border-indigo-500/30'
     },
     {
       stroke: 'text-purple-500',
       glow: 'bg-purple-500/5 shadow-[inset_0_0_20px_rgba(168,85,247,0.02)]',
-      border: 'border-white/10 hover:border-purple-500/30'
+      border: 'border-panel-hover hover:border-purple-500/30'
     },
     {
       stroke: 'text-pink-500',
       glow: 'bg-pink-500/5 shadow-[inset_0_0_20px_rgba(236,72,153,0.02)]',
-      border: 'border-white/10 hover:border-pink-500/30'
+      border: 'border-panel-hover hover:border-pink-500/30'
     }
   ];
 
   return (
-    <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-500 max-w-7xl mx-auto text-slate-100">
+    <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-500 max-w-7xl mx-auto text-content">
       {/* Breadcrumb */}
       <BreadcrumbNav
         homeItem={{ label: 'Command Center', href: '/dashboard' }}
@@ -233,7 +233,7 @@ export default function InstructorGradingPage() {
       />
 
       {/* Header and Back Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-panel pb-6">
         <div className="space-y-1">
           <button
             onClick={() => navigate(submissionsListUrl)}
@@ -241,11 +241,11 @@ export default function InstructorGradingPage() {
           >
             <ChevronLeft className="h-4 w-4" /> Back to Submissions
           </button>
-          <h2 className="text-3xl font-black text-white flex items-center gap-3">
+          <h2 className="text-3xl font-black text-content flex items-center gap-3">
             <FileCheck className="h-8 w-8 text-emerald-400" />
             Evaluate Submission
           </h2>
-          <p className="text-slate-400 text-sm font-medium">
+          <p className="text-content-muted text-sm font-medium">
             Review responses and finalise grade for {student ? `${student.firstName} ${student.lastName}` : 'Student'}.
           </p>
         </div>
@@ -254,28 +254,28 @@ export default function InstructorGradingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Grading Panel (Pinned on desktops) */}
         <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:pr-2">
-          <div className="p-5 sm:p-6 rounded-3xl bg-[#13151f]/80 backdrop-blur-md border border-white/10 shadow-xl space-y-5">
+          <div className="p-5 sm:p-6 rounded-3xl bg-panel/80 backdrop-blur-md border border-panel-hover shadow-xl space-y-5">
             {/* Header */}
-            <div className="flex items-center gap-2.5 pb-1.5 border-b border-white/5">
+            <div className="flex items-center gap-2.5 pb-1.5 border-b border-panel">
               <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                 <Star className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h3 className="text-md font-black text-white">Evaluation Hub</h3>
-                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Configure Grade & Feedback</p>
+                <h3 className="text-md font-black text-content">Evaluation Hub</h3>
+                <p className="text-[8px] text-content-muted font-bold uppercase tracking-wider">Configure Grade & Feedback</p>
               </div>
             </div>
 
             {/* Submitter Bio row (tight layout) */}
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#0a0a0f]/60 border border-white/5">
-              <div className="h-9 w-9 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-white/5 shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-app/60 border border-panel">
+              <div className="h-9 w-9 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-panel shrink-0">
                 <User className="h-4.5 w-4.5 text-indigo-400" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-md font-black text-white truncate">
+                <h4 className="text-md font-black text-content truncate">
                   {student ? `${student.firstName} ${student.lastName}` : 'Unknown Student'}
                 </h4>
-                <p className="text-[10px] text-slate-500 font-mono truncate">{student?.email || '—'}</p>
+                <p className="text-[10px] text-content-muted font-mono truncate">{student?.email || '—'}</p>
               </div>
             </div>
 
@@ -286,7 +286,7 @@ export default function InstructorGradingPage() {
                   <BrainCircuit className="h-4 w-4 text-indigo-400 shrink-0" />
                   <div className="flex flex-col">
                     <span className="text-[12px] font-bold text-indigo-300">AI Suggest: {aiEvaluation.suggested_grade ?? '—'}/100</span>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-content-muted font-mono">
                       Conf: {
                         (aiEvaluation as any).confidence_score !== undefined
                           ? `${Math.round((aiEvaluation as any).confidence_score <= 1 ? (aiEvaluation as any).confidence_score * 100 : (aiEvaluation as any).confidence_score)}%`
@@ -323,12 +323,12 @@ export default function InstructorGradingPage() {
             {/* Form */}
             <form onSubmit={handleSubmitEvaluation} className="space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-0.5 flex items-center gap-1.5">
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-content-muted ms-0.5 flex items-center gap-1.5">
                   Final Grade (0-100)
                   <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-full font-black">Required</span>
                 </Label>
                 <div className="relative">
-                  <Star className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                  <Star className="absolute start-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                   <Input
                     type="number"
                     min="0"
@@ -336,7 +336,7 @@ export default function InstructorGradingPage() {
                     value={grade}
                     onChange={(e) => setGrade(e.target.value)}
                     placeholder="e.g. 90"
-                    className="bg-[#0a0a0f] border-white/10 text-white h-10 pl-10 rounded-lg focus:ring-emerald-500 text-xs disabled:opacity-70"
+                    className="bg-app border-panel-hover text-content h-10 ps-10 rounded-lg focus:ring-emerald-500 text-xs disabled:opacity-70"
                     required
                     disabled={submission.status === 'FINALIZED'}
                   />
@@ -344,14 +344,14 @@ export default function InstructorGradingPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-0.5">Instructor Feedback</Label>
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-content-muted ms-0.5">Instructor Feedback</Label>
                 <div className="relative">
-                  <MessageSquare className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-slate-500" />
+                  <MessageSquare className="absolute start-3.5 top-3.5 h-3.5 w-3.5 text-content-muted" />
                   <textarea
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder="Provide detailed feedback to the student..."
-                    className="w-full bg-[#0a0a0f]/80 border border-white/10 rounded-xl text-white pl-10 pr-3.5 pt-3 pb-3 focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[100px] resize-y text-xs custom-scrollbar disabled:opacity-70"
+                    className="w-full bg-app/80 border border-panel-hover rounded-xl text-content ps-10 pe-3.5 pt-3 pb-3 focus:ring-2 focus:ring-emerald-500 outline-none transition-all min-h-[100px] resize-y text-xs custom-scrollbar disabled:opacity-70"
                     disabled={submission.status === 'FINALIZED'}
                   />
                 </div>
@@ -361,7 +361,7 @@ export default function InstructorGradingPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || !grade}
-                  className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
+                  className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:bg-panel-hover text-content font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
                 >
                   {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                   Finalize Evaluation
@@ -374,17 +374,17 @@ export default function InstructorGradingPage() {
         {/* Right Column: Submission Content */}
         <div className="lg:col-span-8 space-y-6">
           <Tabs defaultValue="submission" className="w-full space-y-6">
-            <TabsList className="grid w-full grid-cols-2 h-14 bg-[#13151f]/60 border border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
+            <TabsList className="grid w-full grid-cols-2 h-14 bg-panel/60 border border-panel-hover rounded-2xl p-1.5 backdrop-blur-md">
               <TabsTrigger
                 value="submission"
-                className="flex items-center justify-center gap-2.5 h-full rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold transition-all border border-transparent data-[state=active]:border-white/5"
+                className="flex items-center justify-center gap-2.5 h-full rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold transition-all border border-transparent data-[state=active]:border-panel"
               >
                 <LayoutTemplate className="h-4.5 w-4.5" />
                 <span>Student Submission</span>
               </TabsTrigger>
               <TabsTrigger
                 value="ai-report"
-                className="flex items-center justify-center gap-2.5 h-full rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold transition-all border border-transparent data-[state=active]:border-white/5"
+                className="flex items-center justify-center gap-2.5 h-full rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold transition-all border border-transparent data-[state=active]:border-panel"
               >
                 <BrainCircuit className="h-4.5 w-4.5" />
                 <span>Detailed AI Analytics</span>
@@ -395,13 +395,13 @@ export default function InstructorGradingPage() {
               {/* Linked Quiz Questions or Standard Submission */}
               {task.task_type === 'QUIZ' && form ? (
                 <div className="space-y-6">
-                  <div className="p-6 rounded-3xl bg-[#13151f]/60 border border-white/10 shadow-lg flex items-center gap-3">
+                  <div className="p-6 rounded-3xl bg-panel/60 border border-panel-hover shadow-lg flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                       <LayoutTemplate className="h-5 w-5 text-indigo-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-black text-white">Quiz Question Responses</h3>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Responses maps with Form setup</p>
+                      <h3 className="text-lg font-black text-content">Quiz Question Responses</h3>
+                      <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">Responses maps with Form setup</p>
                     </div>
                   </div>
 
@@ -415,28 +415,28 @@ export default function InstructorGradingPage() {
                       const val = ans ? ans.value : undefined;
 
                       return (
-                        <div key={qId} className="p-6 sm:p-8 rounded-3xl bg-[#13151f] border border-white/10 shadow-md space-y-4">
+                        <div key={qId} className="p-6 sm:p-8 rounded-3xl bg-panel border border-panel-hover shadow-md space-y-4">
                           <div className="flex justify-between items-start gap-4">
-                            <Label className="text-base font-bold text-white flex gap-2 items-start">
+                            <Label className="text-base font-bold text-content flex gap-2 items-start">
                               <span className="text-indigo-400 font-black shrink-0">{idx + 1}.</span>
                               <span>{q.label}</span>
                               {q.required && <span className="text-red-500 font-bold shrink-0">*</span>}
                             </Label>
-                            <Badge variant="outline" className="text-[9px] uppercase tracking-wider text-slate-500 border-white/5 bg-[#0a0a0f] font-mono">
+                            <Badge variant="outline" className="text-[9px] uppercase tracking-wider text-content-muted border-panel bg-app font-mono">
                               {q.type.replace('_', ' ')}
                             </Badge>
                           </div>
 
                           {/* Display response based on type */}
-                          <div className="mt-2 pt-2 border-t border-white/5">
+                          <div className="mt-2 pt-2 border-t border-panel">
                             {val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0) ? (
-                              <p className="text-sm italic text-slate-500">No response provided.</p>
+                              <p className="text-sm italic text-content-muted">No response provided.</p>
                             ) : (
                               <>
                                 {/* Text inputs */}
                                 {(q.type === "short_text" || q.type === "long_text") && (
-                                  <div className="p-4 rounded-xl bg-[#0a0a0f] border border-white/5">
-                                    <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">{String(val)}</p>
+                                  <div className="p-4 rounded-xl bg-app border border-panel">
+                                    <p className="text-sm text-content leading-relaxed whitespace-pre-wrap">{String(val)}</p>
                                   </div>
                                 )}
 
@@ -452,12 +452,12 @@ export default function InstructorGradingPage() {
                                             "flex items-center gap-3 p-3 rounded-lg border text-sm transition-colors",
                                             isSelected
                                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-bold"
-                                              : "bg-[#0a0a0f]/40 border-white/5 text-slate-400"
+                                              : "bg-app/40 border-panel text-content-muted"
                                           )}
                                         >
                                           <div className={cn(
                                             "h-4 w-4 rounded-full border flex items-center justify-center shrink-0",
-                                            isSelected ? "border-emerald-400 bg-emerald-500/20" : "border-white/10"
+                                            isSelected ? "border-emerald-400 bg-emerald-500/20" : "border-panel-hover"
                                           )}>
                                             {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />}
                                           </div>
@@ -481,12 +481,12 @@ export default function InstructorGradingPage() {
                                             "flex items-center gap-3 p-3 rounded-lg border text-sm transition-colors",
                                             isSelected
                                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-bold"
-                                              : "bg-[#0a0a0f]/40 border-white/5 text-slate-400"
+                                              : "bg-app/40 border-panel text-content-muted"
                                           )}
                                         >
                                           <div className={cn(
                                             "h-4 w-4 rounded border flex items-center justify-center shrink-0",
-                                            isSelected ? "border-emerald-400 bg-emerald-500/20" : "border-white/10"
+                                            isSelected ? "border-emerald-400 bg-emerald-500/20" : "border-panel-hover"
                                           )}>
                                             {isSelected && <Check className="h-3 w-3 text-emerald-400" />}
                                           </div>
@@ -499,7 +499,7 @@ export default function InstructorGradingPage() {
 
                                 {/* Linear scale */}
                                 {q.type === "linear_scale" && (
-                                  <div className="bg-[#0a0a0f] rounded-xl p-4 border border-white/5">
+                                  <div className="bg-app rounded-xl p-4 border border-panel">
                                     {(() => {
                                       const scale = q.scale || { min: 1, max: 5 };
                                       const min = Number(scale.min) || 1;
@@ -516,7 +516,7 @@ export default function InstructorGradingPage() {
                                                   "h-10 w-10 rounded-lg border flex items-center justify-center text-xs font-bold transition-all",
                                                   isSelected
                                                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
-                                                    : "border-white/10 bg-[#13151f] text-slate-500"
+                                                    : "border-panel-hover bg-panel text-content-muted"
                                                 )}
                                               >
                                                 {num}
@@ -531,12 +531,12 @@ export default function InstructorGradingPage() {
 
                                 {/* File Upload Response */}
                                 {q.type === "file" && val && val.url && (
-                                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#0a0a0f] border border-white/5">
+                                  <div className="flex items-center justify-between p-4 rounded-xl bg-app border border-panel">
                                     <div className="flex items-center gap-3">
                                       <FileText className="h-5 w-5 text-indigo-400" />
                                       <div className="min-w-0">
-                                        <p className="text-sm font-bold text-slate-200 truncate">{val.fileName || "Uploaded File"}</p>
-                                        {val.size && <p className="text-xs text-slate-500">{(val.size / 1024).toFixed(1)} KB</p>}
+                                        <p className="text-sm font-bold text-content truncate">{val.fileName || "Uploaded File"}</p>
+                                        {val.size && <p className="text-xs text-content-muted">{(val.size / 1024).toFixed(1)} KB</p>}
                                       </div>
                                     </div>
                                     <a
@@ -560,26 +560,26 @@ export default function InstructorGradingPage() {
               ) : (
                 /* Standard Attachment Submission */
                 <div className="space-y-6">
-                  <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 space-y-4">
-                    <h3 className="text-lg font-black text-white">Student Submission Text</h3>
-                    <div className="p-5 rounded-2xl bg-[#0a0a0f] border border-white/5">
-                      <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                  <div className="p-6 rounded-3xl bg-panel border border-panel-hover space-y-4">
+                    <h3 className="text-lg font-black text-content">Student Submission Text</h3>
+                    <div className="p-5 rounded-2xl bg-app border border-panel">
+                      <p className="text-sm text-content-muted leading-relaxed whitespace-pre-wrap">
                         {submission.content || 'No text content provided.'}
                       </p>
                     </div>
                   </div>
 
                   {submission.attachments && submission.attachments.length > 0 && (
-                    <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 space-y-4">
-                      <h3 className="text-lg font-black text-white">Attached Files</h3>
+                    <div className="p-6 rounded-3xl bg-panel border border-panel-hover space-y-4">
+                      <h3 className="text-lg font-black text-content">Attached Files</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {submission.attachments.map((att, i) => (
-                          <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-[#0a0a0f] border border-white/5">
+                          <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-app border border-panel">
                             <div className="flex items-center gap-3 min-w-0">
                               <Paperclip className="h-5 w-5 text-indigo-400 shrink-0" />
                               <div className="min-w-0">
-                                <p className="text-sm font-bold text-slate-200 truncate">{att.fileName || 'Attachment'}</p>
-                                {att.size && <p className="text-xs text-slate-500">{(att.size / 1024).toFixed(1)} KB</p>}
+                                <p className="text-sm font-bold text-content truncate">{att.fileName || 'Attachment'}</p>
+                                {att.size && <p className="text-xs text-content-muted">{(att.size / 1024).toFixed(1)} KB</p>}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -614,26 +614,26 @@ export default function InstructorGradingPage() {
 
             <TabsContent value="ai-report" className="space-y-6 outline-none">
               {!aiEvaluation ? (
-                <div className="p-12 rounded-3xl bg-[#13151f]/40 backdrop-blur-md border border-white/5 shadow-2xl text-center flex flex-col items-center gap-4 animate-in fade-in duration-300">
+                <div className="p-12 rounded-3xl bg-panel/40 backdrop-blur-md border border-panel shadow-2xl text-center flex flex-col items-center gap-4 animate-in fade-in duration-300">
                   <div className="p-4 rounded-full bg-indigo-500/5 text-indigo-400 border border-indigo-500/10 animate-pulse">
                     <BrainCircuit className="h-12 w-12" />
                   </div>
-                  <h3 className="text-xl font-black text-white">AI Evaluation Pending or Unavailable.</h3>
-                  <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                  <h3 className="text-xl font-black text-content">AI Evaluation Pending or Unavailable.</h3>
+                  <p className="text-content-muted text-sm max-w-md mx-auto leading-relaxed">
                     The cognitive analysis engine is either currently processing this submission in the background, or no text was provided to evaluate. Please refresh the page in a few moments.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-6 animate-in fade-in duration-500">
                   {/* Detailed AI Report Header */}
-                  <div className="p-6 rounded-3xl bg-[#13151f]/60 border border-white/10 shadow-lg flex items-center justify-between gap-3">
+                  <div className="p-6 rounded-3xl bg-panel/60 border border-panel-hover shadow-lg flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                         <BrainCircuit className="h-5 w-5 text-indigo-400" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-black text-white">Detailed AI Analytics</h3>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Automated grading analysis & cognitive feedback</p>
+                        <h3 className="text-lg font-black text-content">Detailed AI Analytics</h3>
+                        <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">Automated grading analysis & cognitive feedback</p>
                       </div>
                     </div>
                   </div>
@@ -641,14 +641,14 @@ export default function InstructorGradingPage() {
                   {/* Visual Analytics Dashboard */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Gauge/Grade Card */}
-                    <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex flex-col items-center justify-center text-center relative overflow-hidden">
-                      <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
-                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-4">Suggested Grade</span>
+                    <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col items-center justify-center text-center relative overflow-hidden">
+                      <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+                      <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest mb-4">Suggested Grade</span>
                       <div className="relative flex items-center justify-center h-28 w-28">
                         {/* Circular track */}
                         <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                           <path
-                            className="text-white/5"
+                            className="text-content/5"
                             strokeWidth="3"
                             stroke="currentColor"
                             fill="none"
@@ -665,30 +665,30 @@ export default function InstructorGradingPage() {
                           />
                         </svg>
                         <div className="flex flex-col items-center">
-                          <span className="text-3xl font-black text-white">{aiEvaluation.suggested_grade ?? '—'}</span>
-                          <span className="text-[9px] text-slate-500 font-bold uppercase">out of 100</span>
+                          <span className="text-3xl font-black text-content">{aiEvaluation.suggested_grade ?? '—'}</span>
+                          <span className="text-[9px] text-content-muted font-bold uppercase">out of 100</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Confidence & Accuracy Card */}
-                    <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex flex-col justify-between relative overflow-hidden md:col-span-2">
-                      <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+                    <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-between relative overflow-hidden md:col-span-2">
+                      <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
                       <div>
-                        <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Confidence Score</span>
-                        <h4 className="text-2xl font-black text-white">
+                        <span className="block text-[10px] text-content-muted font-bold uppercase tracking-widest mb-1">Confidence Score</span>
+                        <h4 className="text-2xl font-black text-content">
                           {(aiEvaluation as any).confidence_score !== undefined
                             ? `${Math.round((aiEvaluation as any).confidence_score <= 1 ? (aiEvaluation as any).confidence_score * 100 : (aiEvaluation as any).confidence_score)}%`
                             : '—'}
                         </h4>
-                        <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                        <p className="text-xs text-content-muted mt-2 leading-relaxed">
                           This score indicates the model's self-assessed accuracy level based on semantic matching and evaluation rubric alignment.
                         </p>
                       </div>
 
                       {/* Custom styled progress bar */}
                       <div className="mt-6 space-y-2">
-                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-panel-hover rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-1000"
                             style={{
@@ -699,7 +699,7 @@ export default function InstructorGradingPage() {
                             }}
                           />
                         </div>
-                        <div className="flex justify-between text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+                        <div className="flex justify-between text-[9px] text-content-muted font-bold uppercase tracking-widest">
                           <span>Low confidence</span>
                           <span>High precision</span>
                         </div>
@@ -708,12 +708,12 @@ export default function InstructorGradingPage() {
                   </div>
 
                   {/* Deep Qualitative Evaluation Text */}
-                  <div className="p-6 sm:p-8 rounded-3xl bg-[#13151f] border border-white/10 shadow-md space-y-4">
-                    <div className="flex items-center gap-2 border-b border-white/5 pb-4">
+                  <div className="p-6 sm:p-8 rounded-3xl bg-panel border border-panel-hover shadow-md space-y-4">
+                    <div className="flex items-center gap-2 border-b border-panel pb-4">
                       <Star className="h-4.5 w-4.5 text-indigo-400" />
-                      <h4 className="text-sm font-black text-white uppercase tracking-wider">Qualitative Feedback Analysis</h4>
+                      <h4 className="text-sm font-black text-content uppercase tracking-wider">Qualitative Feedback Analysis</h4>
                     </div>
-                    <div className="p-5 rounded-2xl bg-[#0a0a0f] border border-white/5 leading-relaxed text-sm text-slate-300 whitespace-pre-wrap font-medium">
+                    <div className="p-5 rounded-2xl bg-app border border-panel leading-relaxed text-sm text-content-muted whitespace-pre-wrap font-medium">
                       {aiEvaluation.feedback || 'No qualitative feedback provided.'}
                     </div>
                   </div>
@@ -725,24 +725,24 @@ export default function InstructorGradingPage() {
                       {weaknessesArr.length > 0 && (
                         <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1c131a] to-[#12131a] border border-rose-500/10 hover:border-rose-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
                           {/* Corner glow */}
-                          <div className="absolute -right-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
+                          <div className="absolute -end-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
 
-                          <div className="flex items-center gap-3 border-b border-white/5 pb-4 relative z-10">
+                          <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
                             <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
                               <AlertCircle className="h-5 w-5 animate-pulse" />
                             </div>
                             <div>
-                              <h4 className="text-sm font-black text-white uppercase tracking-wider">Identified Weaknesses</h4>
+                              <h4 className="text-sm font-black text-content uppercase tracking-wider">Identified Weaknesses</h4>
                               <p className="text-[9px] text-rose-400/80 font-mono uppercase tracking-widest mt-0.5">Areas for Improvement</p>
                             </div>
                           </div>
                           <div className="space-y-3.5 relative z-10 pt-2">
                             {weaknessesArr.map((weakness: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-4 p-3.5 rounded-2xl bg-[#0a0a0f]/40 border border-white/5 hover:border-rose-500/10 transition-all duration-300 group/item">
+                              <div key={idx} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-rose-500/10 transition-all duration-300 group/item">
                                 <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono font-bold text-rose-400 shrink-0">
                                   {String(idx + 1).padStart(2, '0')}
                                 </span>
-                                <p className="text-xs text-slate-300 leading-relaxed font-medium group-hover/item:text-slate-200 transition-colors">
+                                <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
                                   {weakness}
                                 </p>
                               </div>
@@ -755,24 +755,24 @@ export default function InstructorGradingPage() {
                       {recommendationsArr.length > 0 && (
                         <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#121c18] to-[#12131a] border border-emerald-500/10 hover:border-emerald-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
                           {/* Corner glow */}
-                          <div className="absolute -right-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
+                          <div className="absolute -end-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
 
-                          <div className="flex items-center gap-3 border-b border-white/5 pb-4 relative z-10">
+                          <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
                             <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                               <CheckCircle2 className="h-5 w-5 animate-pulse" />
                             </div>
                             <div>
-                              <h4 className="text-sm font-black text-white uppercase tracking-wider">Actionable Recommendations</h4>
+                              <h4 className="text-sm font-black text-content uppercase tracking-wider">Actionable Recommendations</h4>
                               <p className="text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest mt-0.5">Optimization Directives</p>
                             </div>
                           </div>
                           <div className="space-y-3.5 relative z-10 pt-2">
                             {recommendationsArr.map((rec: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-4 p-3.5 rounded-2xl bg-[#0a0a0f]/40 border border-white/5 hover:border-emerald-500/10 transition-all duration-300 group/item">
+                              <div key={idx} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-emerald-500/10 transition-all duration-300 group/item">
                                 <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-400 shrink-0">
                                   {String(idx + 1).padStart(2, '0')}
                                 </span>
-                                <p className="text-xs text-slate-300 leading-relaxed font-medium group-hover/item:text-slate-200 transition-colors">
+                                <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
                                   {rec}
                                 </p>
                               </div>
@@ -785,12 +785,12 @@ export default function InstructorGradingPage() {
 
                   {/* Rubric Criteria Breakdown */}
                   {(aiEvaluation as any).criteria_breakdown && (aiEvaluation as any).criteria_breakdown.length > 0 && (
-                    <div className="p-6 sm:p-8 rounded-3xl bg-[#13151f] border border-white/10 shadow-md space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      <div className="flex items-center gap-2.5 border-b border-white/5 pb-4">
+                    <div className="p-6 sm:p-8 rounded-3xl bg-panel border border-panel-hover shadow-md space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="flex items-center gap-2.5 border-b border-panel pb-4">
                         <Layers className="h-5 w-5 text-indigo-400" />
                         <div>
-                          <h4 className="text-sm font-black text-white uppercase tracking-wider">Rubric Criteria Breakdown</h4>
-                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Weighted Assessment Dimensions</p>
+                          <h4 className="text-sm font-black text-content uppercase tracking-wider">Rubric Criteria Breakdown</h4>
+                          <p className="text-[9px] text-content-muted font-bold uppercase tracking-widest mt-0.5">Weighted Assessment Dimensions</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -799,7 +799,7 @@ export default function InstructorGradingPage() {
                           const color = rubricColors[idx % rubricColors.length];
                           return (
                             <div key={idx} className={cn(
-                              "p-6 rounded-3xl bg-[#13151f] border shadow-md flex flex-col items-center justify-between text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.01] min-h-[260px]",
+                              "p-6 rounded-3xl bg-panel border shadow-md flex flex-col items-center justify-between text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.01] min-h-[260px]",
                               color.border
                             )}>
                               {/* Glow Background effect */}
@@ -807,7 +807,7 @@ export default function InstructorGradingPage() {
 
                               {/* Card Header: Title */}
                               <div className="mb-4 relative z-10 w-full">
-                                <span className="block text-xs text-slate-200 font-black uppercase tracking-wider leading-tight min-h-[32px] flex items-center justify-center">{item.criterion}</span>
+                                <span className="block text-xs text-content font-black uppercase tracking-wider leading-tight min-h-[32px] flex items-center justify-center">{item.criterion}</span>
                               </div>
 
                               {/* Donut Gauge */}
@@ -815,7 +815,7 @@ export default function InstructorGradingPage() {
                                 <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                   {/* Background track */}
                                   <circle
-                                    className="text-white/5"
+                                    className="text-content/5"
                                     strokeWidth="3.5"
                                     stroke="currentColor"
                                     fill="none"
@@ -837,15 +837,15 @@ export default function InstructorGradingPage() {
                                   />
                                 </svg>
                                 <div className="flex flex-col items-center">
-                                  <span className="text-xl font-black text-white">{percentage}%</span>
-                                  <span className="text-[9px] text-slate-500 font-bold uppercase font-mono mt-0.5">{item.score} / {item.max}</span>
+                                  <span className="text-xl font-black text-content">{percentage}%</span>
+                                  <span className="text-[9px] text-content-muted font-bold uppercase font-mono mt-0.5">{item.score} / {item.max}</span>
                                 </div>
                               </div>
 
                               {/* Comments/Feedback */}
                               {item.comments && (
-                                <div className="mt-4 pt-3 border-t border-white/5 w-full relative z-10">
-                                  <p className="text-[11px] italic text-slate-400 leading-relaxed px-1">
+                                <div className="mt-4 pt-3 border-t border-panel w-full relative z-10">
+                                  <p className="text-[11px] italic text-content-muted leading-relaxed px-1">
                                     "{item.comments}"
                                   </p>
                                 </div>
@@ -859,12 +859,12 @@ export default function InstructorGradingPage() {
 
                   {/* Academic Concept Mastery Mapping */}
                   {(aiEvaluation as any).concept_mastery && (aiEvaluation as any).concept_mastery.length > 0 && (
-                    <div className="p-6 sm:p-8 rounded-3xl bg-[#13151f] border border-white/10 shadow-md space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      <div className="flex items-center gap-2.5 border-b border-white/5 pb-4">
+                    <div className="p-6 sm:p-8 rounded-3xl bg-panel border border-panel-hover shadow-md space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className="flex items-center gap-2.5 border-b border-panel pb-4">
                         <Target className="h-5 w-5 text-indigo-400" />
                         <div>
-                          <h4 className="text-sm font-black text-white uppercase tracking-wider">Academic Concept Mastery Mapping</h4>
-                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Core Syllabus Competencies</p>
+                          <h4 className="text-sm font-black text-content uppercase tracking-wider">Academic Concept Mastery Mapping</h4>
+                          <p className="text-[9px] text-content-muted font-bold uppercase tracking-widest mt-0.5">Core Syllabus Competencies</p>
                         </div>
                       </div>
                       <div className="space-y-4">
@@ -882,21 +882,21 @@ export default function InstructorGradingPage() {
                           else if (item.status === 'GOOD') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
 
                           return (
-                            <div key={idx} className="p-4 rounded-2xl bg-[#0a0a0f]/60 border border-white/5 space-y-3">
+                            <div key={idx} className="p-4 rounded-2xl bg-app/60 border border-panel space-y-3">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm font-bold text-slate-200">{item.concept}</span>
+                                <span className="text-sm font-bold text-content">{item.concept}</span>
                                 <Badge variant="outline" className={`text-[9px] uppercase tracking-wider font-mono ${badgeStyle}`}>
                                   {item.status}
                                 </Badge>
                               </div>
                               <div className="space-y-1">
-                                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-1.5 w-full bg-panel-hover rounded-full overflow-hidden">
                                   <div
                                     className={`h-full ${barColor} rounded-full transition-all duration-500`}
                                     style={{ width: `${masteryPercentage}%` }}
                                   />
                                 </div>
-                                <div className="flex justify-between text-[9px] font-mono text-slate-500 font-bold">
+                                <div className="flex justify-between text-[9px] font-mono text-content-muted font-bold">
                                   <span>Mastery Level</span>
                                   <span>{masteryPercentage}%</span>
                                 </div>

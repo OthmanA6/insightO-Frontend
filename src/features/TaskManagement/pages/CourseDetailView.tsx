@@ -85,34 +85,34 @@ export default function CourseDetailView() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-white/10 p-8 md:p-12 shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
-        <div className="absolute top-0 right-0 p-8 opacity-10">
-          <Building2 className="h-48 w-48 text-white" />
+      <section className="relative overflow-hidden rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-panel-hover p-8 md:p-12 shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+        <div className="absolute top-0 end-0 p-8 opacity-10">
+          <Building2 className="h-48 w-48 text-content" />
         </div>
         <div className="relative z-10 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <span className="text-xs font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/20 w-fit px-3 py-1 rounded-lg border border-indigo-500/30">
               {course?.courseCode}
             </span>
-            <h1 className="text-3xl md:text-5xl font-black text-slate-200 tracking-tight">{course?.name}</h1>
+            <h1 className="text-3xl md:text-5xl font-black text-content tracking-tight">{course?.name}</h1>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-slate-400">
-            <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 text-slate-200">
+          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-content-muted">
+            <div className="flex items-center gap-2 bg-panel-hover px-4 py-2 rounded-xl border border-panel-hover text-content">
               <div className="h-5 w-5 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/30">
                 <User className="h-3 w-3 text-indigo-400" />
               </div>
               {instructorName}
             </div>
             {course?.credits && (
-              <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10 text-slate-200">
+              <div className="flex items-center gap-2 bg-panel-hover px-4 py-2 rounded-xl border border-panel-hover text-content">
                 <span className="font-bold text-indigo-400">{course?.credits}</span> Credits
               </div>
             )}
           </div>
 
           {course?.description && (
-            <p className="max-w-3xl text-sm leading-relaxed text-slate-400 mt-2">
+            <p className="max-w-3xl text-sm leading-relaxed text-content-muted mt-2">
               {course?.description}
             </p>
           )}
@@ -122,29 +122,29 @@ export default function CourseDetailView() {
       {/* Tasks Section */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black tracking-tight text-slate-200 flex items-center gap-3">
+          <h2 className="text-xl font-black tracking-tight text-content flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30 text-indigo-400">
               <ClipboardList className="h-5 w-5" />
             </div>
             Active Course Tasks
           </h2>
-          <span className="text-xs font-bold text-slate-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+          <span className="text-xs font-bold text-content-muted bg-panel-hover px-3 py-1.5 rounded-full border border-panel-hover">
             {tasks.length} Assignments
           </span>
         </div>
 
         {tasks.length === 0 ? (
-          <div className="p-16 text-center rounded-3xl border border-white/10 bg-indigo-950/10 backdrop-blur-md flex flex-col items-center gap-4">
-            <ClipboardList className="h-12 w-12 text-slate-500/50" />
-            <p className="text-slate-400 font-medium">No active tasks assigned to this course right now.</p>
+          <div className="p-16 text-center rounded-3xl border border-panel-hover bg-indigo-950/10 backdrop-blur-md flex flex-col items-center gap-4">
+            <ClipboardList className="h-12 w-12 text-content-muted/50" />
+            <p className="text-content-muted font-medium">No active tasks assigned to this course right now.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tasks.map(task => (
-              <div key={task.id || task._id} className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+              <div key={task.id || task._id} className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-black tracking-tight text-slate-200 leading-tight">{task.title}</h3>
-                  <p className="text-sm text-slate-400 line-clamp-3 leading-relaxed">
+                  <h3 className="text-lg font-black tracking-tight text-content leading-tight">{task.title}</h3>
+                  <p className="text-sm text-content-muted line-clamp-3 leading-relaxed">
                     {task.description}
                   </p>
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-400 bg-amber-500/10 w-fit px-3 py-1.5 rounded-lg border border-amber-500/20">
@@ -153,7 +153,7 @@ export default function CourseDetailView() {
                   </div>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-white/10">
+                <div className="pt-6 mt-6 border-t border-panel-hover">
                   <Button 
                     onClick={() => {
                       const taskId = task.id || task._id || '';

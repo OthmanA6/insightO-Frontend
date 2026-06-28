@@ -158,10 +158,10 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  
  {task?.task_type === 'QUIZ' ? (
    !form ? (
-     <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-white/10 rounded-2xl bg-white/5">
+     <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-panel-hover rounded-2xl bg-panel-hover">
        <AlertTriangle className="h-10 w-10 text-amber-500 mb-4 opacity-80" />
-       <h3 className="text-lg font-bold text-white">Quiz Under Construction</h3>
-       <p className="text-sm text-slate-400 mt-2">The instructor has not published the questions for this quiz yet.</p>
+       <h3 className="text-lg font-bold text-content">Quiz Under Construction</h3>
+       <p className="text-sm text-content-muted mt-2">The instructor has not published the questions for this quiz yet.</p>
      </div>
    ) : (
      <div className="space-y-8">
@@ -258,7 +258,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  ) : (
    <>
      <div className="space-y-2">
-       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Submission Content</Label>
+       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Submission Content</Label>
        <Textarea
          value={content}
          onChange={(e) => setContent(e.target.value)}
@@ -268,7 +268,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
      </div>
 
      <div className="space-y-3">
-       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Attachments (Optional)</Label>
+       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Attachments (Optional)</Label>
        
        <div 
          onClick={() => !isUploading && fileInputRef.current?.click()}

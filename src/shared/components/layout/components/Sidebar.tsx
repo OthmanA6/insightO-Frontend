@@ -18,14 +18,12 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       title: "Overview",
       items: [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-        { name: "Global Analytics", href: "/dashboard/analytics", icon: BarChart3 },
       ]
     },
     {
       title: "Surveys & Evaluation",
       items: [
         { name: "Forms & Templates", href: "/dashboard/forms-surveys", icon: FileText },
-        { name: "Evaluation Cycles", href: "/dashboard/evaluation-cycles", icon: Calendar },
       ]
     },
     {
@@ -74,7 +72,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-screen w-72 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+        "flex h-screen w-72 flex-col border-e border-sidebar-border bg-sidebar text-sidebar-foreground",
         className
       )}
       {...props}
@@ -92,19 +90,20 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         <nav className="flex flex-col gap-8">
           {navGroups.map((group) => (
             <div key={group.title} className="space-y-2">
-              <h4 className="px-4 text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">{group.title}</h4>
+              <h4 className="px-4 text-[10px] font-black uppercase tracking-widest text-content-muted mb-4">{group.title}</h4>
               <div className="flex flex-col gap-1">
                 {group.items.map((item) => (
                   <NavLink
                     key={item.name}
                     to={item.href}
+                    end={item.href === "/dashboard"}
                     className={({ isActive }) =>
                       cn(
                         buttonVariants({ variant: isActive ? "outline" : "ghost" }),
                         "w-full justify-start gap-4 h-11 px-4 rounded-xl transition-all font-bold text-xs",
                         isActive 
                           ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20" 
-                          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                          : "text-content-muted hover:text-content hover:bg-panel-hover"
                       )
                     }
                   >

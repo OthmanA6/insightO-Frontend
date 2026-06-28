@@ -80,24 +80,24 @@ export const UserDirectoryPage: React.FC = () => {
         </div>
       </div>
 
-      <Card className="bg-[#1e1b2e] text-card-foreground border-white/5 shadow-xl">
-        <CardHeader className="pb-4 border-b border-white/5">
+      <Card className="bg-panel text-card-foreground border-panel shadow-xl">
+        <CardHeader className="pb-4 border-b border-panel">
           <div className="flex flex-col md:flex-row gap-4 w-full justify-between items-start md:items-center">
             <div className="relative w-full md:w-96">
               <Input
                 type="search"
                 placeholder="Search users by name or email..."
-                className="w-full bg-[#0f111a] border-white/10 text-white placeholder:text-slate-500 pl-10"
+                className="w-full bg-app border-panel-hover text-content placeholder:text-content-muted ps-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="h-4 w-4 text-slate-400 absolute left-3 top-3" />
+              <Search className="h-4 w-4 text-content-muted absolute start-3 top-3" />
             </div>
             
             <div className="flex items-center gap-2 w-full md:w-auto">
-              <Filter className="w-4 h-4 text-slate-400" />
+              <Filter className="w-4 h-4 text-content-muted" />
               <select 
-                className="bg-[#0f111a] border-white/10 text-slate-300 text-sm rounded-md h-10 px-3 focus:ring-1 focus:ring-indigo-500"
+                className="bg-app border-panel-hover text-content-muted text-sm rounded-md h-10 px-3 focus:ring-1 focus:ring-indigo-500"
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
             >
@@ -115,8 +115,8 @@ export const UserDirectoryPage: React.FC = () => {
       {filteredUsers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers.map((user) => (
-            <div key={user.id} className="relative group rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-white/5 hover:border-indigo-500/30 shadow-xl overflow-hidden transition-all duration-500 hover:-translate-y-1">
-              <div className="absolute -right-12 -top-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-700 pointer-events-none" />
+            <div key={user.id} className="relative group rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-panel hover:border-indigo-500/30 shadow-xl overflow-hidden transition-all duration-500 hover:-translate-y-1">
+              <div className="absolute -end-12 -top-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-700 pointer-events-none" />
               <Link to={`/dashboard/users/${user.id}/profile`} className="block h-full relative z-10">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -128,20 +128,20 @@ export const UserDirectoryPage: React.FC = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="font-black text-lg text-white group-hover:text-indigo-400 transition-colors tracking-tight">
+                        <h3 className="font-black text-lg text-content group-hover:text-indigo-400 transition-colors tracking-tight">
                           {user.firstName} {user.lastName}
                         </h3>
-                        <p className="text-sm text-slate-400 truncate w-40 sm:w-48 font-medium">
+                        <p className="text-sm text-content-muted truncate w-40 sm:w-48 font-medium">
                           {user.email}
                         </p>
                       </div>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/5 border border-white/5 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-colors">
-                      <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    <div className="p-2 rounded-xl bg-panel-hover border border-panel group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-colors">
+                      <ChevronRight className="w-4 h-4 text-content-muted group-hover:text-indigo-400 transition-colors" />
                     </div>
                   </div>
                   
-                  <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
+                  <div className="mt-6 flex items-center justify-between border-t border-panel pt-4">
                     <div className={`px-3 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider ${
                       user.role === 'STUDENT' 
                         ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
@@ -151,7 +151,7 @@ export const UserDirectoryPage: React.FC = () => {
                     </div>
                     
                     {user.departmentId && (
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-content-muted font-bold">
                         <Briefcase className="w-3.5 h-3.5" /> Dept Included
                       </div>
                     )}
@@ -162,12 +162,12 @@ export const UserDirectoryPage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center p-12 rounded-3xl bg-[#13151f]/50 border border-white/5 border-dashed">
-          <div className="p-4 rounded-2xl bg-white/5 w-fit mx-auto mb-4">
-            <User className="w-8 h-8 text-slate-500" />
+        <div className="text-center p-12 rounded-3xl bg-panel/50 border border-panel border-dashed">
+          <div className="p-4 rounded-2xl bg-panel-hover w-fit mx-auto mb-4">
+            <User className="w-8 h-8 text-content-muted" />
           </div>
-          <h3 className="text-lg font-black text-white">No users found</h3>
-          <p className="text-sm text-slate-500 mt-2">Try adjusting your search query or filters.</p>
+          <h3 className="text-lg font-black text-content">No users found</h3>
+          <p className="text-sm text-content-muted mt-2">Try adjusting your search query or filters.</p>
         </div>
       )}
       </CardContent>

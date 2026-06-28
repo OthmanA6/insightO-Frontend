@@ -159,7 +159,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate-500">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-content-muted">
         <UserIcon className="h-12 w-12 opacity-20 mb-4" />
         <p>User profile not found</p>
       </div>
@@ -170,8 +170,8 @@ export default function ProfilePage() {
     <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-300 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h2 className="text-4xl font-extrabold tracking-tight text-white">Account Settings</h2>
-          <p className="text-slate-400 font-medium">Manage your digital identity and academic credentials.</p>
+          <h2 className="text-4xl font-extrabold tracking-tight text-content">Account Settings</h2>
+          <p className="text-content-muted font-medium">Manage your digital identity and academic credentials.</p>
         </div>
         <Badge variant="outline" className="bg-indigo-500/5 text-indigo-400 border-indigo-500/20 px-4 py-1.5 font-bold uppercase tracking-widest text-[10px]">
           Verified Identity
@@ -181,7 +181,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Card & Quick Info */}
         <div className="lg:col-span-1 space-y-8">
-          <Card className="bg-[#1e1b2e] border-white/5 shadow-2xl overflow-hidden group">
+          <Card className="bg-panel border-panel shadow-2xl overflow-hidden group">
             <div className="h-24 bg-gradient-to-r from-indigo-600 to-purple-600 relative">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
             </div>
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleAvatarClick}
                   disabled={isUploadingAvatar}
-                  className="absolute bottom-1 right-1 p-2.5 rounded-full bg-indigo-600 border-4 border-[#1e1b2e] text-white hover:bg-indigo-500 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute bottom-1 end-1 p-2.5 rounded-full bg-indigo-600 border-4 border-[#1e1b2e] text-content hover:bg-indigo-500 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Upload profile picture"
                 >
                   {isUploadingAvatar ? (
@@ -214,58 +214,58 @@ export default function ProfilePage() {
                   )}
                 </button>
               </div>
-              <h3 className="text-2xl font-black text-white tracking-tight">{user.firstName} {user.lastName}</h3>
+              <h3 className="text-2xl font-black text-content tracking-tight">{user.firstName} {user.lastName}</h3>
               <p className="text-sm font-bold text-indigo-400/80 uppercase tracking-widest mt-1">{user.role}</p>
               
-              <div className="w-full mt-8 grid grid-cols-2 gap-px bg-white/5 border-y border-white/5 overflow-hidden rounded-xl">
+              <div className="w-full mt-8 grid grid-cols-2 gap-px bg-panel-hover border-y border-panel overflow-hidden rounded-xl">
                 <div className="p-4 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status</span>
+                  <span className="text-[10px] font-bold text-content-muted uppercase tracking-widest mb-1">Status</span>
                   <Badge variant="success" className="px-2 py-0 font-bold text-[9px] h-5 uppercase">Active</Badge>
                 </div>
                 <div className="p-4 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Created</span>
-                  <span className="text-xs font-bold text-slate-300">{new Date(user.createdAt).getFullYear()}</span>
+                  <span className="text-[10px] font-bold text-content-muted uppercase tracking-widest mb-1">Created</span>
+                  <span className="text-xs font-bold text-content-muted">{new Date(user.createdAt).getFullYear()}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1e1b2e] border-white/5 shadow-xl">
+          <Card className="bg-panel border-panel shadow-xl">
             <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <CardTitle className="text-sm font-bold uppercase tracking-widest text-content-muted flex items-center gap-2">
                 <Shield className="h-4 w-4 text-indigo-500" /> Administrative Info
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-4 p-3 rounded-xl bg-panel-hover border border-panel">
                 <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                   <Building2 className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Department</span>
-                  <span className="text-xs font-bold text-slate-200">{user.departmentId?.name || 'Academic Administration'}</span>
+                  <span className="text-[10px] font-bold text-content-muted uppercase tracking-tight">Department</span>
+                  <span className="text-xs font-bold text-content">{user.departmentId?.name || 'Academic Administration'}</span>
                 </div>
               </div>
               
               {user.academicYear && (
-                <div className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                <div className="flex items-center gap-4 p-3 rounded-xl bg-panel-hover border border-panel">
                   <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                     <Calendar className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Academic Year</span>
-                    <span className="text-xs font-bold text-slate-200">{user.academicYear}</span>
+                    <span className="text-[10px] font-bold text-content-muted uppercase tracking-tight">Academic Year</span>
+                    <span className="text-xs font-bold text-content">{user.academicYear}</span>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-4 p-3 rounded-xl bg-panel-hover border border-panel">
                 <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
                   <Fingerprint className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">National ID</span>
-                  <span className="text-xs font-mono font-bold text-slate-400">{user.nationalId}</span>
+                  <span className="text-[10px] font-bold text-content-muted uppercase tracking-tight">National ID</span>
+                  <span className="text-xs font-mono font-bold text-content-muted">{user.nationalId}</span>
                 </div>
               </div>
             </CardContent>
@@ -274,56 +274,56 @@ export default function ProfilePage() {
 
         {/* Right Column - Edit Form */}
         <div className="lg:col-span-2 space-y-8">
-          <Card className="bg-[#1e1b2e] border-white/5 shadow-2xl overflow-hidden">
-            <CardHeader className="bg-white/[0.02] border-b border-white/5 p-8">
-              <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+          <Card className="bg-panel border-panel shadow-2xl overflow-hidden">
+            <CardHeader className="bg-panel-hover border-b border-panel p-8">
+              <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                 <UserIcon className="h-5 w-5 text-indigo-500" /> Personal Identity
               </CardTitle>
-              <CardDescription className="text-slate-500 font-medium mt-1">Update your personal identification details synchronized with the central directory.</CardDescription>
+              <CardDescription className="text-content-muted font-medium mt-1">Update your personal identification details synchronized with the central directory.</CardDescription>
             </CardHeader>
             <form onSubmit={handleUpdate}>
               <CardContent className="p-8 space-y-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div className="space-y-2.5">
-                    <Label htmlFor="firstName" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">First Name</Label>
+                    <Label htmlFor="firstName" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">First Name</Label>
                     <Input 
                       id="firstName" 
                       value={firstName} 
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500" 
-                      startIcon={<UserIcon className="h-4 w-4 text-slate-500" />} 
+                      className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500" 
+                      startIcon={<UserIcon className="h-4 w-4 text-content-muted" />} 
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <Label htmlFor="lastName" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Last Name</Label>
+                    <Label htmlFor="lastName" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Last Name</Label>
                     <Input 
                       id="lastName" 
                       value={lastName} 
                       onChange={(e) => setLastName(e.target.value)}
-                      className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500" 
-                      startIcon={<UserIcon className="h-4 w-4 text-slate-500" />} 
+                      className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500" 
+                      startIcon={<UserIcon className="h-4 w-4 text-content-muted" />} 
                     />
                   </div>
                 </div>
                 <div className="space-y-2.5">
-                  <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Email Address</Label>
+                  <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Email Address</Label>
                   <Input 
                     id="email" 
                     type="email" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500" 
-                    startIcon={<Mail className="h-4 w-4 text-slate-500" />} 
+                    className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500" 
+                    startIcon={<Mail className="h-4 w-4 text-content-muted" />} 
                   />
-                  <p className="text-[10px] text-slate-600 ml-1 font-medium italic">Changes here will require re-verification of academic access.</p>
+                  <p className="text-[10px] text-slate-600 ms-1 font-medium italic">Changes here will require re-verification of academic access.</p>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end gap-3 bg-[#0f111a]/50 p-6 border-t border-white/5">
+              <CardFooter className="flex justify-end gap-3 bg-app/50 p-6 border-t border-panel">
                 <Button 
                   type="button"
                   variant="ghost" 
                   onClick={() => fetchProfile()}
-                  className="text-slate-400 hover:text-white hover:bg-white/5 h-11 px-6 rounded-xl font-bold"
+                  className="text-content-muted hover:text-content hover:bg-panel-hover h-11 px-6 rounded-xl font-bold"
                 >
                   Discard Changes
                 </Button>
@@ -339,15 +339,15 @@ export default function ProfilePage() {
             </form>
           </Card>
 
-          <Card className="bg-[#1e1b2e] border-white/5 border-l-4 border-l-amber-500/50 shadow-xl overflow-hidden">
+          <Card className="bg-panel border-panel border-s-4 border-s-amber-500/50 shadow-xl overflow-hidden">
             <CardContent className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500">
                   <Lock className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white tracking-tight">Security Credentials</h4>
-                  <p className="text-xs text-slate-500 font-medium">Update your password and authentication methods.</p>
+                  <h4 className="text-sm font-bold text-content tracking-tight">Security Credentials</h4>
+                  <p className="text-xs text-content-muted font-medium">Update your password and authentication methods.</p>
                 </div>
               </div>
               <Button 
@@ -381,7 +381,7 @@ export default function ProfilePage() {
               type="button"
               variant="ghost"
               onClick={handleClosePasswordModal}
-              className="text-slate-400 hover:text-white hover:bg-white/5 h-10 px-5 rounded-xl font-bold text-sm"
+              className="text-content-muted hover:text-content hover:bg-panel-hover h-10 px-5 rounded-xl font-bold text-sm"
             >
               Cancel
             </Button>
@@ -400,7 +400,7 @@ export default function ProfilePage() {
         <form id="change-password-form" onSubmit={handleChangePassword} className="space-y-5">
           {/* Current Password */}
           <div className="space-y-2">
-            <Label htmlFor="currentPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+            <Label htmlFor="currentPassword" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
               Current Password
             </Label>
             <div className="relative">
@@ -410,13 +410,13 @@ export default function ProfilePage() {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
-                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-11 rounded-xl focus:ring-amber-500 pe-10"
+                startIcon={<Lock className="h-4 w-4 text-content-muted" />}
               />
               <button
                 type="button"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute end-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-muted transition-colors"
               >
                 {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -425,7 +425,7 @@ export default function ProfilePage() {
 
           {/* New Password */}
           <div className="space-y-2">
-            <Label htmlFor="newPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+            <Label htmlFor="newPassword" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
               New Password
             </Label>
             <div className="relative">
@@ -435,20 +435,20 @@ export default function ProfilePage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Min. 8 characters"
-                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
-                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-11 rounded-xl focus:ring-amber-500 pe-10"
+                startIcon={<Lock className="h-4 w-4 text-content-muted" />}
               />
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute end-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-muted transition-colors"
               >
                 {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {/* Validation indicators */}
             {newPassword.length > 0 && (
-              <div className="flex items-center gap-1.5 ml-1">
+              <div className="flex items-center gap-1.5 ms-1">
                 {passwordLongEnough ? (
                   <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                 ) : (
@@ -463,7 +463,7 @@ export default function ProfilePage() {
 
           {/* Confirm Password */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">
+            <Label htmlFor="confirmPassword" className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
               Confirm New Password
             </Label>
             <div className="relative">
@@ -473,20 +473,20 @@ export default function ProfilePage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter new password"
-                className="bg-[#0f111a] border-white/10 text-white h-11 rounded-xl focus:ring-amber-500 pr-10"
-                startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+                className="bg-app border-panel-hover text-content h-11 rounded-xl focus:ring-amber-500 pe-10"
+                startIcon={<Lock className="h-4 w-4 text-content-muted" />}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute end-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-muted transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {/* Match indicator */}
             {confirmPassword.length > 0 && (
-              <div className="flex items-center gap-1.5 ml-1">
+              <div className="flex items-center gap-1.5 ms-1">
                 {passwordsMatch ? (
                   <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                 ) : (

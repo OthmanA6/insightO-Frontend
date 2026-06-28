@@ -217,19 +217,19 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
             onClose={onClose}
             title=""
             size="xl"
-            className="max-w-3xl bg-[#0a0a0f] border-white/5"
+            className="max-w-3xl bg-app border-panel"
         >
             <Modal.Header
                 onClose={onClose}
                 title={
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-content tracking-tight flex items-center gap-3">
                             <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                                 <ClipboardList className="h-5 w-5 text-indigo-400" />
                             </div>
                             {task ? 'Edit Task Architecture' : 'Provision New Task'}
                         </h2>
-                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">
+                        <p className="text-content-muted text-[10px] font-bold uppercase tracking-widest mt-1">
                             Assignment & Academic Delivery
                         </p>
                     </div>
@@ -241,39 +241,39 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                     <div className="space-y-6">
 
                         <div className="flex flex-col gap-2">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Task Title</Label>
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Task Title</Label>
                             <Input
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="e.g. AI Ethics Case Study"
-                                className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
+                                className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
                             />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Instructional Context</Label>
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Instructional Context</Label>
                             <Textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Provide detailed instructions for the target audience..."
-                                className="bg-[#0f111a] border-white/10 text-white min-h-[120px] rounded-2xl focus:ring-indigo-500 p-4"
+                                className="bg-app border-panel-hover text-content min-h-[120px] rounded-2xl focus:ring-indigo-500 p-4"
                             />
                         </div>
 
                         {/* Target Selection Tabs */}
                         <div className="flex flex-col gap-4">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Delivery Target</Label>
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Delivery Target</Label>
                             <Tabs
                                 value={targetType}
                                 onValueChange={(v) => setTargetType(v as any)}
                                 className="w-full"
                             >
-                                <TabsList className={`grid w-full bg-[#0f111a] p-1 rounded-xl h-12 border border-white/5 ${contextCourseId ? 'grid-cols-1' : contextDepartmentId ? 'grid-cols-2' : 'grid-cols-3'
+                                <TabsList className={`grid w-full bg-app p-1 rounded-xl h-12 border border-panel ${contextCourseId ? 'grid-cols-1' : contextDepartmentId ? 'grid-cols-2' : 'grid-cols-3'
                                     }`}>
                                     {(!contextDepartmentId || contextCourseId) && (
                                         <TabsTrigger
                                             value="COURSE"
-                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2"
+                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold text-xs flex items-center gap-2"
                                         >
                                             <BookOpen className="h-3.5 w-3.5" /> Course
                                         </TabsTrigger>
@@ -281,7 +281,7 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                     {!contextCourseId && (
                                         <TabsTrigger
                                             value="DEPARTMENT"
-                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2"
+                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold text-xs flex items-center gap-2"
                                         >
                                             <Building2 className="h-3.5 w-3.5" /> Dept
                                         </TabsTrigger>
@@ -289,7 +289,7 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                     {!contextCourseId && (
                                         <TabsTrigger
                                             value="SPECIFIC"
-                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs flex items-center gap-2"
+                                            className="rounded-lg data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold text-xs flex items-center gap-2"
                                         >
                                             <Users className="h-3.5 w-3.5" /> Specific
                                         </TabsTrigger>
@@ -304,7 +304,7 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                     <BookOpen className="h-5 w-5" />
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Course Bound Delivery</span>
-                                        <span className="text-sm font-bold text-slate-200">
+                                        <span className="text-sm font-bold text-content">
                                             Target: {contextCourseId ? (contextCourseName || 'Loading...') : 'Inherited from View Context'}
                                         </span>
                                     </div>
@@ -313,18 +313,18 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
 
                             {targetType === 'DEPARTMENT' && (
                                 <div className="flex flex-col gap-2.5">
-                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Select Department</Label>
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Select Department</Label>
                                     <div className="relative">
-                                        <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500 pointer-events-none z-10" />
+                                        <Target className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500 pointer-events-none z-10" />
                                         <select
                                             value={deptId}
                                             onChange={(e) => setDeptId(e.target.value)}
                                             disabled={isDeptLocked}
-                                            className="w-full h-12 pl-11 pr-10 rounded-xl bg-[#0f111a] border border-white/10 text-white text-sm font-medium appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500 transition-[border-color,background-color] disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full h-12 ps-11 pe-10 rounded-xl bg-app border border-panel-hover text-content text-sm font-medium appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500 transition-[border-color,background-color] disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            <option value="" className="bg-[#0f111a]">-- Choose Department --</option>
+                                            <option value="" className="bg-app">-- Choose Department --</option>
                                             {departments.map((d) => (
-                                                <option key={d.id} value={d.id} className="bg-[#0f111a]">
+                                                <option key={d.id} value={d.id} className="bg-app">
                                                     {d.name}
                                                 </option>
                                             ))}
@@ -337,12 +337,12 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="relative flex-1">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                            <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                             <Input
                                                 value={studentSearch}
                                                 onChange={(e) => setStudentSearch(e.target.value)}
                                                 placeholder="Search student directory..."
-                                                className="bg-[#0f111a] border-white/10 text-white h-11 pl-11 rounded-xl"
+                                                className="bg-app border-panel-hover text-content h-11 ps-11 rounded-xl"
                                             />
                                         </div>
                                         {selectedUserIds.length > 0 && (
@@ -357,9 +357,9 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                         )}
                                     </div>
 
-                                    <ScrollArea className="max-h-60 h-auto min-h-[120px] rounded-xl border border-white/5 bg-[#0f111a]/50 p-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                    <ScrollArea className="max-h-60 h-auto min-h-[120px] rounded-xl border border-panel bg-app/50 p-2 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                         {isLoadingUsers ? (
-                                            <div className="flex items-center justify-center h-full gap-3 text-slate-500 py-10">
+                                            <div className="flex items-center justify-center h-full gap-3 text-content-muted py-10">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
                                                 <span className="text-xs font-bold uppercase">Indexing Student Database...</span>
                                             </div>
@@ -376,7 +376,7 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                                         onClick={() => toggleStudent(s.id)}
                                                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-[border-color,background-color] ${selectedUserIds.includes(s.id)
                                                                 ? 'bg-indigo-500/10 border-indigo-500/30'
-                                                                : 'bg-transparent border-white/5 hover:border-white/10'
+                                                                : 'bg-transparent border-panel hover:border-panel-hover'
                                                             }`}
                                                     >
                                                         <Checkbox
@@ -384,8 +384,8 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                                             className="border-white/20 data-[state=checked]:bg-indigo-600"
                                                         />
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className="text-xs font-bold text-white truncate">{s.firstName} {s.lastName}</span>
-                                                            <span className="text-[9px] font-medium text-slate-500 truncate">{s.email}</span>
+                                                            <span className="text-xs font-bold text-content truncate">{s.firstName} {s.lastName}</span>
+                                                            <span className="text-[9px] font-medium text-content-muted truncate">{s.email}</span>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -398,31 +398,31 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Submission Deadline</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Submission Deadline</Label>
                                 <Input
                                     type="datetime-local"
                                     value={deadline}
                                     onChange={(e) => setDeadline(e.target.value)}
                                     onClick={(e) => (e.currentTarget as any).showPicker?.()}
-                                    className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
+                                    className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
                                     required
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Task Status</Label>
-                                <div className="flex gap-2 bg-[#0f111a] p-1 rounded-xl border border-white/10 h-12">
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Task Status</Label>
+                                <div className="flex gap-2 bg-app p-1 rounded-xl border border-panel-hover h-12">
                                     <button
                                         type="button"
                                         onClick={() => setStatus('ACTIVE')}
-                                        className={`flex-1 rounded-lg text-xs font-bold transition-[border-color,background-color] flex items-center justify-center gap-2 ${status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-500 hover:text-slate-300'}`}
+                                        className={`flex-1 rounded-lg text-xs font-bold transition-[border-color,background-color] flex items-center justify-center gap-2 ${status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-content-muted hover:text-content-muted'}`}
                                     >
                                         <CheckCircle2 className="h-4 w-4" /> Active
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setStatus('CLOSED')}
-                                        className={`flex-1 rounded-lg text-xs font-bold transition-[border-color,background-color] flex items-center justify-center gap-2 ${status === 'CLOSED' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'text-slate-500 hover:text-slate-300'}`}
+                                        className={`flex-1 rounded-lg text-xs font-bold transition-[border-color,background-color] flex items-center justify-center gap-2 ${status === 'CLOSED' ? 'bg-red-500/10 text-red-400 border border-eed-500/20' : 'text-content-muted hover:text-content-muted'}`}
                                     >
                                         <AlertCircle className="h-4 w-4" /> Closed
                                     </button>
@@ -431,7 +431,7 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-2">
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1 flex items-center gap-2">
                                 AI Grading Rubric
                                 <span className="text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full font-black">MANDATORY</span>
                             </Label>
@@ -439,20 +439,20 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                 value={rubric}
                                 onChange={(e) => setRubric(e.target.value)}
                                 placeholder={`Calibration Guide: Act as a friendly Teaching Assistant for a [Level, e.g., Freshman] course. Evaluate based on: 1. Logical flow (40%), 2. Accuracy of concepts (40%), 3. Professionalism (20%). \n\nNote: Be lenient on minor syntax but strict on core understanding. Feedback should be constructive and encourage the student to think deeper.`}
-                                className="bg-[#0f111a] border-white/10 text-white min-h-[140px] rounded-2xl focus:ring-indigo-500 p-4 text-sm leading-relaxed"
+                                className="bg-app border-panel-hover text-content min-h-[140px] rounded-2xl focus:ring-indigo-500 p-4 text-sm leading-relaxed"
                                 required
                             />
-                            <p className="text-[9px] text-slate-500 italic ml-1">This rubric guides the AI agent during the automated grading sequence.</p>
+                            <p className="text-[9px] text-content-muted italic ms-1">This rubric guides the AI agent during the automated grading sequence.</p>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Attachments (Optional)</Label>
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Attachments (Optional)</Label>
 
                                     <div
                                         onClick={() => !isUploading && fileInputRef.current?.click()}
                                         className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${isUploading
                                                 ? 'border-indigo-500/50 bg-indigo-500/5 cursor-wait'
-                                                : 'border-white/10 hover:border-indigo-500/50 hover:bg-[#1a1d29] cursor-pointer'
+                                                : 'border-panel-hover hover:border-indigo-500/50 hover:bg-panel cursor-pointer'
                                             }`}
                                     >
                                         <input
@@ -471,31 +471,31 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                             )}
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-sm font-bold text-slate-200">
+                                            <p className="text-sm font-bold text-content">
                                                 {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
                                             </p>
-                                            <p className="text-xs text-slate-500 mt-1">PDF, PNG, JPG (Max 10MB)</p>
+                                            <p className="text-xs text-content-muted mt-1">PDF, PNG, JPG (Max 10MB)</p>
                                         </div>
                                     </div>
 
                                     {attachments.length > 0 && (
                                         <div className="space-y-2 mt-2">
                                             {attachments.map((att, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-[#0f111a] border border-white/5 animate-in fade-in zoom-in-95 duration-200">
+                                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-app border border-panel animate-in fade-in zoom-in-95 duration-200">
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
                                                             <FileText className="h-4 w-4" />
                                                         </div>
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className="text-xs font-bold text-slate-200 truncate">{att.fileName || 'Attachment'}</span>
-                                                            {att.size && <span className="text-[10px] text-slate-500 font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                                                            <span className="text-xs font-bold text-content truncate">{att.fileName || 'Attachment'}</span>
+                                                            {att.size && <span className="text-[10px] text-content-muted font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
                                                         </div>
                                                     </div>
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
                                                         onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
-                                                        className="h-8 w-8 p-0 shrink-0 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                        className="h-8 w-8 p-0 shrink-0 text-content-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </Button>
@@ -506,14 +506,14 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                             </div>
                     </div>
 
-                    <div className="pt-6 border-t border-white/5 flex justify-end gap-3">
-                        <Button variant="ghost" type="button" onClick={onClose} className="h-12 px-6 rounded-xl text-slate-400">
+                    <div className="pt-6 border-t border-panel flex justify-end gap-3">
+                        <Button variant="ghost" type="button" onClick={onClose} className="h-12 px-6 rounded-xl text-content-muted">
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 text-white font-bold shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
+                            className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-panel-hover text-content font-bold shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
                         >
                             {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                             {task ? 'Update Infrastructure' : 'Authorize Publication'}

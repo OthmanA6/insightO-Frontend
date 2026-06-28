@@ -27,7 +27,7 @@ export default function ProgressBar({ percentage }: { percentage: number }) {
         transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
         className={`h-full rounded-full bg-gradient-to-r ${gradientClass} ${shadowClass} relative`}
       >
-        <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]" />
+        <div className="absolute top-0 end-0 bottom-0 start-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]" />
       </motion.div>
     </div>
   );

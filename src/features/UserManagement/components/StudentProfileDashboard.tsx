@@ -48,7 +48,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-4">
-        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        <Loader2 className="w-10 h-10 text-content animate-spin" />
         <p className="text-muted-foreground font-medium">Generating Profile Data...</p>
       </div>
     );
@@ -97,9 +97,9 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
     <div className="w-full max-w-7xl mx-auto space-y-6 p-6 animate-in fade-in zoom-in-95 duration-200">
 
       {/* Header Section */}
-      <div className="relative p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-white/10 shadow-2xl overflow-hidden group">
-        <div className="absolute -right-24 -top-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
-        <div className="absolute -left-24 -bottom-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-700" />
+      <div className="relative p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-panel-hover shadow-2xl overflow-hidden group">
+        <div className="absolute -end-24 -top-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
+        <div className="absolute -start-24 -bottom-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-700" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
           <Avatar className="w-28 h-28 ring-4 ring-[#13151f] border border-indigo-500/30 shadow-2xl shadow-indigo-500/20">
@@ -109,20 +109,20 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           <div className="flex-1 space-y-3 text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center gap-3">
-              <h1 className="text-3xl font-black text-white tracking-tight">{data.user.firstName} {data.user.lastName}</h1>
+              <h1 className="text-3xl font-black text-content tracking-tight">{data.user.firstName} {data.user.lastName}</h1>
               <Badge variant="outline" className="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-emerald-500/10 text-emerald-400 border-emerald-500/20 w-fit mx-auto md:mx-0">
                 Active Profile
               </Badge>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-slate-400 font-medium">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5"><Mail className="w-4 h-4 text-indigo-400" /> {data.user.email}</div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5"><User className="w-4 h-4 text-indigo-400" /> <span className="capitalize">{data.user.role.toLowerCase()}</span></div>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-content-muted font-medium">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Mail className="w-4 h-4 text-indigo-400" /> {data.user.email}</div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><User className="w-4 h-4 text-indigo-400" /> <span className="capitalize">{data.user.role.toLowerCase()}</span></div>
               {data.profile?.departmentId && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5"><Briefcase className="w-4 h-4 text-indigo-400" /> {departmentName}</div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Briefcase className="w-4 h-4 text-indigo-400" /> {departmentName}</div>
               )}
               {data.profile?.academicYear && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5"><Calendar className="w-4 h-4 text-indigo-400" /> Year {data.profile.academicYear}</div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Calendar className="w-4 h-4 text-indigo-400" /> Year {data.profile.academicYear}</div>
               )}
             </div>
           </div>
@@ -134,24 +134,24 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
         <div className="space-y-6">
           {/* كروت المعلومات الأساسية */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
-              <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex items-center justify-between relative overflow-hidden">
+              <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
               <div>
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Role Type</span>
-                <h4 className="text-2xl font-black text-white capitalize">{data.user.role.toLowerCase()}</h4>
-                <p className="text-xs text-slate-400 mt-1">Managing courses and departmental tasks.</p>
+                <span className="block text-[10px] text-content-muted font-bold uppercase tracking-widest mb-1">Role Type</span>
+                <h4 className="text-2xl font-black text-content capitalize">{data.user.role.toLowerCase()}</h4>
+                <p className="text-xs text-content-muted mt-1">Managing courses and departmental tasks.</p>
               </div>
               <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                 <Briefcase className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex items-center justify-between relative overflow-hidden">
-              <div className="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex items-center justify-between relative overflow-hidden">
+              <div className="absolute -end-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
               <div>
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Assigned Courses</span>
-                <h4 className="text-2xl font-black text-white">{data.profile?.teachingCourses?.length || 0}</h4>
-                <p className="text-xs text-slate-400 mt-1">Active courses being managed.</p>
+                <span className="block text-[10px] text-content-muted font-bold uppercase tracking-widest mb-1">Assigned Courses</span>
+                <h4 className="text-2xl font-black text-content">{data.profile?.teachingCourses?.length || 0}</h4>
+                <p className="text-xs text-content-muted mt-1">Active courses being managed.</p>
               </div>
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                 <BookOpen className="w-6 h-6" />
@@ -161,18 +161,18 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           {/* AI Insights Tab - ده الجديد اللي هيعرض الكيرف وتحليل الدكتور */}
           <div className="mt-8">
-            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+            <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
               <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                 <BrainCircuit className="h-5 w-5 text-indigo-400" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white">Performance Insights</h3>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Comparative analysis based on student surveys</p>
+                <h3 className="text-xl font-black text-content">Performance Insights</h3>
+                <p className="text-xs text-content-muted font-medium uppercase tracking-wider">Comparative analysis based on student surveys</p>
               </div>
             </div>
 
             {/* زرعنا الكومبوننت الجوكر هنا وباصينا الـ userId الحقيقي */}
-            <div className="rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0f111a] shadow-2xl relative">
+            <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
               <EntityInsightsView entityType="INSTRUCTOR" entityId={userId} />
             </div>
           </div>
@@ -182,34 +182,34 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
         <>
           {/* Metrics Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
-              <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+              <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Total Submissions</span>
+                <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Total Submissions</span>
                 <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                   <BookOpen className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-3xl font-black text-white relative z-10">{data.aggregated_metrics.total_submissions}</div>
+              <div className="text-3xl font-black text-content relative z-10">{data.aggregated_metrics.total_submissions}</div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
-              <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+              <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Average AI Grade</span>
+                <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Average AI Grade</span>
                 <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                   <Award className="w-4 h-4" />
                 </div>
               </div>
               <div className={`text-3xl font-black relative z-10 ${getGradeColor(data.aggregated_metrics.average_suggested_grade)}`}>
-                {data.aggregated_metrics.average_suggested_grade.toFixed(1)} <span className="text-sm font-bold text-slate-500 opacity-50 uppercase tracking-wider">/ 100</span>
+                {data.aggregated_metrics.average_suggested_grade.toFixed(1)} <span className="text-sm font-bold text-content-muted opacity-50 uppercase tracking-wider">/ 100</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
-              <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+              <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">AI Confidence Index</span>
+                <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">AI Confidence Index</span>
                 <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                   <Target className="w-4 h-4" />
                 </div>
@@ -222,78 +222,78 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           {/* AI Synthesis Highlight Section */}
           {data.ai_synthesis ? (
-            <div className="p-6 rounded-3xl bg-[#13151f]/60 border border-white/10 shadow-lg space-y-6 animate-in fade-in duration-500">
-              <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+            <div className="p-6 rounded-3xl bg-panel/60 border border-panel-hover shadow-lg space-y-6 animate-in fade-in duration-500">
+              <div className="flex items-center gap-3 border-b border-panel pb-4">
                 <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                   <BrainCircuit className="h-5 w-5 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white">Senior Academic Advisor Synthesis</h3>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Automated Profile Analysis & Cognitive Feedback</p>
+                  <h3 className="text-lg font-black text-content">Senior Academic Advisor Synthesis</h3>
+                  <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">Automated Profile Analysis & Cognitive Feedback</p>
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0a0a0f] border border-white/5 leading-relaxed text-sm text-slate-300 whitespace-pre-wrap font-medium">
+              <div className="p-5 rounded-2xl bg-app border border-panel leading-relaxed text-sm text-content-muted whitespace-pre-wrap font-medium">
                 {data.ai_synthesis.overall_summary}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Strengths */}
                 <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#121a18] to-[#12131a] border border-emerald-500/10 hover:border-emerald-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
-                  <div className="absolute -right-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
-                  <div className="flex items-center gap-3 border-b border-white/5 pb-4 relative z-10">
+                  <div className="absolute -end-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
+                  <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-white uppercase tracking-wider">Core Strengths</h4>
+                      <h4 className="text-sm font-black text-content uppercase tracking-wider">Core Strengths</h4>
                       <p className="text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest mt-0.5">Key Capabilities</p>
                     </div>
                   </div>
                   <div className="space-y-3.5 relative z-10 pt-4">
                     {data.ai_synthesis.core_strengths.length > 0 ? (
                       data.ai_synthesis.core_strengths.map((strength, i) => (
-                        <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-[#0a0a0f]/40 border border-white/5 hover:border-emerald-500/10 transition-all duration-300 group/item">
+                        <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-emerald-500/10 transition-all duration-300 group/item">
                           <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-400 shrink-0">
                             {String(i + 1).padStart(2, '0')}
                           </span>
-                          <p className="text-xs text-slate-300 leading-relaxed font-medium group-hover/item:text-slate-200 transition-colors">
+                          <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
                             {strength}
                           </p>
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-slate-500 italic">No specific strengths identified yet.</p>
+                      <p className="text-xs text-content-muted italic">No specific strengths identified yet.</p>
                     )}
                   </div>
                 </div>
 
                 {/* Weaknesses */}
                 <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1c131a] to-[#12131a] border border-rose-500/10 hover:border-rose-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
-                  <div className="absolute -right-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
-                  <div className="flex items-center gap-3 border-b border-white/5 pb-4 relative z-10">
+                  <div className="absolute -end-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
+                  <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
                     <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black text-white uppercase tracking-wider">Persistent Weaknesses</h4>
+                      <h4 className="text-sm font-black text-content uppercase tracking-wider">Persistent Weaknesses</h4>
                       <p className="text-[9px] text-rose-400/80 font-mono uppercase tracking-widest mt-0.5">Areas for Improvement</p>
                     </div>
                   </div>
                   <div className="space-y-3.5 relative z-10 pt-4">
                     {data.ai_synthesis.persistent_weaknesses.length > 0 ? (
                       data.ai_synthesis.persistent_weaknesses.map((weakness, i) => (
-                        <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-[#0a0a0f]/40 border border-white/5 hover:border-rose-500/10 transition-all duration-300 group/item">
+                        <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-rose-500/10 transition-all duration-300 group/item">
                           <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono font-bold text-rose-400 shrink-0">
                             {String(i + 1).padStart(2, '0')}
                           </span>
-                          <p className="text-xs text-slate-300 leading-relaxed font-medium group-hover/item:text-slate-200 transition-colors">
+                          <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
                             {weakness}
                           </p>
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-slate-500 italic">No persistent weaknesses identified.</p>
+                      <p className="text-xs text-content-muted italic">No persistent weaknesses identified.</p>
                     )}
                   </div>
                 </div>
@@ -301,37 +301,37 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
               {/* Action Plan */}
               <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#12131a] border border-indigo-500/10 hover:border-indigo-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
-                <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/15 transition-all duration-500 pointer-events-none" />
-                <div className="flex items-center gap-3 border-b border-white/5 pb-4 relative z-10">
+                <div className="absolute -start-12 -bottom-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/15 transition-all duration-500 pointer-events-none" />
+                <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                     <Target className="h-5 w-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-white uppercase tracking-wider">Action Plan</h4>
+                    <h4 className="text-sm font-black text-content uppercase tracking-wider">Action Plan</h4>
                     <p className="text-[9px] text-indigo-400/80 font-mono uppercase tracking-widest mt-0.5">Targeted Next Steps</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10 pt-4">
                   {data.ai_synthesis.action_plan.length > 0 ? (
                     data.ai_synthesis.action_plan.map((action, i) => (
-                      <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-[#0a0a0f]/40 border border-white/5 hover:border-indigo-500/10 transition-all duration-300 group/item">
+                      <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-app/40 border border-panel hover:border-indigo-500/10 transition-all duration-300 group/item">
                         <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-mono font-bold text-indigo-400 shrink-0 mt-0.5">
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <p className="text-xs text-slate-300 leading-relaxed font-medium group-hover/item:text-slate-200 transition-colors">
+                        <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
                           {action}
                         </p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-xs text-slate-500 italic col-span-full">Keep up the good work!</p>
+                    <p className="text-xs text-content-muted italic col-span-full">Keep up the good work!</p>
                   )}
                 </div>
               </div>
 
             </div>
           ) : (
-            <div className="p-8 rounded-3xl bg-[#13151f]/60 border border-white/10 shadow-lg text-center text-slate-500">
+            <div className="p-8 rounded-3xl bg-panel/60 border border-panel-hover shadow-lg text-center text-content-muted">
               <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-20" />
               <p>No AI Synthesis available yet. Complete more tasks to generate an advisor profile.</p>
             </div>
@@ -339,21 +339,21 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           {/* Detail Tabs */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-3 mb-4 bg-[#1e1b2e] border border-white/5 p-1">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Overview</TabsTrigger>
-              <TabsTrigger value="skills" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Mastery</TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">History</TabsTrigger>
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-4 bg-panel border border-panel p-1">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">Overview</TabsTrigger>
+              <TabsTrigger value="skills" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">Mastery</TabsTrigger>
+              <TabsTrigger value="history" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">History</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
-              <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md">
-                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+                <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                     <Activity className="h-5 w-5 text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-white">Grade Progression</h3>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tracking final grades vs AI suggested grades over time</p>
+                    <h3 className="text-lg font-black text-content">Grade Progression</h3>
+                    <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">Tracking final grades vs AI suggested grades over time</p>
                   </div>
                 </div>
                 <div className="h-[350px] w-full">
@@ -368,7 +368,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                           labelStyle={{ color: '#818cf8', fontWeight: 'bold', marginBottom: '8px', fontSize: '12px' }}
                           formatter={(value: any, name: string) => [
                             <span className={name === 'final' ? 'text-emerald-400 font-bold' : 'text-indigo-400 font-bold'}>{value}</span>,
-                            <span className="text-slate-400">{name === 'final' ? 'Final Grade' : 'AI Grade'}</span>
+                            <span className="text-content-muted">{name === 'final' ? 'Final Grade' : 'AI Grade'}</span>
                           ]}
                           labelFormatter={(label, payload) => payload?.[0]?.payload?.taskName || label}
                         />
@@ -378,7 +378,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                       </LineChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                    <div className="flex flex-col items-center justify-center h-full text-content-muted">
                       <Activity className="w-12 h-12 mb-3 opacity-20" />
                       <p className="text-sm">Not enough task history to plot progression.</p>
                     </div>
@@ -388,14 +388,14 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </TabsContent>
 
             <TabsContent value="skills">
-              <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md">
-                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+                <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                     <Target className="h-5 w-5 text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-white">Concept Mastery</h3>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI evaluated mastery levels across different topics</p>
+                    <h3 className="text-lg font-black text-content">Concept Mastery</h3>
+                    <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">AI evaluated mastery levels across different topics</p>
                   </div>
                 </div>
                 <div className="h-[400px] w-full">
@@ -415,7 +415,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                    <div className="flex flex-col items-center justify-center h-full text-content-muted">
                       <Target className="w-12 h-12 mb-3 opacity-20" />
                       <p>No concept mastery data available yet.</p>
                     </div>
@@ -425,28 +425,28 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </TabsContent>
 
             <TabsContent value="history">
-              <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10 shadow-md">
-                <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+                <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                     <BookOpen className="h-5 w-5 text-indigo-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-white">Submission History</h3>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Recent assignments and evaluations</p>
+                    <h3 className="text-lg font-black text-content">Submission History</h3>
+                    <p className="text-[10px] text-content-muted font-bold uppercase tracking-wider">Recent assignments and evaluations</p>
                   </div>
                 </div>
                 <div className="w-full">
                   {data.task_history && data.task_history.length > 0 ? (
-                    <div className="rounded-md border border-white/5 overflow-x-auto custom-scrollbar">
-                      <table className="w-full text-sm text-left">
-                        <thead className="text-[10px] tracking-wider uppercase bg-[#0f111a] border-b border-white/5 text-slate-400">
+                    <div className="rounded-md border border-panel overflow-x-auto custom-scrollbar">
+                      <table className="w-full text-sm text-start">
+                        <thead className="text-[10px] tracking-wider uppercase bg-app border-b border-panel text-content-muted">
                           <tr>
                             <th className="px-4 py-3 font-bold">Task</th>
                             <th className="px-4 py-3 font-bold">Type</th>
                             <th className="px-4 py-3 font-bold">Status</th>
-                            <th className="px-4 py-3 font-bold text-right">AI Grade</th>
-                            <th className="px-4 py-3 font-bold text-right">Final Grade</th>
-                            <th className="px-4 py-3 font-bold text-right">Date</th>
+                            <th className="px-4 py-3 font-bold text-end">AI Grade</th>
+                            <th className="px-4 py-3 font-bold text-end">Final Grade</th>
+                            <th className="px-4 py-3 font-bold text-end">Date</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -459,7 +459,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                             const taskLink = `/dashboard/courses/${courseId}/tasks/${item.task_id?._id || 'unknown'}/submissions/${item._id}/grade`;
 
                             return (
-                              <tr key={item._id} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group">
+                              <tr key={item._id} className="border-b border-panel last:border-0 hover:bg-panel-hover transition-colors group">
                                 <td className="px-4 py-3 font-medium">
                                   <Link
                                     to={taskLink}
@@ -469,19 +469,19 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                                     <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                   </Link>
                                 </td>
-                                <td className="px-4 py-3 text-slate-400">{item.task_id?.task_type || '-'}</td>
+                                <td className="px-4 py-3 text-content-muted">{item.task_id?.task_type || '-'}</td>
                                 <td className="px-4 py-3">
-                                  <Badge variant={item.status === 'FINALIZED' ? 'default' : 'secondary'} className="text-[10px] uppercase bg-slate-800 text-slate-300 border-white/10">
+                                  <Badge variant={item.status === 'FINALIZED' ? 'default' : 'secondary'} className="text-[10px] uppercase bg-panel-hover text-content-muted border-panel-hover">
                                     {item.status.replace('_', ' ')}
                                   </Badge>
                                 </td>
-                                <td className="px-4 py-3 text-right font-medium text-slate-200">
+                                <td className="px-4 py-3 text-end font-medium text-content">
                                   {item.ai_suggested_grade !== undefined && item.ai_suggested_grade !== null ? `${item.ai_suggested_grade}` : '-'}
                                 </td>
-                                <td className="px-4 py-3 text-right font-bold text-emerald-400">
+                                <td className="px-4 py-3 text-end font-bold text-emerald-400">
                                   {item.final_grade !== undefined && item.final_grade !== null ? `${item.final_grade}` : '-'}
                                 </td>
-                                <td className="px-4 py-3 text-right text-slate-400 whitespace-nowrap">
+                                <td className="px-4 py-3 text-end text-content-muted whitespace-nowrap">
                                   {new Date(item.updatedAt).toLocaleDateString()}
                                 </td>
                               </tr>
@@ -491,7 +491,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                       </table>
                     </div>
                   ) : (
-                    <div className="text-center p-6 text-slate-500">
+                    <div className="text-center p-6 text-content-muted">
                       <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-20" />
                       <p>No task history found for this student.</p>
                     </div>

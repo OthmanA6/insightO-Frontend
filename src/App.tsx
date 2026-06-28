@@ -15,8 +15,6 @@ import FormResponsePage from '@/features/Forms/pages/FormResponsePage'
 import PublicFormViewPage from '@/features/Forms/pages/PublicFormViewPage'
 import DepartmentManagementPage from '@/features/DepartmentManagement/pages/DepartmentManagementPage'
 import DepartmentDetailPage from '@/features/DepartmentManagement/pages/DepartmentDetailPage'
-import EvaluationCyclesPage from '@/features/EvaluationCycles/pages/EvaluationCyclesPage'
-import GlobalAnalyticsPage from '@/features/Analytics/pages/GlobalAnalyticsPage'
 import CourseTasksView from '@/features/TaskManagement/pages/CourseTasksView'
 import TaskSubmissionsPage from '@/features/TaskManagement/pages/TaskSubmissionsPage'
 import QuizBuilderPage from '@/features/TaskManagement/pages/QuizBuilderPage'
@@ -102,8 +100,6 @@ function App() {
             <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
             <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId/submissions/:submissionId/grade" element={<InstructorGradingPage />} />
 
-            <Route path="evaluation-cycles" element={<EvaluationCyclesPage />} />
-            <Route path="analytics" element={<GlobalAnalyticsPage />} />
             <Route path="ai-usage-dashboard" element={<AiUsageDashboardPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="forms-results/:formId" element={<FormsResultsPage />} />

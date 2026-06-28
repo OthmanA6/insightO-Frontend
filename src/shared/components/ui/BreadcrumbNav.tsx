@@ -25,7 +25,7 @@ export function BreadcrumbNav({ items, homeItem, className }: BreadcrumbNavProps
     >
       <Link
         to={homeItem?.href || "/dashboard/departments"}
-        className="flex items-center gap-1.5 text-slate-500 hover:text-indigo-400 transition-colors group"
+        className="flex items-center gap-1.5 text-content-muted hover:text-indigo-400 transition-colors group"
       >
         <Home className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
         <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider">
@@ -47,7 +47,7 @@ export function BreadcrumbNav({ items, homeItem, className }: BreadcrumbNavProps
             ) : (
               <Link
                 to={item.href}
-                className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-indigo-400 transition-colors truncate max-w-[180px]"
+                className="text-xs font-bold uppercase tracking-wider text-content-muted hover:text-indigo-400 transition-colors truncate max-w-[180px]"
               >
                 {item.label}
               </Link>

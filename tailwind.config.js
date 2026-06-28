@@ -43,6 +43,19 @@ export default {
         'text-muted': '#94a3b8',
         success: '#22d3ee',
         warning: '#f472b6',
+        
+        // ── Dynamic Variables ──────────────────────────────────
+        'app': 'var(--bg-app)',
+        'panel': 'var(--bg-panel)',
+        'panel-border': 'var(--border-panel)',
+        'panel-border-hover': 'var(--border-panel-hover)',
+        'content': 'var(--text-primary)',
+        'content-muted': 'var(--text-secondary)',
+        'panel-hover': 'var(--hover-panel)',
+      },
+      borderColor: {
+        'panel': 'var(--border-panel)',
+        'panel-hover': 'var(--border-panel-hover)',
       },
       boxShadow: {
         'primary-sm': '0 1px 3px 0 rgba(79,70,229,.4)',

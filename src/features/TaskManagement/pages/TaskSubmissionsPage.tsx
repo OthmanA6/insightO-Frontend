@@ -124,11 +124,11 @@ export default function TaskSubmissionsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-4xl font-black tracking-tight text-content flex items-center gap-3">
             <FileText className="h-8 w-8 text-indigo-500" />
             {task?.title || 'Task Submissions'}
           </h2>
-          <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">
+          <p className="text-content-muted font-bold uppercase text-[10px] tracking-[0.3em]">
             Student Submissions & Grading
           </p>
         </div>
@@ -136,25 +136,25 @@ export default function TaskSubmissionsPage() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-xl border-white/10 hover:bg-[#1a1d29] text-slate-300 font-bold"
+            className="h-12 px-6 rounded-xl border-panel-hover hover:bg-panel text-content-muted font-bold"
           >
-            <Download className="mr-2 h-4 w-4" /> Export All
+            <Download className="me-2 h-4 w-4" /> Export All
           </Button>
         </div>
       </div>
 
       {/* Task Info Card */}
       {task && (
-        <div className="p-6 rounded-3xl bg-[#13151f] border border-white/10">
-          <p className="text-sm text-slate-400 leading-relaxed italic mb-4">
+        <div className="p-6 rounded-3xl bg-panel border border-panel-hover">
+          <p className="text-sm text-content-muted leading-relaxed italic mb-4">
             "{task.description || 'No instructions provided.'}"
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Badge
               variant="outline"
-              className="font-mono text-[10px] border-white/10 text-slate-400"
+              className="font-mono text-[10px] border-panel-hover text-content-muted"
             >
-              <Clock className="mr-1.5 h-3 w-3" />
+              <Clock className="me-1.5 h-3 w-3" />
               Deadline: {new Date(task.deadline).toLocaleDateString()}
             </Badge>
             <Badge
@@ -163,32 +163,32 @@ export default function TaskSubmissionsPage() {
                 'text-[10px] font-black uppercase',
                 task.status === 'ACTIVE'
                   ? 'text-emerald-400 border-emerald-500/20'
-                  : 'text-red-400 border-red-500/20',
+                  : 'text-red-400 border-eed-500/20',
               )}
             >
               {task.status === 'ACTIVE' ? (
                 <>
-                  <CheckCircle2 className="mr-1.5 h-3 w-3" /> Active
+                  <CheckCircle2 className="me-1.5 h-3 w-3" /> Active
                 </>
               ) : (
                 <>
-                  <AlertCircle className="mr-1.5 h-3 w-3" /> Closed
+                  <AlertCircle className="me-1.5 h-3 w-3" /> Closed
                 </>
               )}
             </Badge>
             <Badge
               variant="outline"
-              className="font-mono text-[10px] border-white/10 text-indigo-400"
+              className="font-mono text-[10px] border-panel-hover text-indigo-400"
             >
               {submissions.length} Submission{submissions.length !== 1 ? 's' : ''}
             </Badge>
           </div>
           {task.ai_grading_rubric && (
-            <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="mt-4 pt-4 border-t border-panel">
               <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
                 AI Grading Rubric
               </span>
-              <p className="text-xs text-slate-400 mt-1">{task.ai_grading_rubric}</p>
+              <p className="text-xs text-content-muted mt-1">{task.ai_grading_rubric}</p>
             </div>
           )}
         </div>
@@ -199,14 +199,14 @@ export default function TaskSubmissionsPage() {
         {isLoading ? (
           <div className="py-20 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            <p className="text-sm font-bold text-content-muted uppercase tracking-widest">
               Loading Submissions...
             </p>
           </div>
         ) : submissions.length === 0 ? (
           <div className="py-20 flex flex-col items-center gap-4 opacity-20">
-            <FileText className="h-16 w-16 text-slate-500" />
-            <p className="text-lg font-bold text-slate-500">
+            <FileText className="h-16 w-16 text-content-muted" />
+            <p className="text-lg font-bold text-content-muted">
               No submissions received yet
             </p>
           </div>
@@ -221,27 +221,27 @@ export default function TaskSubmissionsPage() {
             return (
               <div
                 key={subId}
-                className="group rounded-3xl bg-[#13151f] border border-white/10 hover:border-indigo-500/50 transition-[border-color,background-color] p-8"
+                className="group rounded-3xl bg-panel border border-panel-hover hover:border-indigo-500/50 transition-[border-color,background-color] p-8"
               >
                 <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                   {/* Student Info */}
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5 shrink-0">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel shrink-0">
                       <User className="h-7 w-7" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-black text-white">
+                      <h3 className="text-lg font-black text-content">
                         {student
                           ? `${student.firstName} ${student.lastName}`
                           : 'Unknown Student'}
                       </h3>
-                      <p className="text-xs text-slate-500 font-mono">
+                      <p className="text-xs text-content-muted font-mono">
                         {student?.email || '—'}
                       </p>
 
                       {/* Submitted content */}
                       {task?.task_type === 'QUIZ' && sub.form_answers && sub.form_answers.length > 0 ? (
-                        <div className="mt-4 space-y-4 p-5 rounded-2xl bg-[#0f111a] border border-white/5">
+                        <div className="mt-4 space-y-4 p-5 rounded-2xl bg-app border border-panel">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="h-2 w-2 rounded-full bg-indigo-500" />
                             <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Quiz Responses</span>
@@ -252,8 +252,8 @@ export default function TaskSubmissionsPage() {
 
                             return (
                               <div key={i} className="space-y-1">
-                                <p className="text-xs font-bold text-slate-400">{qLabel}</p>
-                                <p className="text-sm text-slate-200">
+                                <p className="text-xs font-bold text-content-muted">{qLabel}</p>
+                                <p className="text-sm text-content">
                                   {Array.isArray(ans.value) ? ans.value.join(', ') : String(ans.value)}
                                 </p>
                               </div>
@@ -261,8 +261,8 @@ export default function TaskSubmissionsPage() {
                           })}
                         </div>
                       ) : (
-                        <div className="mt-4 p-4 rounded-2xl bg-[#0f111a] border border-white/5">
-                          <p className="text-sm text-slate-300 leading-relaxed">
+                        <div className="mt-4 p-4 rounded-2xl bg-app border border-panel">
+                          <p className="text-sm text-content-muted leading-relaxed">
                             {sub.content || 'No content provided.'}
                           </p>
                         </div>
@@ -272,7 +272,7 @@ export default function TaskSubmissionsPage() {
                       {sub.attachments && sub.attachments.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {sub.attachments.map((att, i) => (
-                            <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a1d29] border border-white/5 group-hover:border-indigo-500/20 transition-colors">
+                            <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel border border-panel group-hover:border-indigo-500/20 transition-colors">
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -322,11 +322,11 @@ export default function TaskSubmissionsPage() {
                     </span>
 
                     {/* Grades */}
-                    <div className="space-y-2 text-right">
+                    <div className="space-y-2 text-end">
                       {sub.ai_evaluation?.suggested_grade !== undefined && sub.ai_evaluation?.suggested_grade !== null && (
                         <div className="flex items-center gap-2">
                           <Star className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-xs font-bold text-slate-400">
+                          <span className="text-xs font-bold text-content-muted">
                             AI Grade:{' '}
                             <span className="text-amber-400 font-black">
                               {sub.ai_evaluation.suggested_grade}
@@ -337,7 +337,7 @@ export default function TaskSubmissionsPage() {
                       {sub.final_grade !== undefined && sub.final_grade !== null && (
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                          <span className="text-xs font-bold text-slate-400">
+                          <span className="text-xs font-bold text-content-muted">
                             Final Grade:{' '}
                             <span className="text-emerald-400 font-black">
                               {sub.final_grade}
@@ -351,7 +351,7 @@ export default function TaskSubmissionsPage() {
                     {sub.instructor_feedback && (
                       <div className="flex items-start gap-2 max-w-xs">
                         <MessageSquare className="h-3.5 w-3.5 text-indigo-400 mt-0.5 shrink-0" />
-                        <p className="text-xs text-slate-400 italic">
+                        <p className="text-xs text-content-muted italic">
                           "{sub.instructor_feedback}"
                         </p>
                       </div>
@@ -364,7 +364,7 @@ export default function TaskSubmissionsPage() {
                         className={cn(
                           "h-9 px-4 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-[border-color,background-color]",
                           sub.status === 'FINALIZED'
-                            ? "text-slate-400 border-white/10 hover:bg-[#1a1d29] hover:text-slate-200"
+                            ? "text-content-muted border-panel-hover hover:bg-panel hover:text-content"
                             : "text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
                         )}
                         onClick={() => {
@@ -375,7 +375,7 @@ export default function TaskSubmissionsPage() {
                           navigate(targetUrl);
                         }}
                       >
-                        <Star className="mr-1.5 h-3.5 w-3.5" />
+                        <Star className="me-1.5 h-3.5 w-3.5" />
                         {sub.status === 'FINALIZED' ? 'Update Evaluation' : 'Finalize Grade'}
                       </Button>
                     )}

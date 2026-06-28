@@ -121,37 +121,37 @@ export default function InstructorDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Total Modules</span>
-            <span className="text-3xl font-black text-slate-200">{courses.length}</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Total Modules</span>
+            <span className="text-3xl font-black text-content">{courses.length}</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Total Students</span>
-            <span className="text-3xl font-black text-slate-200">{totalStudents}</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Total Students</span>
+            <span className="text-3xl font-black text-content">{totalStudents}</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Average Performance</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Average Performance</span>
             <span className="text-3xl font-black text-emerald-500">{averageGrade.toFixed(1)}%</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Pending Reviews</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Pending Reviews</span>
             <span className="text-3xl font-black text-amber-500">{pendingReviews.length}</span>
           </div>
         </div>
       </section>
 
       <Tabs defaultValue="insights" className="w-full">
-        <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-white/10 p-1 mb-8 flex w-fit rounded-2xl shadow-xl">
-          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+        <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-panel-hover p-1 mb-8 flex w-fit rounded-2xl shadow-xl">
+          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
             Performance & Insights
           </TabsTrigger>
-          <TabsTrigger value="courses" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+          <TabsTrigger value="courses" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
             Active Courses & Tasks
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="insights" className="mt-0 outline-none">
-          <div className="rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#0f111a] shadow-2xl relative">
+          <div className="rounded-[2.5rem] overflow-hidden border border-panel-hover bg-app shadow-2xl relative">
             <EntityInsightsView entityType="INSTRUCTOR" entityId={user?.id || user?._id || ""} />
           </div>
         </TabsContent>
@@ -176,16 +176,16 @@ export default function InstructorDashboardPage() {
               <Link 
                 to={`/dashboard/courses`} 
                 key={course.id || course._id} 
-                className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
+                className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
               >
-                <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                  <BookOpen className="h-24 w-24 text-white" />
+                <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                  <BookOpen className="h-24 w-24 text-content" />
                 </div>
                 <div className="relative z-10">
                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">{course.courseCode}</span>
-                  <h3 className="text-lg font-bold text-slate-200 leading-tight">{course.name}</h3>
+                  <h3 className="text-lg font-bold text-content leading-tight">{course.name}</h3>
                 </div>
-                <div className="relative z-10 flex items-center gap-2 text-xs font-medium text-slate-400 mt-4">
+                <div className="relative z-10 flex items-center gap-2 text-xs font-medium text-content-muted mt-4">
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/30">
                     <span className="text-[10px]">👥</span>
                   </div>
@@ -218,17 +218,17 @@ export default function InstructorDashboardPage() {
               const courseId = task.target?.course_id;
 
               return (
-                <div key={task.id || task._id} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+                <div key={task.id || task._id} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-[border-color,background-color] duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
                         <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
                       </div>
-                      <h3 className="text-base font-bold text-slate-200">{task.title}</h3>
+                      <h3 className="text-base font-bold text-content">{task.title}</h3>
                     </div>
-                    <p className="text-sm text-slate-400 pl-11">{getCourseName(courseId)}</p>
-                    <div className="flex flex-wrap items-center gap-2 ml-11">
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-white/5 w-fit px-3 py-1.5 rounded-lg border border-white/10">
+                    <p className="text-sm text-content-muted ps-11">{getCourseName(courseId)}</p>
+                    <div className="flex flex-wrap items-center gap-2 ms-11">
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-content-muted bg-panel-hover w-fit px-3 py-1.5 rounded-lg border border-panel-hover">
                         <Clock className="h-3 w-3" />
                         Due {format(new Date(task.deadline), 'MMM d')}
                       </div>
@@ -242,7 +242,7 @@ export default function InstructorDashboardPage() {
                       to={`/dashboard/departments/all/courses/${courseId}/tasks/${task.id || task._id}`}
                     >
                       <Button 
-                        className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-white/5 text-slate-300 hover:bg-indigo-600 hover:text-white transition-colors flex items-center gap-2 border border-white/10 shadow-none hover:shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                        className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-panel-hover text-content-muted hover:bg-indigo-600 hover:text-content transition-colors flex items-center gap-2 border border-panel-hover shadow-none hover:shadow-[0_0_15px_rgba(79,70,229,0.3)]"
                       >
                         <Search className="h-4 w-4" /> View Submissions
                       </Button>

@@ -23,7 +23,7 @@ const buttonVariants = cva(
          * Solid indigo – primary CTA
          */
         primary: [
-          'bg-primary-600 text-white',
+          'bg-primary-600 text-content',
           'shadow-primary',
           'hover:bg-primary-hover hover:shadow-primary-lg',
         ],
@@ -32,7 +32,7 @@ const buttonVariants = cva(
          * Indigo → Purple gradient – "Generate AI" & hero CTAs
          */
         gradient: [
-          'bg-gradient-primary text-white',
+          'bg-gradient-primary text-content',
           'shadow-primary',
           'hover:opacity-90 hover:shadow-primary-lg',
         ],
@@ -43,7 +43,7 @@ const buttonVariants = cva(
         outline: [
           'border border-slate-700 bg-transparent text-slate-900',
           'hover:bg-slate-100',
-          'dark:text-slate-100 dark:border-slate-600',
+          'dark:text-content dark:border-slate-600',
           'dark:hover:bg-surface-highlight',
         ],
 
@@ -53,7 +53,7 @@ const buttonVariants = cva(
         ghost: [
           'border-0 bg-transparent text-slate-700',
           'hover:bg-slate-100 hover:text-slate-900',
-          'dark:text-slate-300 dark:hover:bg-surface-highlight dark:hover:text-slate-100',
+          'dark:text-content-muted dark:hover:bg-surface-highlight dark:hover:text-content',
         ],
 
         /**

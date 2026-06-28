@@ -89,20 +89,20 @@ export default function StudentDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Total Courses</span>
-            <span className="text-3xl font-black text-slate-200">{courses.length}</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Total Courses</span>
+            <span className="text-3xl font-black text-content">{courses.length}</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Pending Tasks</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Pending Tasks</span>
             <span className="text-3xl font-black text-amber-500">{pendingTasks.length}</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Completed Tasks</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Completed Tasks</span>
             <span className="text-3xl font-black text-emerald-500">{submissions.length}</span>
           </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Average Grade</span>
+          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Average Grade</span>
             <span className="text-3xl font-black text-blue-500">{averageGrade.toFixed(1)}%</span>
           </div>
         </div>
@@ -124,16 +124,16 @@ export default function StudentDashboardPage() {
           
           <div className="space-y-4">
             {urgentTasks.map(task => (
-              <div key={task.id || task._id} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+              <div key={task.id || task._id} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
                       <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     </div>
-                    <h3 className="text-base font-bold text-slate-200">{task.title}</h3>
+                    <h3 className="text-base font-bold text-content">{task.title}</h3>
                   </div>
-                  <p className="text-sm text-slate-400 pl-11">{getCourseName(task.target?.course_id)}</p>
-                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 w-fit px-3 py-1.5 rounded-lg border border-amber-500/20 ml-11">
+                  <p className="text-sm text-content-muted ps-11">{getCourseName(task.target?.course_id)}</p>
+                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 w-fit px-3 py-1.5 rounded-lg border border-amber-500/20 ms-11">
                     <Clock className="h-3 w-3" />
                     Due {format(new Date(task.deadline), 'MMM d, h:mm a')}
                   </div>
@@ -185,16 +185,16 @@ export default function StudentDashboardPage() {
                 <Link 
                   to={`/dashboard/student-courses/${course.id || course._id}`} 
                   key={course.id || course._id} 
-                  className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
+                  className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                    <Building2 className="h-24 w-24 text-white" />
+                  <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                    <Building2 className="h-24 w-24 text-content" />
                   </div>
                   <div className="relative z-10">
                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">{course.courseCode}</span>
-                    <h3 className="text-lg font-bold text-slate-200 leading-tight">{course.name}</h3>
+                    <h3 className="text-lg font-bold text-content leading-tight">{course.name}</h3>
                   </div>
-                  <div className="relative z-10 flex items-center gap-2 text-xs font-medium text-slate-400 mt-4">
+                  <div className="relative z-10 flex items-center gap-2 text-xs font-medium text-content-muted mt-4">
                     <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/30">
                       <span className="text-[10px]">🎓</span>
                     </div>

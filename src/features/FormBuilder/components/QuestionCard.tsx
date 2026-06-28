@@ -97,14 +97,14 @@ export function QuestionCard({
       case "short_text":
       case "long_text":
         return (
-          <div className="bg-[#0f111a] rounded-xl p-4 border border-white/5">
+          <div className="bg-app rounded-xl p-4 border border-panel">
             <p className="text-sm text-slate-600 italic">Respondent answer goes here...</p>
           </div>
         )
       case "multiple_choice":
       case "checkbox":
         return (
-          <div className="bg-[#0f111a] rounded-xl p-4 border border-white/5 space-y-2">
+          <div className="bg-app rounded-xl p-4 border border-panel space-y-2">
             {(question.options || []).map((opt, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className={cn("w-4 h-4 border-2 border-slate-600", question.type === "checkbox" ? "rounded-sm" : "rounded-full")}></div>
@@ -115,12 +115,12 @@ export function QuestionCard({
                     newOpts[idx] = e.target.value
                     onUpdate(question.id!, { options: newOpts })
                   }}
-                  className="bg-transparent border-none p-0 h-6 text-sm text-white focus-visible:ring-0"
+                  className="bg-transparent border-none p-0 h-6 text-sm text-content focus-visible:ring-0"
                 />
               </div>
             ))}
             <div
-              className="text-sm text-indigo-500 cursor-pointer mt-2 pl-7 hover:text-indigo-400 font-medium"
+              className="text-sm text-indigo-500 cursor-pointer mt-2 ps-7 hover:text-indigo-400 font-medium"
               onClick={(e) => {
                 e.stopPropagation()
                 const newOpts = [...(question.options || []), `Option ${(question.options?.length || 0) + 1}`]
@@ -133,8 +133,8 @@ export function QuestionCard({
         )
       case "linear_scale":
         return (
-          <div className="bg-[#0f111a] rounded-xl p-4 border border-white/5">
-            <div className="flex items-center justify-between text-[10px] text-slate-500 mb-3 uppercase font-bold tracking-wider">
+          <div className="bg-app rounded-xl p-4 border border-panel">
+            <div className="flex items-center justify-between text-[10px] text-content-muted mb-3 uppercase font-bold tracking-wider">
               <span>{question.scale?.min || 1} (Poor)</span>
               <span>{question.scale?.max || 5} (Excellent)</span>
             </div>
@@ -146,7 +146,7 @@ export function QuestionCard({
                     "h-10 flex-1 min-w-[36px] rounded-lg border flex items-center justify-center text-sm font-medium transition-all",
                     val === (question.scale?.max || 5)
                       ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-bold"
-                      : "border-white/10 bg-[#1e1b2e] text-slate-400"
+                      : "border-panel-hover bg-panel text-content-muted"
                   )}
                 >
                   {val}
@@ -157,7 +157,7 @@ export function QuestionCard({
         )
       case "file":
         return (
-          <div className="bg-[#0f111a] rounded-xl p-8 border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 gap-2">
+          <div className="bg-app rounded-xl p-8 border-2 border-dashed border-panel-hover flex flex-col items-center justify-center text-content-muted gap-2">
             <Upload className="h-8 w-8 opacity-20" />
             <span className="text-sm font-medium">Click or drag file to upload</span>
             <span className="text-[10px] text-slate-600 uppercase font-bold tracking-widest">
@@ -186,15 +186,15 @@ export function QuestionCard({
       <div
         {...attributes}
         {...listeners}
-        className="absolute -left-10 top-1/2 -translate-y-1/2 text-slate-600 opacity-0 group-hover:opacity-100 hover:text-white cursor-grab active:cursor-grabbing transition-all p-2"
+        className="absolute -start-10 top-1/2 -translate-y-1/2 text-slate-600 opacity-0 group-hover:opacity-100 hover:text-content cursor-grab active:cursor-grabbing transition-all p-2"
       >
         <GripVertical className="h-5 w-5" />
       </div>
 
       <div
         className={cn(
-          "question-card rounded-2xl bg-[#1e1b2e] p-6 shadow-lg cursor-pointer relative group transition-all duration-300 border-2 overflow-visible",
-          isActive ? "border-indigo-600 shadow-indigo-600/10" : "border-white/5 hover:border-white/10",
+          "question-card rounded-2xl bg-panel p-6 shadow-lg cursor-pointer relative group transition-all duration-300 border-2 overflow-visible",
+          isActive ? "border-indigo-600 shadow-indigo-600/10" : "border-panel hover:border-panel-hover",
         )}
       >
         <div className="flex flex-col gap-4">
@@ -205,7 +205,7 @@ export function QuestionCard({
                 type="text"
                 value={question.label}
                 onChange={(e) => onUpdate(question.id!, { label: e.target.value })}
-                className="w-full bg-[#2d2a42]/30 text-base font-semibold text-white border border-transparent focus:border-indigo-500 rounded-lg px-3 py-2 outline-none transition-all placeholder:text-white/10"
+                className="w-full bg-panel-hover/30 text-base font-semibold text-content border border-transparent focus:border-indigo-500 rounded-lg px-3 py-2 outline-none transition-all placeholder:text-content/10"
                 placeholder={`New ${Config.label}`}
               />
             </div>
@@ -215,17 +215,17 @@ export function QuestionCard({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex items-center gap-2 bg-[#0f111a] border border-white/10 hover:border-indigo-500/50 rounded-lg px-3 py-2 transition-all group/type"
+                    className="flex items-center gap-2 bg-app border border-panel-hover hover:border-indigo-500/50 rounded-lg px-3 py-2 transition-all group/type"
                   >
-                    <Config.icon className="h-4 w-4 text-slate-400 group-hover/type:text-indigo-400 transition-colors" />
-                    <span className="text-xs font-bold text-slate-300 hidden sm:block uppercase tracking-wider">{Config.label}</span>
-                    <ChevronDown className="h-3.5 w-3.5 text-slate-500 transition-transform" />
+                    <Config.icon className="h-4 w-4 text-content-muted group-hover/type:text-indigo-400 transition-colors" />
+                    <span className="text-xs font-bold text-content-muted hidden sm:block uppercase tracking-wider">{Config.label}</span>
+                    <ChevronDown className="h-3.5 w-3.5 text-content-muted transition-transform" />
                   </button>
                 </DropdownMenuTrigger>
                 
                 <DropdownMenuContent 
                   align="end" 
-                  className="w-48 bg-[#1e1b2e] border-white/10 text-slate-300 z-[101]"
+                  className="w-48 bg-panel border-panel-hover text-content-muted z-[101]"
                 >
                   {TYPE_OPTIONS.map((opt) => (
                     <DropdownMenuItem
@@ -235,7 +235,7 @@ export function QuestionCard({
                         "flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-wider cursor-pointer outline-none",
                         question.type === opt.type
                           ? "bg-indigo-600/20 text-indigo-400"
-                          : "hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white"
+                          : "hover:bg-panel-hover hover:text-content focus:bg-panel-hover focus:text-content"
                       )}
                     >
                       <opt.icon className="h-4 w-4 shrink-0" />

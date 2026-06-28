@@ -149,10 +149,10 @@ export default function SubmitQuizPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#0a0a0f]">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-app">
         <div className="flex flex-col items-center gap-4 text-indigo-500">
           <Loader2 className="h-10 w-10 animate-spin" />
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Loading Quiz Module...</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-content-muted">Loading Quiz Module...</p>
         </div>
       </div>
     );
@@ -160,11 +160,11 @@ export default function SubmitQuizPage() {
 
   if (!task || !form) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-[#0a0a0f]">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-[#1e1b2e]/50 backdrop-blur-md border border-white/5 shadow-2xl text-center flex flex-col items-center gap-4">
-          <AlertCircle className="h-16 w-16 text-slate-500" />
-          <h2 className="text-2xl font-black text-white">Quiz Unavailable</h2>
-          <p className="text-slate-400 text-sm font-medium">This quiz is not available, has no questions, or you might not have access to it.</p>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-app">
+        <div className="max-w-md w-full p-8 rounded-3xl bg-panel/50 backdrop-blur-md border border-panel shadow-2xl text-center flex flex-col items-center gap-4">
+          <AlertCircle className="h-16 w-16 text-content-muted" />
+          <h2 className="text-2xl font-black text-content">Quiz Unavailable</h2>
+          <p className="text-content-muted text-sm font-medium">This quiz is not available, has no questions, or you might not have access to it.</p>
           <Button onClick={() => navigate("/dashboard")} className="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 px-8 font-bold transition-colors">
             Return to Dashboard
           </Button>
@@ -175,16 +175,16 @@ export default function SubmitQuizPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-[#0a0a0f]">
-        <div className="max-w-md w-full p-10 rounded-3xl bg-[#1e1b2e] border border-white/5 shadow-2xl flex flex-col items-center text-center gap-6 animate-in zoom-in-95 duration-500">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 bg-app">
+        <div className="max-w-md w-full p-10 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col items-center text-center gap-6 animate-in zoom-in-95 duration-500">
           <div className="h-24 w-24 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
             <CheckCircle2 className="h-12 w-12 text-emerald-500" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-black text-white">Quiz Submitted!</h2>
-            <p className="text-slate-400 text-sm font-medium">Your answers have been securely submitted and stored.</p>
+            <h2 className="text-3xl font-black text-content">Quiz Submitted!</h2>
+            <p className="text-content-muted text-sm font-medium">Your answers have been securely submitted and stored.</p>
           </div>
-          <Button onClick={() => navigate("/dashboard")} variant="outline" className="w-full mt-4 h-12 rounded-xl border-white/10 hover:bg-white/5 text-slate-300 font-bold transition-all">
+          <Button onClick={() => navigate("/dashboard")} variant="outline" className="w-full mt-4 h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold transition-all">
             Return to Dashboard
           </Button>
         </div>
@@ -193,35 +193,35 @@ export default function SubmitQuizPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a0f] text-slate-100 py-12 px-4 sm:px-6 relative overflow-y-auto">
+    <div className="min-h-[calc(100vh-4rem)] bg-app text-content py-12 px-4 sm:px-6 relative overflow-y-auto">
       {/* Background decorations */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div className="absolute top-0 start-0 w-full h-full pointer-events-none overflow-hidden">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px]" />
         <div className="absolute top-[60%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[100px]" />
       </div>
 
       <div className="max-w-3xl mx-auto space-y-8 relative z-10">
         {/* Header Block */}
-        <div className="p-8 sm:p-12 rounded-3xl bg-[#1e1b2e]/60 backdrop-blur-md border-t-4 border-t-indigo-500 border-x border-b border-white/5 shadow-2xl space-y-6">
+        <div className="p-8 sm:p-12 rounded-3xl bg-panel/60 backdrop-blur-md border-t-4 border-t-indigo-500 border-x border-b border-panel shadow-2xl space-y-6">
           <div>
             <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 px-3 py-1 font-bold text-[10px] uppercase tracking-widest mb-4">
               Quiz Form Task
             </Badge>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">{task.title}</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-content tracking-tight leading-tight">{task.title}</h1>
             {task.description && (
-              <p className="text-slate-400 font-medium mt-4 text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-content-muted font-medium mt-4 text-sm leading-relaxed whitespace-pre-wrap">
                 {task.description}
               </p>
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/5 text-xs">
+          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-panel text-xs">
             <div className="flex items-center gap-2 text-amber-400 font-bold uppercase tracking-wider bg-amber-500/10 px-3.5 py-2 rounded-xl border border-amber-500/20">
               <Clock className="h-4 w-4" />
               <span>Due: {format(new Date(task.deadline), "MMM d, yyyy h:mm a")}</span>
             </div>
             {form.is_anonymous && (
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+              <span className="text-[10px] font-bold text-content-muted uppercase tracking-widest flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> Anonymous
               </span>
             )}
@@ -240,13 +240,13 @@ export default function SubmitQuizPage() {
                 key={qId}
                 id={`question-${qId}`}
                 className={cn(
-                  "p-8 sm:p-10 rounded-3xl bg-[#1e1b2e]/40 backdrop-blur-md border transition-all duration-300",
-                  hasError ? "border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-white/5 shadow-xl hover:border-white/10"
+                  "p-8 sm:p-10 rounded-3xl bg-panel/40 backdrop-blur-md border transition-all duration-300",
+                  hasError ? "border-eed-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-panel shadow-xl hover:border-panel-hover"
                 )}
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-lg font-bold text-white flex gap-2 items-start">
+                    <Label className="text-lg font-bold text-content flex gap-2 items-start">
                       <span className="text-indigo-400 shrink-0">{idx + 1}.</span>
                       <span>{q.label}</span>
                       {q.required && <span className="text-red-500 shrink-0">*</span>}
@@ -258,7 +258,7 @@ export default function SubmitQuizPage() {
                       value={val || ""}
                       onChange={(e) => handleAnswerChange(qId, e.target.value)}
                       placeholder="Your answer..."
-                      className="bg-[#0f111a]/80 border-white/10 h-14 rounded-xl text-white px-4 focus:ring-indigo-500 transition-all text-base shadow-inner"
+                      className="bg-app/80 border-panel-hover h-14 rounded-xl text-content px-4 focus:ring-indigo-500 transition-all text-base shadow-inner"
                     />
                   )}
 
@@ -267,7 +267,7 @@ export default function SubmitQuizPage() {
                       value={val || ""}
                       onChange={(e) => handleAnswerChange(qId, e.target.value)}
                       placeholder="Your detailed answer..."
-                      className="w-full bg-[#0f111a]/80 border border-white/10 rounded-xl text-white p-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all min-h-[120px] resize-y text-base custom-scrollbar shadow-inner"
+                      className="w-full bg-app/80 border border-panel-hover rounded-xl text-content p-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all min-h-[120px] resize-y text-base custom-scrollbar shadow-inner"
                     />
                   )}
 
@@ -280,7 +280,7 @@ export default function SubmitQuizPage() {
                             key={i}
                             className={cn(
                               "flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all",
-                              isSelected ? "bg-indigo-600/10 border-indigo-500 text-indigo-100" : "bg-[#0f111a]/50 border-white/5 hover:border-white/10 text-slate-300"
+                              isSelected ? "bg-indigo-600/10 border-indigo-500 text-indigo-100" : "bg-app/50 border-panel hover:border-panel-hover text-content-muted"
                             )}
                           >
                             <input
@@ -314,7 +314,7 @@ export default function SubmitQuizPage() {
                             key={i}
                             className={cn(
                               "flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all",
-                              isSelected ? "bg-indigo-600/10 border-indigo-500 text-indigo-100" : "bg-[#0f111a]/50 border-white/5 hover:border-white/10 text-slate-300"
+                              isSelected ? "bg-indigo-600/10 border-indigo-500 text-indigo-100" : "bg-app/50 border-panel hover:border-panel-hover text-content-muted"
                             )}
                           >
                             <input
@@ -335,7 +335,7 @@ export default function SubmitQuizPage() {
                               "h-4 w-4 rounded-sm border-2 transition-all flex items-center justify-center shrink-0",
                               isSelected ? "border-indigo-500 bg-indigo-500" : "border-slate-400 dark:border-white/20"
                             )}>
-                              {isSelected && <Check className="h-3 w-3 text-white" />}
+                              {isSelected && <Check className="h-3 w-3 text-content" />}
                             </div>
                             <span className="font-medium text-base">{opt}</span>
                           </label>
@@ -345,14 +345,14 @@ export default function SubmitQuizPage() {
                   )}
 
                   {q.type === "linear_scale" && (
-                    <div className="bg-[#0f111a]/60 rounded-xl p-6 border border-white/5 space-y-4">
+                    <div className="bg-app/60 rounded-xl p-6 border border-panel space-y-4">
                       {(() => {
                         const scale = q.scale || { min: 1, max: 5 };
                         const min = Number(scale.min) || 1;
                         const max = Number(scale.max) || 5;
                         return (
                           <>
-                            <div className="flex items-center justify-between text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                            <div className="flex items-center justify-between text-[10px] text-content-muted uppercase font-bold tracking-wider">
                               <span>{min} (Poor)</span>
                               <span>{max} (Excellent)</span>
                             </div>
@@ -369,7 +369,7 @@ export default function SubmitQuizPage() {
                                       "h-11 flex-1 min-w-[40px] rounded-lg border flex items-center justify-center text-sm font-medium transition-all",
                                       isSelected
                                         ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-bold shadow-[0_0_15px_rgba(79,70,229,0.15)]"
-                                        : "border-white/10 bg-[#1e1b2e]/60 text-slate-400 hover:border-white/20 hover:text-slate-200"
+                                        : "border-panel-hover bg-panel/60 text-content-muted hover:border-white/20 hover:text-content"
                                     )}
                                   >
                                     {num}
@@ -386,19 +386,19 @@ export default function SubmitQuizPage() {
                   {q.type === "file" && (
                     <div className="space-y-4">
                       <label className={cn(
-                        "flex flex-col items-center justify-center w-full h-32 border-2 border-white/10 border-dashed rounded-2xl cursor-pointer bg-[#0f111a]/60 hover:bg-white/5 hover:border-indigo-500/50 transition-all group",
+                        "flex flex-col items-center justify-center w-full h-32 border-2 border-panel-hover border-dashed rounded-2xl cursor-pointer bg-app/60 hover:bg-panel-hover hover:border-indigo-500/50 transition-all group",
                         isUploading[qId] && "pointer-events-none opacity-55"
                       )}>
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           {isUploading[qId] ? (
                             <Loader2 className="w-8 h-8 text-indigo-500 mb-3 animate-spin" />
                           ) : (
-                            <Upload className="w-8 h-8 text-slate-500 mb-3 group-hover:text-indigo-400 transition-colors" />
+                            <Upload className="w-8 h-8 text-content-muted mb-3 group-hover:text-indigo-400 transition-colors" />
                           )}
-                          <p className="text-sm font-bold text-slate-300">
+                          <p className="text-sm font-bold text-content-muted">
                             {isUploading[qId] ? "Uploading your file..." : "Click to upload file"}
                           </p>
-                          <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest">
+                          <p className="text-xs text-content-muted mt-1 uppercase tracking-widest">
                             {q.file_config?.allowed_types?.join(", ") || "Any file"} (Max {Math.round((q.file_config?.max_size || 5242880) / 1024 / 1024)}MB)
                           </p>
                         </div>
@@ -416,16 +416,16 @@ export default function SubmitQuizPage() {
                         />
                       </label>
                       {val && val.fileName && (
-                        <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-panel-hover border border-panel-hover">
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5 text-indigo-400" />
-                            <span className="text-sm font-bold text-slate-200">{val.fileName}</span>
-                            {val.size && <span className="text-xs text-slate-500 font-mono">({(val.size / 1024).toFixed(1)} KB)</span>}
+                            <span className="text-sm font-bold text-content">{val.fileName}</span>
+                            {val.size && <span className="text-xs text-content-muted font-mono">({(val.size / 1024).toFixed(1)} KB)</span>}
                           </div>
                           <button
                             type="button"
                             onClick={() => handleAnswerChange(qId, undefined)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                            className="p-1.5 rounded-lg text-content-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -450,7 +450,7 @@ export default function SubmitQuizPage() {
           <Button
             onClick={() => navigate(-1)}
             variant="outline"
-            className="h-16 px-8 rounded-2xl border-white/10 hover:bg-white/5 text-slate-300 font-bold transition-all"
+            className="h-16 px-8 rounded-2xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold transition-all"
           >
             Cancel
           </Button>

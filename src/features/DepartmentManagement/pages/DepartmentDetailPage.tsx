@@ -171,11 +171,11 @@ export default function DepartmentDetailPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-4xl font-black tracking-tight text-content flex items-center gap-3">
             <Building2 className="h-8 w-8 text-indigo-500"/>
             {department?.name || 'Department'}
           </h2>
-          <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">
+          <p className="text-content-muted font-bold uppercase text-[10px] tracking-[0.3em]">
             {department?.code || ''} · Courses & Programs
           </p>
         </div>
@@ -183,9 +183,9 @@ export default function DepartmentDetailPage() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-xl border-white/10 hover:bg-[#1a1d29] text-slate-300 font-bold"
+            className="h-12 px-6 rounded-xl border-panel-hover hover:bg-panel text-content-muted font-bold"
           >
-            <Download className="mr-2 h-4 w-4"/> Export
+            <Download className="me-2 h-4 w-4"/> Export
           </Button>
           <Button
             onClick={() => {
@@ -201,17 +201,17 @@ export default function DepartmentDetailPage() {
       </div>
 
       <Tabs defaultValue="insights" className="w-full">
-        <TabsList className="bg-[#13151f] border border-white/5 p-1 mb-8 flex w-fit rounded-2xl">
-          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+        <TabsList className="bg-panel border border-panel p-1 mb-8 flex w-fit rounded-2xl">
+          <TabsTrigger value="insights" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
             Analysis & Insights
           </TabsTrigger>
-          <TabsTrigger value="management" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-sm font-bold transition-all">
+          <TabsTrigger value="management" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
             Courses & Management
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="insights" className="mt-0 outline-none">
-          <div className="rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0f111a] shadow-2xl relative">
+          <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
             <EntityInsightsView entityType="DEPARTMENT" entityId={departmentId!} />
           </div>
         </TabsContent>
@@ -219,45 +219,45 @@ export default function DepartmentDetailPage() {
         <TabsContent value="management" className="mt-0 outline-none space-y-8">
           {/* Department Info Card */}
           {department && (
-        <div className="p-6 rounded-3xl bg-[#13151f] border border-white/5">
-          <p className="text-sm text-slate-400 leading-relaxed italic">
+        <div className="p-6 rounded-3xl bg-panel border border-panel">
+          <p className="text-sm text-content-muted leading-relaxed italic">
             "{department.description || 'No description provided for this academic entity.'}"
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-panel">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#1a1d29] text-indigo-400">
+              <div className="p-2 rounded-lg bg-panel text-indigo-400">
                 <BookOpen className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Courses</span>
-                <span className="text-sm font-bold text-slate-200">{courses.length}</span>
+                <span className="text-sm font-bold text-content">{courses.length}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#1a1d29] text-emerald-400">
+              <div className="p-2 rounded-lg bg-panel text-emerald-400">
                 <Users className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Students</span>
-                <span className="text-sm font-bold text-slate-200">{studentsCount.length}</span>
+                <span className="text-sm font-bold text-content">{studentsCount.length}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#1a1d29] text-purple-400">
+              <div className="p-2 rounded-lg bg-panel text-purple-400">
                 <GraduationCap className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Instructors</span>
-                <span className="text-sm font-bold text-slate-200">{instructorsCount.length}</span>
+                <span className="text-sm font-bold text-content">{instructorsCount.length}</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#1a1d29] text-amber-400">
+              <div className="p-2 rounded-lg bg-panel text-amber-400">
                 <Clock className="h-4 w-4"/>
               </div>
               <div className="flex flex-col">
                 <span className="text-[9px] font-black text-slate-600 uppercase">Created</span>
-                <span className="text-sm font-bold text-slate-200">
+                <span className="text-sm font-bold text-content">
                   {department.createdAt
                     ? new Date(department.createdAt).toLocaleDateString()
                     : '—'}
@@ -265,20 +265,20 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
+          <div className="mt-6 pt-6 border-t border-panel flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-black text-white shadow-indigo-500/20">
+              <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-black text-content shadow-indigo-500/20">
                 {hodUser ? `${hodUser.firstName.charAt(0)}${hodUser.lastName.charAt(0)}` : '?'}
               </div>
               <div className="flex flex-col">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Head of Department</span>
-                <span className="text-sm font-bold text-slate-200">
+                <span className="text-[9px] font-black text-content-muted uppercase tracking-widest">Head of Department</span>
+                <span className="text-sm font-bold text-content">
                   {hodUser ? `${hodUser.firstName} ${hodUser.lastName}` : 'Not Appointed'}
                 </span>
               </div>
             </div>
             <div className="hidden md:block">
-              <Badge variant="outline"className="border-white/5 text-slate-500 text-[10px] uppercase font-bold">
+              <Badge variant="outline"className="border-panel text-content-muted text-[10px] uppercase font-bold">
                 Sync Status: {isLoading ? 'Updating...' : 'Live'}
               </Badge>
             </div>
@@ -287,25 +287,25 @@ export default function DepartmentDetailPage() {
       )}
 
       {/* Control Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#13151f] p-4 rounded-3xl border border-white/5">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-panel p-4 rounded-3xl border border-panel">
         <div className="w-full lg:w-96 relative group">
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search courses by name or code..."
-            className="h-12 rounded-2xl bg-[#0f111a] border-white/5 text-white pl-12 pr-4 font-bold"
+            className="h-12 rounded-2xl bg-app border-panel text-content ps-12 pe-4 font-bold"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-500 transition-colors"/>
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-content-muted group-focus-within:text-indigo-500 transition-colors"/>
         </div>
 
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <Button
             variant="ghost"
-            className="text-slate-400 font-bold hover:text-white hover:bg-[#1a1d29]"
+            className="text-content-muted font-bold hover:text-content hover:bg-panel"
           >
-            <Filter className="mr-2 h-4 w-4"/> All
+            <Filter className="me-2 h-4 w-4"/> All
           </Button>
-          <div className="h-8 w-px bg-[#1a1d29] mx-2 hidden lg:block"/>
+          <div className="h-8 w-px bg-panel mx-2 hidden lg:block"/>
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
             Courses: {filteredCourses.length}
           </p>
@@ -317,14 +317,14 @@ export default function DepartmentDetailPage() {
         {isLoading ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-indigo-500"/>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            <p className="text-sm font-bold text-content-muted uppercase tracking-widest">
               Loading Courses...
             </p>
           </div>
         ) : filteredCourses.length === 0 ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4 opacity-20">
-            <BookOpen className="h-16 w-16 text-slate-500"/>
-            <p className="text-lg font-bold text-slate-500">
+            <BookOpen className="h-16 w-16 text-content-muted"/>
+            <p className="text-lg font-bold text-content-muted">
               No courses found in this department
             </p>
           </div>
@@ -334,7 +334,7 @@ export default function DepartmentDetailPage() {
             return (
               <div
                 key={courseId}
-                className="group relative rounded-3xl bg-[#13151f] border border-white/5 hover:border-indigo-500/50 transition-[border-color,background-color] p-8 flex flex-col gap-6 cursor-pointer"
+                className="group relative rounded-3xl bg-panel border border-panel hover:border-indigo-500/50 transition-[border-color,background-color] p-8 flex flex-col gap-6 cursor-pointer"
                 onClick={() =>
                   navigate(
                     `/dashboard/departments/${departmentId}/courses/${courseId}`,
@@ -343,17 +343,17 @@ export default function DepartmentDetailPage() {
               >
                 <div className="flex justify-between items-start">
                   <div className="flex gap-4">
-                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel">
                       <BookOpen className="h-8 w-8"/>
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">
+                      <h3 className="text-xl font-black text-content group-hover:text-indigo-400 transition-colors">
                         {course.name}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge
                           variant="outline"
-                          className="font-mono text-[10px] border-white/10 text-slate-500 uppercase"
+                          className="font-mono text-[10px] border-panel-hover text-content-muted uppercase"
                         >
                           {course.courseCode}
                         </Badge>
@@ -380,15 +380,15 @@ export default function DepartmentDetailPage() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="h-10 w-10 p-0 rounded-xl hover:bg-[#1a1d29]"
+                        className="h-10 w-10 p-0 rounded-xl hover:bg-panel"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <MoreVertical className="h-5 w-5 text-slate-500"/>
+                        <MoreVertical className="h-5 w-5 text-content-muted"/>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="bg-[#0a0a0f] border-white/5 min-w-[160px]"
+                      className="bg-app border-panel min-w-[160px]"
                     >
                       <DropdownMenuItem
                         onClick={(e) => {
@@ -396,7 +396,7 @@ export default function DepartmentDetailPage() {
                           setEditingCourse(course);
                           setIsCourseModalOpen(true);
                         }}
-                        className="flex items-center gap-2 hover:bg-[#1a1d29] font-bold py-3 text-slate-300 cursor-pointer"
+                        className="flex items-center gap-2 hover:bg-panel font-bold py-3 text-content-muted cursor-pointer"
                       >
                         <Edit3 className="h-4 w-4"/> Edit Course
                       </DropdownMenuItem>
@@ -414,20 +414,20 @@ export default function DepartmentDetailPage() {
                   </DropdownMenu>
                 </div>
 
-                <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 italic">
+                <p className="text-sm text-content-muted leading-relaxed line-clamp-2 italic">
                   "{course.description || 'No description provided for this course.'}"
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-panel">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#1a1d29] text-indigo-400">
+                    <div className="p-2 rounded-lg bg-panel text-indigo-400">
                       <GraduationCap className="h-4 w-4"/>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-black text-slate-600 uppercase">
                         Instructor
                       </span>
-                      <span className="text-xs font-bold text-slate-200">
+                      <span className="text-xs font-bold text-content">
                         {(() => {
                           const inst = course.instructorId as any;
                           if (inst && typeof inst === 'object') {
@@ -440,14 +440,14 @@ export default function DepartmentDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#1a1d29] text-purple-400">
+                    <div className="p-2 rounded-lg bg-panel text-purple-400">
                       <Users className="h-4 w-4"/>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-black text-slate-600 uppercase">
                         Enrolled
                       </span>
-                      <span className="text-xs font-bold text-slate-200">
+                      <span className="text-xs font-bold text-content">
                         {
                           users.filter((u) => {
                             if (u.role !== 'STUDENT') return false;
@@ -473,7 +473,7 @@ export default function DepartmentDetailPage() {
                     }}
                   >
                     View Tasks{' '}
-                    <ChevronRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform"/>
+                    <ChevronRight className="ms-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform"/>
                   </Button>
                 </div>
               </div>

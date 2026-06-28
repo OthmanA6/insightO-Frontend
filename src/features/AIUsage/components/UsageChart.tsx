@@ -25,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const data = payload[0].payload;
     return (
       <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md p-4 rounded-xl shadow-xl border border-gray-100 dark:border-gray-800">
-        <p className="font-bold text-gray-900 dark:text-white mb-2">{label}</p>
+        <p className="font-bold text-gray-900 dark:text-content mb-2">{label}</p>
         <div className="space-y-1">
           <p className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
             Used: {data.tokens.toLocaleString()} tokens

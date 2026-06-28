@@ -62,22 +62,22 @@ export function SystemFileViewer({ fileUrl, fileName }: SystemFileViewerProps) {
     };
 
     return (
-      <div className="rounded-xl overflow-hidden border border-white/10 bg-[#0d0f17] flex flex-col h-[80vh] min-h-[600px] shadow-2xl">
+      <div className="rounded-xl overflow-hidden border border-panel-hover bg-app flex flex-col h-[80vh] min-h-[600px] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-3.5 bg-[#13151f] border-b border-white/5 shrink-0">
+        <div className="flex items-center gap-3 px-5 py-3.5 bg-panel border-b border-panel shrink-0">
           <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
             <FileCode className="h-4 w-4" />
           </div>
-          <span className="text-sm font-bold text-slate-300 font-mono tracking-tight">{fileName}</span>
+          <span className="text-sm font-bold text-content-muted font-mono tracking-tight">{fileName}</span>
         </div>
         
         {/* Content */}
         <div className="flex-1 overflow-auto relative custom-scrollbar">
           {isLoadingCode && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#0d0f17]/50 backdrop-blur-sm z-10">
-              <div className="flex items-center gap-3 bg-[#13151f] border border-white/10 px-5 py-3 rounded-2xl shadow-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-app/50 backdrop-blur-sm z-10">
+              <div className="flex items-center gap-3 bg-panel border border-panel-hover px-5 py-3 rounded-2xl shadow-xl">
                 <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
-                <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Loading Code...</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Loading Code...</span>
               </div>
             </div>
           )}
@@ -111,16 +111,16 @@ export function SystemFileViewer({ fileUrl, fileName }: SystemFileViewerProps) {
 
   // Document Viewer for non-code files (PDFs, Images, Word docs, etc)
   return (
-    <div className="rounded-xl overflow-hidden border border-white/10 bg-[#13151f] flex flex-col h-[80vh] min-h-[600px] shadow-2xl relative">
+    <div className="rounded-xl overflow-hidden border border-panel-hover bg-panel flex flex-col h-[80vh] min-h-[600px] shadow-2xl relative">
       {/* Custom Sleek Header */}
-      <div className="flex items-center gap-3 px-5 py-3.5 bg-[#13151f] border-b border-white/5 shrink-0 z-10 shadow-sm">
+      <div className="flex items-center gap-3 px-5 py-3.5 bg-panel border-b border-panel shrink-0 z-10 shadow-sm">
         <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <FileText className="h-4 w-4" />
         </div>
-        <span className="text-sm font-bold text-slate-300 font-mono tracking-tight">{fileName}</span>
+        <span className="text-sm font-bold text-content-muted font-mono tracking-tight">{fileName}</span>
       </div>
 
-      <div className="flex-1 relative bg-[#0a0a0f] min-h-0">
+      <div className="flex-1 relative bg-app min-h-0">
         <div className="absolute inset-0 overflow-auto">
           <DocViewer 
             documents={[{ uri: absoluteUrl, fileName }]} 

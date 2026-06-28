@@ -129,7 +129,7 @@ export default function MySubmissionsPage() {
 
                   {sub.status === 'FINALIZED' && (
                     <div className="mt-4 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/20 p-6 relative overflow-hidden">
-                       <div className="absolute top-0 right-0 p-6 opacity-5">
+                       <div className="absolute top-0 end-0 p-6 opacity-5">
                         <CheckCircle2 className="h-24 w-24 text-emerald-500" />
                       </div>
                       <div className="relative z-10 space-y-4">
@@ -142,7 +142,7 @@ export default function MySubmissionsPage() {
                           </span>
                         </div>
                         {sub.instructor_feedback && (
-                          <div className="pl-4 border-l-2 border-emerald-500/50">
+                          <div className="ps-4 border-s-2 border-emerald-500/50">
                             <p className="text-sm text-foreground/90 font-medium italic">"{sub.instructor_feedback}"</p>
                           </div>
                         )}

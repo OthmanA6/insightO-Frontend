@@ -49,7 +49,7 @@ function ModalHeader({
     <div className="flex items-center justify-between border-b border-slate-200/10 px-6 py-4">
       <h2
         id="modal-title"
-        className="text-base font-semibold tracking-tight text-slate-900 dark:text-white"
+        className="text-base font-semibold tracking-tight text-slate-900 dark:text-content"
       >
         {title}
       </h2>
@@ -60,9 +60,9 @@ function ModalHeader({
         onClick={onClose}
         className={cn(
           'inline-flex h-7 w-7 items-center justify-center rounded-md',
-          'text-slate-500 transition-colors duration-150',
+          'text-content-muted transition-colors duration-150',
           'hover:bg-slate-100 hover:text-slate-900',
-          'dark:text-slate-400 dark:hover:bg-surface-highlight dark:hover:text-white',
+          'dark:text-content-muted dark:hover:bg-surface-highlight dark:hover:text-content',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
           'active:scale-95'
         )}

@@ -45,7 +45,7 @@ export function Navbar() {
         {/* Notification Bell */}
         <button className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "relative h-9 w-9 p-0 rounded-full")}>
           <Bell className="h-5 w-5 text-muted-foreground" />
-          <span className="absolute right-1.5 top-1.5 flex h-2 w-2 rounded-full bg-red-500"></span>
+          <span className="absolute end-1.5 top-1.5 flex h-2 w-2 rounded-full bg-red-500"></span>
           <span className="sr-only">Notifications</span>
         </button>
 
@@ -58,30 +58,30 @@ export function Navbar() {
               <AvatarFallback className="bg-indigo-600/20 text-indigo-400 font-bold text-xs uppercase">{userInitials}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-[#13151f] border-white/5 text-slate-200">
+          <DropdownMenuContent align="end" className="w-56 bg-panel border-panel text-content">
             {/* 4️⃣ عرض اسم المستخدم الفعلي المسجل حالياً في الـ SaaS */}
-            <DropdownMenuLabel className="font-bold text-slate-400">{userFullName}</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
-            <DropdownMenuItem asChild className="cursor-pointer focus:bg-white/5">
+            <DropdownMenuLabel className="font-bold text-content-muted">{userFullName}</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-panel-hover" />
+            <DropdownMenuItem asChild className="cursor-pointer focus:bg-panel-hover">
               <Link to="/dashboard/profile" className="w-full flex items-center">
-                <User className="mr-2 h-4 w-4 text-slate-400" />
+                <User className="me-2 h-4 w-4 text-content-muted" />
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer focus:bg-white/5">
+            <DropdownMenuItem asChild className="cursor-pointer focus:bg-panel-hover">
               <Link to="/dashboard/settings" className="w-full flex items-center">
-                <Settings className="mr-2 h-4 w-4 text-slate-400" />
+                <Settings className="me-2 h-4 w-4 text-content-muted" />
                 <span>Settings</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-panel-hover" />
             
             {/* 5️⃣ السحر هنا: ربط حدث الـ onClick بالدالة القوية المصلحة فوراً */}
             <DropdownMenuItem 
               onClick={logout} 
               className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-bold"
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="me-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

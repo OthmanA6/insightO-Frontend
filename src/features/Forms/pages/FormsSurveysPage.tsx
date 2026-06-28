@@ -39,8 +39,8 @@ export default function FormsSurveysPage() {
   }
 
   const SortIcon = ({ field }: { field: "date" | "status" | "questions" | "responses" }) => {
-    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 ml-1 opacity-40 group-hover:opacity-100 transition-opacity" />
-    return sortOrder === "asc" ? <ArrowUp className="h-3 w-3 ml-1 text-indigo-400" /> : <ArrowDown className="h-3 w-3 ml-1 text-indigo-400" />
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 ms-1 opacity-40 group-hover:opacity-100 transition-opacity" />
+    return sortOrder === "asc" ? <ArrowUp className="h-3 w-3 ms-1 text-indigo-400" /> : <ArrowDown className="h-3 w-3 ms-1 text-indigo-400" />
   }
 
   const fetchForms = async () => {
@@ -136,23 +136,23 @@ export default function FormsSurveysPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h2 className="text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-4xl font-extrabold tracking-tight text-content flex items-center gap-3">
             Forms &amp; Surveys
           </h2>
-          <p className="text-slate-400 font-medium">Design and manage institutional evaluations and performance reviews.</p>
+          <p className="text-content-muted font-medium">Design and manage institutional evaluations and performance reviews.</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Button
             variant="outline"
             onClick={() => navigate("/builder")}
-            className="flex-1 md:flex-none h-12 rounded-xl border-white/10 hover:bg-white/5 text-slate-300 font-bold"
+            className="flex-1 md:flex-none h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold"
           >
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="me-2 h-5 w-5" />
             Blank Form
           </Button>
-          <Button className="flex-1 md:flex-none h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 font-black text-white hover:opacity-90 shadow-xl shadow-indigo-500/20">
-            <Sparkles className="mr-2 h-5 w-5" />
+          <Button className="flex-1 md:flex-none h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 font-black text-content hover:opacity-90 shadow-xl shadow-indigo-500/20">
+            <Sparkles className="me-2 h-5 w-5" />
             Create with AI
           </Button>
         </div>
@@ -174,16 +174,16 @@ export default function FormsSurveysPage() {
             color: 'text-emerald-400',
           },
         ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-2xl bg-[#1e1b2e] border border-white/5 shadow-lg flex items-center justify-between group hover:border-white/10 transition-all">
+          <div key={i} className="p-6 rounded-2xl bg-panel border border-panel shadow-lg flex items-center justify-between group hover:border-panel-hover transition-all">
             <div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-              <h4 className="text-2xl font-black text-white mt-1">
+              <p className="text-[10px] font-bold text-content-muted uppercase tracking-widest">{stat.label}</p>
+              <h4 className="text-2xl font-black text-content mt-1">
                 {isLoading
-                  ? <span className="inline-block h-7 w-12 rounded-md bg-white/5 animate-pulse" />
+                  ? <span className="inline-block h-7 w-12 rounded-md bg-panel-hover animate-pulse" />
                   : stat.count}
               </h4>
             </div>
-            <div className={cn("p-3 rounded-xl bg-white/5 transition-transform group-hover:scale-110", stat.color)}>
+            <div className={cn("p-3 rounded-xl bg-panel-hover transition-transform group-hover:scale-110", stat.color)}>
               <stat.icon className="h-6 w-6" />
             </div>
           </div>
@@ -192,8 +192,8 @@ export default function FormsSurveysPage() {
 
       {/* Main Content Area */}
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#1e1b2e] p-3 rounded-2xl border border-white/5">
-          <div className="flex gap-1 p-1 bg-[#0f111a] rounded-xl border border-white/5 w-full lg:w-auto">
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-panel p-3 rounded-2xl border border-panel">
+          <div className="flex gap-1 p-1 bg-app rounded-xl border border-panel w-full lg:w-auto">
             {[
               { id: 'all', label: 'All Forms' },
               { id: 'active', label: 'Active' },
@@ -206,7 +206,7 @@ export default function FormsSurveysPage() {
                   "flex-1 lg:flex-none px-6 py-2 text-xs font-bold transition-all rounded-lg uppercase tracking-widest",
                   tab === t.id
                     ? "bg-indigo-600 text-white shadow-lg"
-                    : "text-slate-500 hover:text-slate-300"
+                    : "text-content-muted hover:text-content-muted"
                 )}
               >
                 {t.label}
@@ -219,41 +219,41 @@ export default function FormsSurveysPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by title or description..."
-              startIcon={<Search className="h-4 w-4 text-slate-500" />}
-              className="h-11 rounded-xl bg-[#0f111a] border-white/10 text-white focus:ring-indigo-500"
+              startIcon={<Search className="h-4 w-4 text-content-muted" />}
+              className="h-11 rounded-xl bg-app border-panel-hover text-content focus:ring-indigo-500"
             />
           </div>
         </div>
 
         {/* Forms Table */}
-        <div className="rounded-2xl border border-white/5 bg-[#1e1b2e] overflow-hidden shadow-2xl">
+        <div className="rounded-2xl border border-panel bg-panel overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-start">
               <thead>
-                <tr className="border-b border-white/5 bg-white/[0.02] text-[10px] uppercase tracking-widest text-slate-500 font-black">
-                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('date')}>
+                <tr className="border-b border-panel bg-panel-hover text-[10px] uppercase tracking-widest text-content-muted font-black">
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-panel-hover hover:text-content transition-colors select-none whitespace-nowrap" onClick={() => handleSort('date')}>
                     <div className="flex items-center">Form Architecture <SortIcon field="date" /></div>
                   </th>
                   <th className="px-4 py-4 whitespace-nowrap">Targeting</th>
-                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('status')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-panel-hover hover:text-content transition-colors select-none whitespace-nowrap" onClick={() => handleSort('status')}>
                     <div className="flex items-center">Status <SortIcon field="status" /></div>
                   </th>
-                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('questions')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-panel-hover hover:text-content transition-colors select-none whitespace-nowrap" onClick={() => handleSort('questions')}>
                     <div className="flex items-center">Questions <SortIcon field="questions" /></div>
                   </th>
-                  <th className="px-4 py-4 cursor-pointer group hover:bg-white/5 hover:text-white transition-colors select-none whitespace-nowrap" onClick={() => handleSort('responses')}>
+                  <th className="px-4 py-4 cursor-pointer group hover:bg-panel-hover hover:text-content transition-colors select-none whitespace-nowrap" onClick={() => handleSort('responses')}>
                     <div className="flex items-center">Responses <SortIcon field="responses" /></div>
                   </th>
-                  <th className="px-4 py-4 text-right whitespace-nowrap">Actions</th>
+                  <th className="px-4 py-4 text-end whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-panel">
                 {isLoading ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-                        <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Synchronizing Survey Data...</p>
+                        <p className="text-sm font-bold text-content-muted uppercase tracking-widest">Synchronizing Survey Data...</p>
                       </div>
                     </td>
                   </tr>
@@ -261,27 +261,27 @@ export default function FormsSurveysPage() {
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center">
                       <div className="flex flex-col items-center gap-4 opacity-20">
-                        <ClipboardList className="h-16 w-16 text-slate-500" />
-                        <p className="text-lg font-bold text-slate-500">No forms found matching your criteria</p>
+                        <ClipboardList className="h-16 w-16 text-content-muted" />
+                        <p className="text-lg font-bold text-content-muted">No forms found matching your criteria</p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   visibleRows.map((row) => (
-                    <tr key={row.id} className="group hover:bg-white/[0.02] transition-colors">
+                    <tr key={row.id} className="group hover:bg-panel-hover transition-colors">
                       <td className="px-4 py-4 w-[35%]">
                         <div className="flex items-center gap-4">
                           <div className={cn(
                             "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-lg transition-transform group-hover:scale-110 duration-300",
-                            row.is_active ? "bg-indigo-500/10 text-indigo-400" : "bg-slate-500/10 text-slate-500"
+                            row.is_active ? "bg-indigo-500/10 text-indigo-400" : "bg-slate-500/10 text-content-muted"
                           )}>
                             <FileText className="h-6 w-6" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-lg font-black text-white truncate leading-tight">
+                            <div className="text-lg font-black text-content truncate leading-tight">
                               {row.title}
                             </div>
-                            <div className="text-xs font-bold text-slate-500 mt-0.5 flex items-center gap-2">
+                            <div className="text-xs font-bold text-content-muted mt-0.5 flex items-center gap-2">
                               By {row.creator_id?.firstName || 'System Admin'}
                               <span className="h-1 w-1 rounded-full bg-slate-700"></span>
                               {new Date(row.createdAt!).toLocaleDateString()}
@@ -296,7 +296,7 @@ export default function FormsSurveysPage() {
                           </Badge>
                           <div className="flex flex-wrap gap-1">
                             {row.evaluator_roles?.map(role => (
-                              <span key={role} className="text-[8px] font-bold text-slate-500 uppercase">{role}</span>
+                              <span key={role} className="text-[8px] font-bold text-content-muted uppercase">{role}</span>
                             ))}
                           </div>
                         </div>
@@ -311,7 +311,7 @@ export default function FormsSurveysPage() {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-black text-white">{row.questions?.length ?? 0}</span>
+                          <span className="text-lg font-black text-content">{row.questions?.length ?? 0}</span>
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
@@ -319,7 +319,7 @@ export default function FormsSurveysPage() {
                           <span className="text-lg font-black text-emerald-400">{row.responsesCount ?? 0}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-right whitespace-nowrap">
+                      <td className="px-4 py-4 text-end whitespace-nowrap">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
@@ -332,20 +332,20 @@ export default function FormsSurveysPage() {
 
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg hover:bg-white/5 text-slate-400">
+                              <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg hover:bg-panel-hover text-content-muted">
                                 <MoreVertical className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-[#1e1b2e] border-white/5 text-slate-200 min-w-[160px]">
+                            <DropdownMenuContent align="end" className="bg-panel border-panel text-content min-w-[160px]">
                               <DropdownMenuItem
-                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                className="flex items-center gap-2 hover:bg-panel-hover cursor-pointer font-bold py-3"
                                 onClick={() => navigate(`/builder/${row._id || row.id}`)}
                               >
                                 <Edit3 className="h-4 w-4 text-indigo-400" /> Edit Form
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
-                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                className="flex items-center gap-2 hover:bg-panel-hover cursor-pointer font-bold py-3"
                                 onClick={() => {
                                   navigator.clipboard.writeText(`${window.location.origin}/form/${row._id || row.id}`)
                                   toast.success("Share link copied to clipboard")
@@ -355,7 +355,7 @@ export default function FormsSurveysPage() {
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
-                                className="flex items-center gap-2 hover:bg-white/5 cursor-pointer font-bold py-3"
+                                className="flex items-center gap-2 hover:bg-panel-hover cursor-pointer font-bold py-3"
                                 onClick={() => handleToggleActive(row)}
                               >
                                 {row.is_active ? (

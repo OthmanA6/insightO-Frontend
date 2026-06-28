@@ -50,8 +50,8 @@ export default function SettingsPage() {
   return (
     <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-300 max-w-6xl mx-auto">
       <div className="flex flex-col gap-1">
-        <h2 className="text-4xl font-extrabold tracking-tight text-white">System Settings</h2>
-        <p className="text-slate-400 font-medium">Configure your account preferences and security protocols.</p>
+        <h2 className="text-4xl font-extrabold tracking-tight text-content">System Settings</h2>
+        <p className="text-content-muted font-medium">Configure your account preferences and security protocols.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -70,11 +70,11 @@ export default function SettingsPage() {
               className={`w-full justify-start font-bold h-12 rounded-xl transition-all ${
                 activeTab === tab.id 
                 ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
-                : "text-slate-400 hover:text-white hover:bg-white/5"
+                : "text-content-muted hover:text-content hover:bg-panel-hover"
               }`}
               onClick={() => setActiveTab(tab.id as SettingsTab)}
             >
-              <tab.icon className={`mr-3 h-4 w-4 ${activeTab === tab.id ? 'text-white' : 'text-slate-500'}`} />
+              <tab.icon className={`me-3 h-4 w-4 ${activeTab === tab.id ? 'text-content' : 'text-content-muted'}`} />
               {tab.label}
             </Button>
           ))}
@@ -83,46 +83,46 @@ export default function SettingsPage() {
         {/* Settings Content */}
         <div className="lg:col-span-3 space-y-6">
           {activeTab === 'notifications' && (
-            <Card className="bg-[#1e1b2e] border-white/5 shadow-2xl overflow-hidden animate-in slide-in-from-right-4">
-              <CardHeader className="bg-white/[0.02] border-b border-white/5 p-8">
-                <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+            <Card className="bg-panel border-panel shadow-2xl overflow-hidden animate-in slide-in-from-right-4">
+              <CardHeader className="bg-panel-hover border-b border-panel p-8">
+                <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                   <Bell className="h-5 w-5 text-indigo-500" /> Notifications
                 </CardTitle>
-                <CardDescription className="text-slate-500 font-medium mt-1">Manage how InsightO communicates with you across different channels.</CardDescription>
+                <CardDescription className="text-content-muted font-medium mt-1">Manage how InsightO communicates with you across different channels.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-10">
                 <div className="space-y-6">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">Academic Notifications</h4>
+                  <h4 className="text-[10px] font-bold text-content-muted uppercase tracking-widest border-b border-panel pb-2">Academic Notifications</h4>
                   
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-panel-hover border border-panel hover:border-panel-hover transition-all">
                     <div className="space-y-1">
-                      <Label className="text-sm font-bold text-slate-200">New Evaluations</Label>
-                      <p className="text-xs text-slate-500 font-medium">Get notified when a new evaluation is assigned to your department.</p>
+                      <Label className="text-sm font-bold text-content">New Evaluations</Label>
+                      <p className="text-xs text-content-muted font-medium">Get notified when a new evaluation is assigned to your department.</p>
                     </div>
                     <Switch defaultChecked className="data-[state=checked]:bg-indigo-600" />
                   </div>
                   
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-panel-hover border border-panel hover:border-panel-hover transition-all">
                     <div className="space-y-1">
-                      <Label className="text-sm font-bold text-slate-200">Submission Deadlines</Label>
-                      <p className="text-xs text-slate-500 font-medium">Reminders about upcoming academic document submission deadlines.</p>
+                      <Label className="text-sm font-bold text-content">Submission Deadlines</Label>
+                      <p className="text-xs text-content-muted font-medium">Reminders about upcoming academic document submission deadlines.</p>
                     </div>
                     <Switch defaultChecked className="data-[state=checked]:bg-indigo-600" />
                   </div>
                 </div>
 
                 <div className="space-y-6">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">Platform Updates</h4>
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
+                  <h4 className="text-[10px] font-bold text-content-muted uppercase tracking-widest border-b border-panel pb-2">Platform Updates</h4>
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-panel-hover border border-panel hover:border-panel-hover transition-all">
                     <div className="space-y-1">
-                      <Label className="text-sm font-bold text-slate-200">System Maintenance</Label>
-                      <p className="text-xs text-slate-500 font-medium">Crucial updates about scheduled downtime or platform upgrades.</p>
+                      <Label className="text-sm font-bold text-content">System Maintenance</Label>
+                      <p className="text-xs text-content-muted font-medium">Crucial updates about scheduled downtime or platform upgrades.</p>
                     </div>
                     <Switch defaultChecked className="data-[state=checked]:bg-indigo-600" />
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="bg-[#0f111a]/50 border-t border-white/5 p-6 flex justify-end">
+              <CardFooter className="bg-app/50 border-t border-panel p-6 flex justify-end">
                 <Button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-11 px-8 rounded-xl shadow-lg">Save Preferences</Button>
               </CardFooter>
             </Card>
@@ -130,47 +130,47 @@ export default function SettingsPage() {
 
           {activeTab === 'security' && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
-              <Card className="bg-[#1e1b2e] border-white/5 shadow-2xl overflow-hidden">
-                <CardHeader className="bg-white/[0.02] border-b border-white/5 p-8">
-                  <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+              <Card className="bg-panel border-panel shadow-2xl overflow-hidden">
+                <CardHeader className="bg-panel-hover border-b border-panel p-8">
+                  <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                     <Key className="h-5 w-5 text-indigo-500" /> Change Password
                   </CardTitle>
-                  <CardDescription className="text-slate-500 font-medium mt-1">Ensure your account stays protected by using a unique and strong password.</CardDescription>
+                  <CardDescription className="text-content-muted font-medium mt-1">Ensure your account stays protected by using a unique and strong password.</CardDescription>
                 </CardHeader>
                 <form onSubmit={handlePasswordChange}>
                   <CardContent className="p-8 space-y-6">
                     <div className="space-y-2.5">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Current Password</Label>
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Current Password</Label>
                       <Input 
                         type="password" 
                         value={passwordCurrent}
                         onChange={(e) => setPasswordCurrent(e.target.value)}
                         placeholder="••••••••" 
-                        className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
-                        startIcon={<Lock className="h-4 w-4 text-slate-500" />}
+                        className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
+                        startIcon={<Lock className="h-4 w-4 text-content-muted" />}
                       />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2.5">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">New Password</Label>
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">New Password</Label>
                         <Input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••" 
-                          className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
-                          startIcon={<Key className="h-4 w-4 text-slate-500" />}
+                          className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
+                          startIcon={<Key className="h-4 w-4 text-content-muted" />}
                         />
                       </div>
                       <div className="space-y-2.5">
-                        <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Confirm New Password</Label>
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Confirm New Password</Label>
                         <Input 
                           type="password" 
                           value={passwordConfirm}
                           onChange={(e) => setPasswordConfirm(e.target.value)}
                           placeholder="••••••••" 
-                          className="bg-[#0f111a] border-white/10 text-white h-12 rounded-xl focus:ring-indigo-500"
-                          startIcon={<CheckCircle2 className="h-4 w-4 text-slate-500" />}
+                          className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-indigo-500"
+                          startIcon={<CheckCircle2 className="h-4 w-4 text-content-muted" />}
                         />
                       </div>
                     </div>
@@ -181,7 +181,7 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </CardContent>
-                  <CardFooter className="bg-[#0f111a]/50 border-t border-white/5 p-6 flex justify-end">
+                  <CardFooter className="bg-app/50 border-t border-panel p-6 flex justify-end">
                     <Button 
                       type="submit" 
                       disabled={isSaving}
@@ -194,15 +194,15 @@ export default function SettingsPage() {
                 </form>
               </Card>
 
-              <Card className="bg-[#1e1b2e] border-white/5 shadow-xl overflow-hidden border-l-4 border-l-indigo-500">
+              <Card className="bg-panel border-panel shadow-xl overflow-hidden border-s-4 border-s-indigo-500">
                 <CardContent className="p-8 flex items-center justify-between">
                   <div className="flex items-center gap-6">
                     <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                       <ShieldCheck className="h-8 w-8" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold text-white tracking-tight">Two-Factor Authentication</h4>
-                      <p className="text-sm text-slate-500 font-medium">Add an extra layer of security to your account.</p>
+                      <h4 className="text-lg font-bold text-content tracking-tight">Two-Factor Authentication</h4>
+                      <p className="text-sm text-content-muted font-medium">Add an extra layer of security to your account.</p>
                     </div>
                   </div>
                   <Button variant="outline" className="border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/10 h-11 px-8 rounded-xl font-bold uppercase tracking-widest text-[10px]">
@@ -211,24 +211,24 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1e1b2e] border-white/5 shadow-xl overflow-hidden">
+              <Card className="bg-panel border-panel shadow-xl overflow-hidden">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                  <CardTitle className="text-sm font-bold uppercase tracking-widest text-content-muted flex items-center gap-2">
                     <History className="h-4 w-4 text-indigo-500" /> Recent Security Activity
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="divide-y divide-white/5">
+                  <div className="divide-y divide-panel">
                     {[
                       { action: 'Password Change', date: 'May 10, 2024', status: 'Success', icon: Key },
                       { action: 'New Login from Chrome on Windows', date: 'May 08, 2024', status: 'Success', icon: Laptop },
                     ].map((item, i) => (
-                      <div key={i} className="px-8 py-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
+                      <div key={i} className="px-8 py-4 flex items-center justify-between hover:bg-panel-hover transition-all">
                         <div className="flex items-center gap-4">
-                          <item.icon className="h-4 w-4 text-slate-500" />
+                          <item.icon className="h-4 w-4 text-content-muted" />
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold text-slate-200">{item.action}</span>
-                            <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{item.date}</span>
+                            <span className="text-sm font-bold text-content">{item.action}</span>
+                            <span className="text-[10px] text-content-muted font-medium uppercase tracking-wider">{item.date}</span>
                           </div>
                         </div>
                         <Badge variant="success" className="px-2 py-0 text-[8px] uppercase">{item.status}</Badge>
@@ -241,12 +241,12 @@ export default function SettingsPage() {
           )}
 
           {(activeTab === 'privacy' || activeTab === 'language' || activeTab === 'devices') && (
-            <Card className="bg-[#1e1b2e] border-white/5 border-dashed border-2 py-20 flex flex-col items-center justify-center text-center animate-in fade-in">
-              <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <Card className="bg-panel border-panel border-dashed border-2 py-20 flex flex-col items-center justify-center text-center animate-in fade-in">
+              <div className="h-16 w-16 rounded-full bg-panel-hover flex items-center justify-center mb-4">
                 <Shield className="h-8 w-8 text-slate-600" />
               </div>
-              <h3 className="text-xl font-bold text-white tracking-tight">{activeTab.toUpperCase()} Module</h3>
-              <p className="text-sm text-slate-500 max-w-xs mt-2 font-medium">This synchronization module is currently being provisioned in the backend directory.</p>
+              <h3 className="text-xl font-bold text-content tracking-tight">{activeTab.toUpperCase()} Module</h3>
+              <p className="text-sm text-content-muted max-w-xs mt-2 font-medium">This synchronization module is currently being provisioned in the backend directory.</p>
             </Card>
           )}
         </div>

@@ -29,27 +29,27 @@ export default function UsersTable({ users }: { users: UserUsage[] }) {
   const sortedUsers = [...users].sort((a, b) => b.totalTokensUsed - a.totalTokensUsed);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm backdrop-blur-xl bg-white/50 dark:bg-gray-900/50">
+    <div className="overflow-hidden rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm backdrop-blur-xl bg-panel-hover0 dark:bg-gray-900/50">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200/50 dark:divide-gray-700/50">
           <thead className="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-md">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Instructor
               </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Tokens Used
               </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Limit
               </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Usage %
               </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Requests
               </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              <th className="px-6 py-4 text-start text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                 Status
               </th>
             </tr>
@@ -79,8 +79,8 @@ export default function UsersTable({ users }: { users: UserUsage[] }) {
                           <User className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-bold text-gray-900 dark:text-white">
+                      <div className="ms-4">
+                        <div className="text-sm font-bold text-gray-900 dark:text-content">
                           {user.name}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -90,7 +90,7 @@ export default function UsersTable({ users }: { users: UserUsage[] }) {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">
+                    <div className="text-sm font-bold text-gray-900 dark:text-content">
                       {user.totalTokensUsed.toLocaleString()}
                     </div>
                   </td>
@@ -116,7 +116,7 @@ export default function UsersTable({ users }: { users: UserUsage[] }) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-bold rounded-xl items-center gap-1.5 ${
                       isDanger 
-                        ? 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' 
+                        ? 'bg-red-100 text-red-800 border border-eed-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' 
                         : isWarning 
                           ? 'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' 
                           : 'bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'

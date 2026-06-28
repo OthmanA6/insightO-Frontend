@@ -79,7 +79,7 @@ export default function StudentCoursesAndTasksPage() {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-4rem)] bg-background">
         <div className="flex flex-col items-center gap-4 text-muted-foreground">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-content" />
           <span className="text-xs font-bold uppercase tracking-widest">Loading Directory...</span>
         </div>
       </div>
@@ -118,11 +118,11 @@ export default function StudentCoursesAndTasksPage() {
               </button>
             </div>
 
-            <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-white/10 p-1 rounded-xl h-auto shrink-0 shadow-inner">
-              <TabsTrigger value="courses" className="rounded-lg px-6 py-2.5 text-xs font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-slate-400 transition-all">
+            <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-panel-hover p-1 rounded-xl h-auto shrink-0 shadow-inner">
+              <TabsTrigger value="courses" className="rounded-lg px-6 py-2.5 text-xs font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-content text-content-muted transition-all">
                 My Courses
               </TabsTrigger>
-              <TabsTrigger value="tasks" className="rounded-lg px-6 py-2.5 text-xs font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-slate-400 transition-all">
+              <TabsTrigger value="tasks" className="rounded-lg px-6 py-2.5 text-xs font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-content text-content-muted transition-all">
                 Task Center
               </TabsTrigger>
             </TabsList>
@@ -132,13 +132,13 @@ export default function StudentCoursesAndTasksPage() {
         {/* SEARCH & FILTERS ROW */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search by name, code, or title..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 h-12 bg-card border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
+              className="w-full ps-10 pe-4 h-12 bg-card border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
@@ -150,7 +150,7 @@ export default function StudentCoursesAndTasksPage() {
                   onClick={() => setTaskFilter(filter as TaskFilter)}
                   className={`text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-xl transition-all border shrink-0 ${
                     taskFilter === filter 
-                      ? 'bg-primary/10 text-primary border-primary/20 shadow-sm' 
+                      ? 'bg-primary/10 text-content border-primary/20 shadow-sm' 
                       : 'bg-card text-muted-foreground border-border hover:bg-muted'
                   }`}
                 >
@@ -178,40 +178,40 @@ export default function StudentCoursesAndTasksPage() {
                   <Link 
                     to={`/dashboard/student-courses/${course.id || course._id}`} 
                     key={course.id || course._id} 
-                    className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[180px]"
+                    className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[180px]"
                   >
-                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity transform group-hover:scale-110">
-                      <Building2 className="h-24 w-24 text-white" />
+                    <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity transform group-hover:scale-110">
+                      <Building2 className="h-24 w-24 text-content" />
                     </div>
                     <div className="relative z-10 space-y-4">
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{course?.courseCode}</span>
-                        <h3 className="text-lg font-black tracking-tight text-slate-200 leading-tight">{course?.name}</h3>
+                        <h3 className="text-lg font-black tracking-tight text-content leading-tight">{course?.name}</h3>
                       </div>
                     </div>
                     <div className="relative z-10 flex items-center justify-between mt-6">
-                      <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                      <div className="flex items-center gap-2 text-xs font-medium text-content-muted bg-panel-hover px-3 py-1.5 rounded-lg border border-panel-hover">
                         <div className="h-4 w-4 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/30">
                           <span className="text-[8px]">🎓</span>
                         </div>
                         {instructorName}
                       </div>
-                      <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-indigo-400 transition-colors group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4 text-content-muted group-hover:text-indigo-400 transition-colors group-hover:translate-x-1" />
                     </div>
                   </Link>
                 );
               })}
             </div>
           ) : (
-            <div className="rounded-3xl border border-border bg-[#0f111a] overflow-hidden shadow-sm">
+            <div className="rounded-3xl border border-border bg-app overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-muted-foreground">
+                <table className="w-full text-start text-sm text-muted-foreground">
                   <thead className="bg-card/50 text-xs uppercase tracking-wider font-black text-foreground border-b border-border">
                     <tr>
                       <th className="px-6 py-4">Course Details</th>
                       <th className="px-6 py-4">Instructor</th>
                       <th className="px-6 py-4">Credits</th>
-                      <th className="px-6 py-4 text-right">Action</th>
+                      <th className="px-6 py-4 text-end">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -222,18 +222,18 @@ export default function StudentCoursesAndTasksPage() {
                         <tr key={course.id || course._id} className="hover:bg-muted/30 transition-colors group">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
+                              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-content shrink-0 border border-primary/20">
                                 <BookOpen className="h-5 w-5" />
                               </div>
                               <div>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-0.5">{course.courseCode}</div>
-                                <div className="font-bold text-foreground group-hover:text-primary transition-colors">{course.name}</div>
+                                <div className="text-[10px] font-black uppercase tracking-widest text-content mb-0.5">{course.courseCode}</div>
+                                <div className="font-bold text-foreground group-hover:text-content transition-colors">{course.name}</div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 font-medium">{instructorName}</td>
                           <td className="px-6 py-4 font-medium">{course.credits || '-'}</td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-4 text-end">
                             <Link 
                               to={`/dashboard/student-courses/${course.id || course._id}`}
                               className="inline-flex items-center justify-center h-9 px-4 rounded-lg bg-card border border-border text-xs font-bold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
@@ -267,12 +267,12 @@ export default function StudentCoursesAndTasksPage() {
                 const isSubmitted = submittedTaskIds.includes(taskId) && !isGraded;
 
                 return (
-                  <div key={taskId} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col justify-between min-h-[180px] relative overflow-hidden group">
+                  <div key={taskId} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col justify-between min-h-[180px] relative overflow-hidden group">
                     <div className="space-y-3 relative z-10">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="text-base font-black tracking-tight text-slate-200 leading-snug">{task.title}</h3>
+                        <h3 className="text-base font-black tracking-tight text-content leading-snug">{task.title}</h3>
                       </div>
-                      <p className="text-xs font-medium text-slate-400 truncate border-l-2 border-indigo-500/50 pl-2 py-0.5">
+                      <p className="text-xs font-medium text-content-muted truncate border-s-2 border-indigo-500/50 ps-2 py-0.5">
                         {getCourseName(task.target?.course_id)}
                       </p>
                       <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 w-fit px-2.5 py-1 rounded-md border border-amber-500/20">
@@ -293,17 +293,17 @@ export default function StudentCoursesAndTasksPage() {
                           }}
                           className="w-full h-10 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
                         >
-                          Submit Assignment <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                          Submit Assignment <ArrowRight className="h-3.5 w-3.5 ms-1" />
                         </Button>
                       )}
                       {isSubmitted && (
                         <div className="w-full h-10 flex items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 text-xs font-bold border border-amber-500/20">
-                          <AlertCircle className="h-3.5 w-3.5 mr-2" /> Under Review
+                          <AlertCircle className="h-3.5 w-3.5 me-2" /> Under Review
                         </div>
                       )}
                       {isGraded && (
                         <div className="w-full h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20">
-                          <CheckCircle2 className="h-3.5 w-3.5 mr-2" /> Graded
+                          <CheckCircle2 className="h-3.5 w-3.5 me-2" /> Graded
                         </div>
                       )}
                     </div>
@@ -312,16 +312,16 @@ export default function StudentCoursesAndTasksPage() {
               })}
             </div>
           ) : (
-            <div className="rounded-3xl border border-border bg-[#0f111a] overflow-hidden shadow-sm">
+            <div className="rounded-3xl border border-border bg-app overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-muted-foreground">
+                <table className="w-full text-start text-sm text-muted-foreground">
                   <thead className="bg-card/50 text-xs uppercase tracking-wider font-black text-foreground border-b border-border">
                     <tr>
                       <th className="px-6 py-4">Assignment Task</th>
                       <th className="px-6 py-4">Course Module</th>
                       <th className="px-6 py-4">Deadline</th>
                       <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4 text-right">Action</th>
+                      <th className="px-6 py-4 text-end">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -345,7 +345,7 @@ export default function StudentCoursesAndTasksPage() {
                             {isSubmitted && <span className="text-[10px] font-bold uppercase text-amber-500">Under Review</span>}
                             {isGraded && <span className="text-[10px] font-bold uppercase text-emerald-500">Graded</span>}
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-4 text-end">
                             {isPending && (
                               <Button 
                                 onClick={() => {

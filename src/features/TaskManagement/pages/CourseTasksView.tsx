@@ -159,11 +159,11 @@ export default function CourseTasksView() {
  {/* Header */}
  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
  <div className="space-y-1">
- <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+ <h2 className="text-4xl font-black tracking-tight text-content flex items-center gap-3">
  <ClipboardList className="h-8 w-8 text-indigo-500"/>
  Task Management
  </h2>
- <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">
+ <p className="text-content-muted font-bold uppercase text-[10px] tracking-[0.3em]">
  {courseName || 'Course'} · Academic Assignments & Projects
  </p>
  </div>
@@ -171,9 +171,9 @@ export default function CourseTasksView() {
  <div className="flex items-center gap-3 w-full md:w-auto">
  <Button
  variant="outline"
- className="h-12 px-6 rounded-xl border-white/10 hover:bg-[#1a1d29] text-slate-300 font-bold"
+ className="h-12 px-6 rounded-xl border-panel-hover hover:bg-panel text-content-muted font-bold"
  >
- <Download className="mr-2 h-4 w-4"/> Export Report
+ <Download className="me-2 h-4 w-4"/> Export Report
  </Button>
  <Button
  onClick={() => {
@@ -189,48 +189,48 @@ export default function CourseTasksView() {
  </div>
 
  <Tabs defaultValue="insights" className="w-full mt-4">
-    <TabsList className="bg-[#13151f] border border-white/5 p-1.5 rounded-2xl mb-8 inline-flex h-14 items-center justify-center">
+    <TabsList className="bg-panel border border-panel p-1.5 rounded-2xl mb-8 inline-flex h-14 items-center justify-center">
       <TabsTrigger 
         value="insights" 
-        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 hover:text-slate-200 transition-all shadow-sm"
+        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
       >
         Analysis & Insights
       </TabsTrigger>
       <TabsTrigger 
         value="tasks" 
-        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 hover:text-slate-200 transition-all shadow-sm"
+        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
       >
         Tasks Management
       </TabsTrigger>
     </TabsList>
 
     <TabsContent value="insights" className="mt-0 outline-none">
-      <div className="rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0f111a] shadow-2xl relative">
+      <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
         <EntityInsightsView entityType="COURSE" entityId={courseId || ""} />
       </div>
     </TabsContent>
 
     <TabsContent value="tasks" className="mt-0 outline-none space-y-8">
       {/* Control Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-[#13151f] p-4 rounded-3xl border border-white/5">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-panel p-4 rounded-3xl border border-panel">
         <div className="w-full lg:w-96 relative group">
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search tasks by title..."
-            className="h-12 rounded-2xl bg-[#0f111a] border-white/5 text-white pl-12 pr-4 font-bold"
+            className="h-12 rounded-2xl bg-app border-panel text-content ps-12 pe-4 font-bold"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-indigo-500 transition-colors"/>
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-content-muted group-focus-within:text-indigo-500 transition-colors"/>
         </div>
 
         <div className="flex items-center gap-4 w-full lg:w-auto">
           <Button
             variant="ghost"
-            className="text-slate-400 font-bold hover:text-white hover:bg-[#1a1d29]"
+            className="text-content-muted font-bold hover:text-content hover:bg-panel"
           >
-            <Filter className="mr-2 h-4 w-4"/> All Status
+            <Filter className="me-2 h-4 w-4"/> All Status
           </Button>
-          <div className="h-8 w-px bg-[#1a1d29] mx-2 hidden lg:block"/>
+          <div className="h-8 w-px bg-panel mx-2 hidden lg:block"/>
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
             Active Tasks: {tasks.length}
           </p>
@@ -242,14 +242,14 @@ export default function CourseTasksView() {
         {isLoading ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-indigo-500"/>
-            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+            <p className="text-sm font-bold text-content-muted uppercase tracking-widest">
               Synchronizing Tasks...
             </p>
           </div>
         ) : filteredTasks.length === 0 ? (
           <div className="col-span-full py-20 flex flex-col items-center gap-4 opacity-20">
-            <ClipboardList className="h-16 w-16 text-slate-500"/>
-            <p className="text-lg font-bold text-slate-500">
+            <ClipboardList className="h-16 w-16 text-content-muted"/>
+            <p className="text-lg font-bold text-content-muted">
               No tasks found for this course
             </p>
           </div>
@@ -257,21 +257,21 @@ export default function CourseTasksView() {
           filteredTasks.map((task) => (
             <div
               key={task.id || task._id}
-              className="group relative rounded-3xl bg-[#13151f] border border-white/5 hover:border-indigo-500/50 transition-[border-color,background-color] p-8 flex flex-col gap-6"
+              className="group relative rounded-3xl bg-panel border border-panel hover:border-indigo-500/50 transition-[border-color,background-color] p-8 flex flex-col gap-6"
             >
               <div className="flex justify-between items-start">
                 <div className="flex gap-4">
-                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-white/5">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel">
                     <ClipboardList className="h-8 w-8"/>
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-white group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-xl font-black text-content group-hover:text-indigo-400 transition-colors">
                       {task.title}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge
                         variant="outline"
-                        className="font-mono text-[10px] border-white/10 text-slate-500 uppercase"
+                        className="font-mono text-[10px] border-panel-hover text-content-muted uppercase"
                       >
                         {(() => {
                           try {
@@ -306,21 +306,21 @@ export default function CourseTasksView() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="h-10 w-10 p-0 rounded-xl hover:bg-[#1a1d29]"
+                      className="h-10 w-10 p-0 rounded-xl hover:bg-panel"
                     >
-                      <MoreVertical className="h-5 w-5 text-slate-500"/>
+                      <MoreVertical className="h-5 w-5 text-content-muted"/>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="bg-[#0a0a0f] border-white/5 min-w-[160px]"
+                    className="bg-app border-panel min-w-[160px]"
                   >
                     <DropdownMenuItem
                       onClick={() => {
                         setEditingTask(task);
                         setIsTaskModalOpen(true);
                       }}
-                      className="flex items-center gap-2 hover:bg-[#1a1d29] font-bold py-3 text-indigo-400 cursor-pointer"
+                      className="flex items-center gap-2 hover:bg-panel font-bold py-3 text-indigo-400 cursor-pointer"
                     >
                       <Edit3 className="h-4 w-4"/> Edit Details
                     </DropdownMenuItem>
@@ -334,33 +334,33 @@ export default function CourseTasksView() {
                 </DropdownMenu>
               </div>
 
-              <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 italic">
+              <p className="text-sm text-content-muted leading-relaxed line-clamp-2 italic">
                 "{task.description || 'No instruction set for this assignment.'}"
               </p>
 
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-panel">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#1a1d29] text-indigo-400">
+                  <div className="p-2 rounded-lg bg-panel text-indigo-400">
                     <Target className="h-4 w-4"/>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black text-slate-600 uppercase">
                       Target Entity
                     </span>
-                    <span className="text-xs font-bold text-slate-200">
+                    <span className="text-xs font-bold text-content">
                       {courseName || 'Course'}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#1a1d29] text-purple-400">
+                  <div className="p-2 rounded-lg bg-panel text-purple-400">
                     <Users className="h-4 w-4"/>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black text-slate-600 uppercase">
                       Submissions
                     </span>
-                    <span className="text-xs font-bold text-slate-200">
+                    <span className="text-xs font-bold text-content">
                       0 Responses
                     </span>
                   </div>
@@ -369,14 +369,14 @@ export default function CourseTasksView() {
 
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-black text-white">
+                  <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-black text-content">
                     {task.creator_id?.firstName?.charAt(0) || 'A'}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter leading-none">
+                    <span className="text-[9px] font-black text-content-muted uppercase tracking-tighter leading-none">
                       Creator
                     </span>
-                    <span className="text-[11px] font-bold text-slate-300">
+                    <span className="text-[11px] font-bold text-content-muted">
                       {task.creator_id?.firstName || 'System'}{' '}
                       {task.creator_id?.lastName || 'Admin'}
                     </span>
@@ -393,7 +393,7 @@ export default function CourseTasksView() {
                   }
                 >
                   View Submissions{' '}
-                  <ArrowUpRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"/>
+                  <ArrowUpRight className="ms-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"/>
                 </Button>
               </div>
             </div>

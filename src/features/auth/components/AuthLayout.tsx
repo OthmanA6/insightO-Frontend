@@ -25,10 +25,10 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen w-full overflow-hidden font-sans transition-colors duration-300">
       {/* ── Left Brand Panel ──────────────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-[#020617] border-r border-slate-800/50 overflow-hidden items-center justify-center p-20">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-app border-e border-slate-800/50 overflow-hidden items-center justify-center p-20">
         <div className="absolute inset-0 brand-pattern z-0 pointer-events-none" />
 
-        <div className="absolute top-0 left-0 w-full h-full opacity-40 z-0 pointer-events-none">
+        <div className="absolute top-0 start-0 w-full h-full opacity-40 z-0 pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-600/30 rounded-full blur-[120px] animate-pulse" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[150px]" />
         </div>
@@ -36,17 +36,17 @@ export default function AuthLayout({
         <div className="relative z-10 max-w-xl">
           <Link to="/" className="flex items-center gap-3 mb-12">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-              <BarChart3 className="text-white size-7" />
+              <BarChart3 className="text-content size-7" />
             </div>
-            <h2 className="text-white text-3xl font-bold tracking-tight">
+            <h2 className="text-content text-3xl font-bold tracking-tight">
               insightO
             </h2>
           </Link>
 
-          <h1 className="text-white text-5xl font-black leading-tight tracking-tight mb-8">
+          <h1 className="text-content text-5xl font-black leading-tight tracking-tight mb-8">
             {headline}
           </h1>
-          <p className="text-slate-400 text-xl leading-relaxed mb-12">
+          <p className="text-content-muted text-xl leading-relaxed mb-12">
             {description}
           </p>
 
@@ -67,7 +67,7 @@ export default function AuthLayout({
                   >
                     {feature.icon}
                   </div>
-                  <span className="text-slate-300 font-medium">
+                  <span className="text-content-muted font-medium">
                     {feature.text}
                   </span>
                 </div>
@@ -79,7 +79,7 @@ export default function AuthLayout({
 
       {/* ── Right Form Panel ──────────────────────────────────────────── */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 overflow-y-auto bg-white dark:bg-bg-dark relative">
-        <div className="absolute top-6 right-6 z-50">
+        <div className="absolute top-6 end-6 z-50">
           <ThemeToggle />
         </div>
 
@@ -88,9 +88,9 @@ export default function AuthLayout({
           <div className="mb-8 lg:hidden">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-                <BarChart3 className="text-white size-5" />
+                <BarChart3 className="text-content size-5" />
               </div>
-              <h2 className="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">
+              <h2 className="text-slate-900 dark:text-content text-2xl font-bold tracking-tight">
                 insightO
               </h2>
             </Link>
