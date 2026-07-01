@@ -3,6 +3,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import * as courseApi from '@/shared/api/courseApi';
 import * as taskApi from '@/features/TaskManagement/api/taskApi';
 import { getMySubmissions } from '@/shared/api/taskSubmissionApi';
+import { getAllForms } from '@/features/FormBuilder/api/formApi';
 import type { Course } from '@/shared/api/courseApi';
 import type { Task } from '@/features/TaskManagement/api/taskApi';
 import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
@@ -18,6 +19,7 @@ export default function StudentDashboardPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
+  const [assignedSurveys, setAssignedSurveys] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [taskToSubmit, setTaskToSubmit] = useState<string | null>(null);
 
@@ -25,14 +27,30 @@ export default function StudentDashboardPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [coursesData, tasksData, submissionsData] = await Promise.all([
+        const [coursesData, tasksData, submissionsData, allForms] = await Promise.all([
           courseApi.getCourses(),
           taskApi.getTasks(),
-          getMySubmissions()
+          getMySubmissions(),
+          getAllForms()
         ]);
         setCourses(coursesData);
         setTasks(tasksData.filter(t => t.status === 'ACTIVE'));
         setSubmissions(submissionsData);
+        
+        // Filter forms that are active, assigned to STUDENT, and match department
+        const studentForms = allForms.filter(f => {
+          const isStudentForm = f.is_active && f.evaluator_roles?.includes('STUDENT');
+          if (!isStudentForm) return false;
+          
+          if (f.department_id) {
+            const formDeptId = typeof f.department_id === 'object' ? (f.department_id as any)._id || (f.department_id as any).id : f.department_id;
+            const userDeptId = typeof user?.departmentId === 'object' ? (user.departmentId as any)._id || (user.departmentId as any).id : user?.departmentId;
+            return formDeptId === userDeptId;
+          }
+          
+          return true; // No department assigned means it's a general survey
+        });
+        setAssignedSurveys(studentForms.length);
       } catch (error) {
         console.error('Failed to load student data:', error);
       } finally {
@@ -55,11 +73,14 @@ export default function StudentDashboardPage() {
     ? finalizedSubmissions.reduce((acc, sub) => acc + (sub.final_grade || 0), 0) / finalizedSubmissions.length
     : 0;
 
+  const isExpired = (deadline: string) => deadline ? new Date(deadline) < new Date() : false;
+
   const submittedTaskIds = submissions.map(s => s.task_id ? (typeof s.task_id === 'object' ? ((s.task_id as any)._id || (s.task_id as any).id) : s.task_id) : null).filter(Boolean);
   const pendingTasks = tasks.filter(t => !submittedTaskIds.includes(t.id || t._id));
 
-  // Sorting for urgency
+  // Sorting for urgency - only include tasks that haven't expired
   const urgentTasks = pendingTasks
+    .filter(t => !isExpired(t.deadline))
     .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
     .slice(0, 3);
 
@@ -88,19 +109,23 @@ export default function StudentDashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Total Courses</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          <Link to="/dashboard/courses-tasks" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Total Courses</span>
             <span className="text-3xl font-black text-content">{courses.length}</span>
-          </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Pending Tasks</span>
-            <span className="text-3xl font-black text-amber-500">{pendingTasks.length}</span>
-          </div>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Completed Tasks</span>
+          </Link>
+          <Link to="/dashboard/student-surveys" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Assigned Surveys</span>
+            <span className="text-3xl font-black text-purple-500">{assignedSurveys}</span>
+          </Link>
+          <Link to="/dashboard/courses-tasks" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Pending Tasks</span>
+            <span className="text-3xl font-black text-amber-500">{pendingTasks.filter(t => !isExpired(t.deadline)).length}</span>
+          </Link>
+          <Link to="/dashboard/student-evaluations" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+            <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Completed Tasks</span>
             <span className="text-3xl font-black text-emerald-500">{submissions.length}</span>
-          </div>
+          </Link>
           <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Average Grade</span>
             <span className="text-3xl font-black text-blue-500">{averageGrade.toFixed(1)}%</span>

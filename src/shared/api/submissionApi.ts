@@ -77,3 +77,11 @@ export const getFormSubmissions = async (formId: string): Promise<Submission[]> 
   );
   return response.data.data;
 };
+
+// ─── GET /forms/my-submissions ───────────────────────────────────────────────
+export const getMyFormSubmissions = async (): Promise<Submission[]> => {
+  const response = await api.get<{ status: string; data: Submission[] }>(
+    '/forms/my-submissions'
+  );
+  return response.data.data;
+};

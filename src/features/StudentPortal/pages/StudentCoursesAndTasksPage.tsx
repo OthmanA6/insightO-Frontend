@@ -5,15 +5,16 @@ import { getMySubmissions } from '@/shared/api/taskSubmissionApi';
 import type { Course } from '@/shared/api/courseApi';
 import type { Task } from '@/features/TaskManagement/api/taskApi';
 import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
-import { BookOpen, Loader2, ArrowRight, Clock, Building2, CheckCircle2, Search, LayoutGrid, List as ListIcon, AlertCircle } from 'lucide-react';
+import { BookOpen, Loader2, ArrowRight, Clock, Building2, CheckCircle2, Search, LayoutGrid, List as ListIcon, AlertCircle, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/shared/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitTaskModal } from '@/features/TaskManagement/components/SubmitTaskModal';
+import { toast } from 'sonner';
 
 type ViewMode = 'GRID' | 'LIST';
-type TaskFilter = 'ALL' | 'PENDING' | 'SUBMITTED' | 'GRADED';
+type TaskFilter = 'ALL' | 'OPEN' | 'PENDING' | 'SUBMITTED' | 'GRADED';
 
 export default function StudentCoursesAndTasksPage() {
   const navigate = useNavigate();
@@ -56,6 +57,22 @@ export default function StudentCoursesAndTasksPage() {
   };
 
 
+  // Deadline helper
+  const isExpired = (deadline: string) => deadline ? new Date(deadline) < new Date() : false;
+
+  const handleSubmitTask = (task: Task) => {
+    if (isExpired(task.deadline)) {
+      toast.error('Deadline Passed', { description: 'The deadline for this assignment has expired. Submissions are no longer accepted.' });
+      return;
+    }
+    const taskId = task.id || task._id || '';
+    if (task.task_type === 'QUIZ') {
+      navigate(`/dashboard/submit-quiz/${taskId}`);
+    } else {
+      setTaskToSubmit(taskId);
+    }
+  };
+
   // Compute Task States
   const submittedTaskIds = submissions.map(s => s.task_id ? (typeof s.task_id === 'object' ? ((s.task_id as any)._id || (s.task_id as any).id) : s.task_id) : null).filter(Boolean);
   const gradedTaskIds = submissions.filter(s => s.status === 'FINALIZED').map(s => s.task_id ? (typeof s.task_id === 'object' ? ((s.task_id as any)._id || (s.task_id as any).id) : s.task_id) : null).filter(Boolean);
@@ -69,6 +86,7 @@ export default function StudentCoursesAndTasksPage() {
     if (!matchesSearch) return false;
 
     if (taskFilter === 'ALL') return true;
+    if (taskFilter === 'OPEN') return !submittedTaskIds.includes(id) && !isExpired(t.deadline);
     if (taskFilter === 'PENDING') return !submittedTaskIds.includes(id);
     if (taskFilter === 'SUBMITTED') return submittedTaskIds.includes(id) && !gradedTaskIds.includes(id);
     if (taskFilter === 'GRADED') return gradedTaskIds.includes(id);
@@ -144,7 +162,7 @@ export default function StudentCoursesAndTasksPage() {
 
           <TabsContent value="tasks" className="m-0">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
-              {['ALL', 'PENDING', 'SUBMITTED', 'GRADED'].map(filter => (
+              {['ALL', 'OPEN', 'PENDING', 'SUBMITTED', 'GRADED'].map(filter => (
                 <button
                   key={filter}
                   onClick={() => setTaskFilter(filter as TaskFilter)}
@@ -282,19 +300,18 @@ export default function StudentCoursesAndTasksPage() {
                     </div>
 
                     <div className="mt-6 relative z-10">
-                      {isPending && (
-                        <Button 
-                          onClick={() => {
-                            if (task.task_type === 'QUIZ') {
-                              navigate(`/dashboard/submit-quiz/${taskId}`);
-                            } else {
-                              setTaskToSubmit(taskId || '');
-                            }
-                          }}
+                      {isPending && !isExpired(task.deadline) && (
+                        <Button
+                          onClick={() => handleSubmitTask(task)}
                           className="w-full h-10 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
                         >
                           Submit Assignment <ArrowRight className="h-3.5 w-3.5 ms-1" />
                         </Button>
+                      )}
+                      {isPending && isExpired(task.deadline) && (
+                        <div className="w-full h-10 flex items-center justify-center rounded-xl bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20 cursor-not-allowed">
+                          <Ban className="h-3.5 w-3.5 me-2" /> Deadline Passed
+                        </div>
                       )}
                       {isSubmitted && (
                         <div className="w-full h-10 flex items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 text-xs font-bold border border-amber-500/20">
@@ -346,20 +363,19 @@ export default function StudentCoursesAndTasksPage() {
                             {isGraded && <span className="text-[10px] font-bold uppercase text-emerald-500">Graded</span>}
                           </td>
                           <td className="px-6 py-4 text-end">
-                            {isPending && (
-                              <Button 
-                                onClick={() => {
-                                  if (task.task_type === 'QUIZ') {
-                                    navigate(`/dashboard/submit-quiz/${taskId}`);
-                                  } else {
-                                    setTaskToSubmit(taskId || '');
-                                  }
-                                }}
+                            {isPending && !isExpired(task.deadline) && (
+                              <Button
+                                onClick={() => handleSubmitTask(task)}
                                 size="sm"
                                 className="h-8 rounded-lg text-[10px] px-3"
                               >
                                 Submit
                               </Button>
+                            )}
+                            {isPending && isExpired(task.deadline) && (
+                              <span className="text-[10px] font-bold text-red-400 flex items-center justify-end gap-1">
+                                <Ban className="h-3 w-3" /> Expired
+                              </span>
                             )}
                             {(isSubmitted || isGraded) && (
                               <span className="text-[10px] text-muted-foreground italic">Locked</span>
