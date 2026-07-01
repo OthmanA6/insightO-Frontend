@@ -3,7 +3,7 @@ import { Modal } from '@/shared/components/ui/Modal';
 import { Button } from '@/shared/components/ui/button';
 import { Label } from '@/shared/components/ui/label';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Loader2, UploadCloud, FileText, CheckCircle2, X, AlertTriangle } from 'lucide-react';
+import { Loader2, UploadCloud, FileText, CheckCircle2, X, AlertTriangle, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/shared/api/axiosInstance';
 import { submitTask } from '@/shared/api/taskSubmissionApi';
@@ -30,6 +30,14 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  const [form, setForm] = useState<Form | null>(null);
  const [isLoadingTask, setIsLoadingTask] = useState(false);
  const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
+
+ const getFullUrl = (url: string) => {
+   if (!url) return '#';
+   if (url.startsWith('http')) return url;
+   const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') : 'http://localhost:5000';
+   const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+   return `${baseUrl}/${cleanUrl}`;
+ };
 
  useEffect(() => {
    if (open && taskId) {
@@ -156,6 +164,49 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
  ) : (
  <form onSubmit={handleSubmit} className="space-y-8">
  
+  {/* Task Details Section */}
+  {task && (task.description || (task.attachments && task.attachments.length > 0)) && (
+    <div className="bg-muted/30 border border-border p-5 rounded-2xl space-y-4">
+      {task.description && (
+        <div className="space-y-1.5">
+          <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Task Description</Label>
+          <p className="text-sm text-foreground whitespace-pre-wrap">{task.description}</p>
+        </div>
+      )}
+      
+      {task.attachments && task.attachments.length > 0 && (
+        <div className="space-y-2 mt-4">
+          <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Instructor Attachments</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {task.attachments.map((att: any, idx: number) => (
+              <a 
+                key={idx} 
+                href={getFullUrl(att.url)} 
+                target="_blank" 
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center justify-between p-3 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 shrink-0">
+                    <FileText className="h-4 w-4"/>
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{att.fileName || `Attachment ${idx + 1}`}</span>
+                    {att.size && <span className="text-[10px] text-muted-foreground font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                  </div>
+                </div>
+                <div className="p-1.5 rounded-md bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                  <Download className="h-3.5 w-3.5" />
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
  {task?.task_type === 'QUIZ' ? (
    !form ? (
      <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-panel-hover rounded-2xl bg-panel-hover">
