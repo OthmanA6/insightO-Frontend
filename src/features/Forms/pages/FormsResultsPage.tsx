@@ -88,7 +88,11 @@ export default function FormsResultsPage() {
   }
 
   const handleGenerateSummaryAi = async () => {
-    if (!formId || !submissions.length) return
+    if (!formId) return
+    if (submissions.length === 0) {
+      toast.error("There is No responses to analyze please wait until the form goes Viral xD")
+      return
+    }
     setSummaryAiLoading(true)
     try {
       const result = await analyzeForm(formId)
@@ -104,6 +108,10 @@ export default function FormsResultsPage() {
 
   const handleGenerateAudit = async () => {
     if (!formId) return
+    if (submissions.length === 0) {
+      toast.error("There is No responses to analyze please wait until the form goes Viral xD")
+      return
+    }
     setIsAiLoading(true)
     setAiTokenError(false)
     setAiData(null)
@@ -244,7 +252,7 @@ export default function FormsResultsPage() {
                     </div>
                     <h3 className="text-xl font-black text-slate-900 dark:text-content uppercase tracking-tight mb-2">System Ready for Synthesis</h3>
                     <p className="text-sm text-content-muted dark:text-content-muted font-bold uppercase tracking-widest max-w-xs leading-relaxed">
-                      Waiting for initial data streams to initialize strategic pattern recognition core.
+                      There is No responses to analyze please wait until the form goes Viral xD
                     </p>
                   </div>
                 ) : !summaryAiData && !summaryAiLoading ? (
@@ -686,7 +694,9 @@ export default function FormsResultsPage() {
                             Generate Deep AI Insights
                           </h3>
                           <p className="text-indigo-100/90 font-medium leading-relaxed max-w-2xl mx-auto text-lg">
-                            Activate our advanced neural engine to synthesize qualitative responses, extract sentiment vectors, and reveal actionable operational intelligence from your survey data.
+                            {submissions.length === 0 
+                              ? "There is No responses to analyze please wait until the form goes Viral xD" 
+                              : "Activate our advanced neural engine to synthesize qualitative responses, extract sentiment vectors, and reveal actionable operational intelligence from your survey data."}
                           </p>
                         </div>
 

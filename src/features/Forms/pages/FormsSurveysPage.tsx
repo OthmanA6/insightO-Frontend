@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock, Share2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Search, Plus, Sparkles, Users, BarChart3, ClipboardList, MoreVertical, Loader2, Trash2, Edit3, FileText, Lock, Unlock, Share2, ArrowUpDown, ArrowUp, ArrowDown, Building, Filter } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
@@ -22,6 +22,7 @@ export default function FormsSurveysPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<TabKey>("all")
   const [query, setQuery] = useState("")
+  const [targetFilter, setTargetFilter] = useState<string>("all")
   const [forms, setForms] = useState<(Form & { responsesCount?: number })[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [totalResponses, setTotalResponses] = useState<number | null>(null)
@@ -113,7 +114,9 @@ export default function FormsSurveysPage() {
         row.title.toLowerCase().includes(q) ||
         row.description.toLowerCase().includes(q)
 
-      return matchesTab && matchesQuery
+      const matchesTarget = targetFilter === "all" || row.subject_role === targetFilter
+
+      return matchesTab && matchesQuery && matchesTarget
     })
 
     return filtered.sort((a, b) => {
@@ -129,7 +132,7 @@ export default function FormsSurveysPage() {
       }
       return sortOrder === "desc" ? cmp : -cmp
     })
-  }, [tab, query, forms, sortField, sortOrder])
+  }, [tab, query, forms, sortField, sortOrder, targetFilter])
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 animate-in fade-in zoom-in-95 duration-300 max-w-[1400px] mx-auto w-full">
@@ -143,6 +146,14 @@ export default function FormsSurveysPage() {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/dashboard/facilities")}
+            className="flex-1 md:flex-none h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold"
+          >
+            <Building className="me-2 h-5 w-5" />
+            Manage Facilities
+          </Button>
           <Button
             variant="outline"
             onClick={() => navigate("/builder")}
@@ -214,14 +225,32 @@ export default function FormsSurveysPage() {
             ))}
           </div>
 
-          <div className="w-full lg:w-96">
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by title or description..."
-              startIcon={<Search className="h-4 w-4 text-content-muted" />}
-              className="h-11 rounded-xl bg-app border-panel-hover text-content focus:ring-indigo-500"
-            />
+          <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1 sm:w-80">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by title or description..."
+                startIcon={<Search className="h-4 w-4 text-content-muted" />}
+                className="h-11 rounded-xl bg-app border-panel-hover text-content focus:ring-indigo-500 w-full"
+              />
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <Filter className="h-4 w-4 text-content-muted" />
+              </div>
+              <select
+                value={targetFilter}
+                onChange={(e) => setTargetFilter(e.target.value)}
+                className="h-11 w-full sm:w-auto rounded-xl bg-app border border-panel-hover text-content-muted focus:ring-indigo-500 focus:border-indigo-500 pl-10 pr-8 text-sm outline-none transition-colors appearance-none cursor-pointer hover:border-indigo-500/50"
+              >
+                <option value="all">All Targets</option>
+                <option value="FACILITY">Facilities</option>
+                <option value="COURSE">Courses</option>
+                <option value="DEPARTMENT">Departments</option>
+                <option value="INSTRUCTOR">Instructors</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -291,9 +320,15 @@ export default function FormsSurveysPage() {
                       </td>
                       <td className="px-4 py-4 w-[25%]">
                         <div className="flex flex-col gap-1.5">
-                          <Badge variant="outline" className="w-fit bg-indigo-500/5 text-indigo-400 border-indigo-500/20 px-2 py-0 font-black text-[9px] uppercase tracking-widest">
-                            {row.subject_role} Subject
-                          </Badge>
+                          {row.subject_role === 'FACILITY' ? (
+                            <Badge variant="outline" className="w-fit bg-indigo-500/5 text-indigo-400 border-indigo-500/20 px-2 py-0 font-black text-[9px] uppercase tracking-widest">
+                              {((row as any).facility_id)?.name || 'Facility'}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="w-fit bg-indigo-500/5 text-indigo-400 border-indigo-500/20 px-2 py-0 font-black text-[9px] uppercase tracking-widest">
+                              {row.subject_role} Subject
+                            </Badge>
+                          )}
                           <div className="flex flex-wrap gap-1">
                             {row.evaluator_roles?.map(role => (
                               <span key={role} className="text-[8px] font-bold text-content-muted uppercase">{role}</span>
