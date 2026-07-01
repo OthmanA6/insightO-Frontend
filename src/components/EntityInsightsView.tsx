@@ -17,9 +17,10 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import api from '@/shared/api/axiosInstance';
+import { toast } from 'sonner';
 
 interface EntityInsightsProps {
-  entityType: "COURSE" | "DEPARTMENT" | "INSTRUCTOR";
+  entityType: "COURSE" | "DEPARTMENT" | "INSTRUCTOR" | "FACILITY";
   entityId: string;
 }
 
@@ -52,6 +53,8 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
         endpoint = `/admin/departments/${entityId}/insights`; // ركز هنا ضفنا admin/
       } else if (entityType === "INSTRUCTOR") {
         endpoint = `/users/${entityId}/insights`;
+      } else if (entityType === "FACILITY") {
+        endpoint = `/facilities/${entityId}/insights`;
       }
 
       if (forceAI) {
@@ -59,7 +62,11 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
       }
 
       const response = await api.get<{ status: string; data: InsightData }>(endpoint);
-      setData(response.data.data);
+      const fetchedData = response.data.data;
+      if (forceAI && fetchedData.ai_status === "no_data") {
+        toast.error("There is No responses to analyze please wait until the form goes Viral xD");
+      }
+      setData(fetchedData);
     } catch (error) {
       console.error("Failed to fetch insights", error);
     } finally {
@@ -160,6 +167,16 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
         </div>
       )}
 
+      {ai_status === "no_data" && (
+        <div className="mb-8 p-8 bg-indigo-500/5 border border-indigo-500/20 rounded-3xl flex flex-col items-center justify-center text-center shadow-xl backdrop-blur-sm">
+          <div className="bg-indigo-500/10 p-4 rounded-full mb-4 shadow-inner">
+             <Zap className="w-8 h-8 text-indigo-400 opacity-70" />
+          </div>
+          <h3 className="text-xl font-bold text-content mb-2 uppercase tracking-wide">System Ready for Synthesis</h3>
+          <p className="text-content-muted text-sm font-medium">There is No responses to analyze please wait until the form goes Viral xD</p>
+        </div>
+      )}
+
       {/* Chart Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -223,7 +240,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
       </motion.div>
 
       {/* AI Actionable Cards (3-Column Grid) */}
-      {aiInsights && (
+      {aiInsights && ai_status !== "no_data" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           {/* Core Strengths */}

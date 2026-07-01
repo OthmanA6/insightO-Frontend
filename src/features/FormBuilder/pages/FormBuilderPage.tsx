@@ -64,6 +64,7 @@ import * as courseApi from "@/shared/api/courseApi"
 import * as userAdminApi from "@/shared/api/userAdminApi"
 import * as taskApi from "@/features/TaskManagement/api/taskApi"
 import { uploadFile } from "@/shared/api/utilityApi"
+import api from "@/shared/api/axiosInstance"
 import type { Department } from "@/shared/api/departmentApi"
 import type { Course } from "@/shared/api/courseApi"
 import type { AdminUser } from "@/shared/api/userAdminApi"
@@ -122,9 +123,11 @@ export default function FormBuilderPage() {
   const [departmentId, setDepartmentId] = useState("")
   const [courseId, setCourseId] = useState("")
   const [instructorId, setInstructorId] = useState("")
+  const [facilityId, setFacilityId] = useState("")
   const [departments, setDepartments] = useState<Department[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [instructors, setInstructors] = useState<AdminUser[]>([])
+  const [facilities, setFacilities] = useState<any[]>([])
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({})
 
   const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS)
@@ -163,14 +166,16 @@ export default function FormBuilderPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [deptData, courseData, userData] = await Promise.all([
+        const [deptData, courseData, userData, facilityRes] = await Promise.all([
           departmentApi.getAllDepartments(),
           courseApi.getCourses(),
-          userAdminApi.getAllUsers()
+          userAdminApi.getAllUsers(),
+          api.get('/facilities').catch(() => ({ data: { data: { facilities: [] } } }))
         ])
         setDepartments(deptData)
         setCourses(courseData)
         setInstructors(userData.filter(u => u.role === 'INSTRUCTOR'))
+        setFacilities(facilityRes.data?.data?.facilities || [])
 
         if (formId) {
           const form = await formApi.getForm(formId)
@@ -184,6 +189,7 @@ export default function FormBuilderPage() {
           setDepartmentId(form.department_id || "")
           setCourseId(form.course_id || "")
           setInstructorId(form.instructor_id || "")
+          setFacilityId(form.facility_id || "")
 
           if (form.questions && form.questions.length > 0) {
             // Defensive mapping: Ensure questions have required fields for their type
@@ -195,6 +201,17 @@ export default function FormBuilderPage() {
             }))
             setQuestions(sanitizedQuestions)
             setActiveId(sanitizedQuestions[0]._id || sanitizedQuestions[0].id || null)
+          }
+        } else {
+          // Pre-populate if query parameters are present
+          const target = searchParams.get('target');
+          const queryFacilityId = searchParams.get('facilityId');
+          if (target === 'facility') {
+            setSubjectRole('FACILITY');
+            setCategory('SPECIALIZED');
+            if (queryFacilityId) {
+              setFacilityId(queryFacilityId);
+            }
           }
         }
       } catch (err) {
@@ -270,8 +287,9 @@ export default function FormBuilderPage() {
     // Validation for specialized fields
     const errors: Record<string, boolean> = {}
     if (category === "SPECIALIZED") {
-      if (!departmentId) errors.department = true
-
+      if (subjectRole !== "FACILITY" && !departmentId) {
+        errors.department = true
+      }
       if (subjectRole === "COURSE") {
         if (!courseId) errors.course = true
         if (!instructorId) errors.instructor = true // الكورس دايما مربوط بدكتور
@@ -279,6 +297,10 @@ export default function FormBuilderPage() {
 
       if (subjectRole === "INSTRUCTOR") {
         if (!instructorId) errors.instructor = true // لازم نختار الدكتور
+      }
+
+      if (subjectRole === "FACILITY") {
+        if (!facilityId) errors.facility = true
       }
     }
 
@@ -290,7 +312,12 @@ export default function FormBuilderPage() {
 
     // ─── Backend Compliance Validation ───
     const actualSubjectRole = subjectRole;
-    if (evaluatorRoles.includes(actualSubjectRole)) {
+    let finalEvaluatorRoles = evaluatorRoles;
+    if (actualSubjectRole === "FACILITY") {
+      finalEvaluatorRoles = ["GENERAL"] as FormRole[];
+    }
+
+    if (finalEvaluatorRoles.includes(actualSubjectRole)) {
       toast.error(`Conflict: Evaluator roles cannot include the Subject role (${actualSubjectRole}).`)
       return
     }
@@ -326,22 +353,25 @@ export default function FormBuilderPage() {
           description: formDescription,
           category: category,
           is_active: isActive,
-          is_anonymous: isAnonymous
-        })
+          is_anonymous: isAnonymous,
+          evaluator_roles: finalEvaluatorRoles,
+          facility_id: category === "SPECIALIZED" && subjectRole === "FACILITY" && facilityId ? facilityId : undefined,
+        } as any)
       } else {
         // 1. Create the Form (تعديل الـ Payload هنا)
         form = await formApi.createForm({
           title: formTitle,
           description: formDescription,
           category: category,
-          evaluator_roles: evaluatorRoles,
+          evaluator_roles: finalEvaluatorRoles,
           subject_role: actualSubjectRole as FormRole,
           is_anonymous: isAnonymous,
           is_active: isActive,
-          department_id: category === "SPECIALIZED" && departmentId ? departmentId : undefined,
+          department_id: category === "SPECIALIZED" && subjectRole !== "FACILITY" && departmentId ? departmentId : undefined,
           course_id: category === "SPECIALIZED" && subjectRole === "COURSE" && courseId ? courseId : undefined,
           // هنبعت الـ instructor_id لو كنا بنقيم كورس أو دكتور بشكل مباشر
           instructor_id: category === "SPECIALIZED" && ["COURSE", "INSTRUCTOR"].includes(subjectRole) && instructorId ? instructorId : undefined,
+          facility_id: category === "SPECIALIZED" && subjectRole === "FACILITY" && facilityId ? facilityId : undefined,
         })
       }
 
@@ -770,25 +800,27 @@ export default function FormBuilderPage() {
                           </div>
                         ) : (
                           <>
-                            <div className="space-y-3">
-                              <Label className={cn("text-[10px] uppercase font-black tracking-widest ms-1 transition-colors", validationErrors.department ? "text-red-400" : "text-content-muted")}>Academic Department</Label>
-                              <select
-                                value={departmentId}
-                                onChange={(e) => {
-                                  setDepartmentId(e.target.value);
-                                  if (e.target.value) setValidationErrors(prev => ({ ...prev, department: false }));
-                                }}
-                                className={cn(
-                                  "w-full bg-app border text-content text-xs font-bold rounded-xl p-3 outline-none transition-all focus:border-indigo-500",
-                                  validationErrors.department ? "border-eed-500/50" : "border-panel-hover"
-                                )}
-                              >
-                                <option value="">Select Target Entity</option>
-                                {departments.map(dept => (
-                                  <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
-                                ))}
-                              </select>
-                            </div>
+                            {subjectRole !== "FACILITY" && (
+                              <div className="space-y-3">
+                                <Label className={cn("text-[10px] uppercase font-black tracking-widest ms-1 transition-colors", validationErrors.department ? "text-red-400" : "text-content-muted")}>Academic Department</Label>
+                                <select
+                                  value={departmentId}
+                                  onChange={(e) => {
+                                    setDepartmentId(e.target.value);
+                                    if (e.target.value) setValidationErrors(prev => ({ ...prev, department: false }));
+                                  }}
+                                  className={cn(
+                                    "w-full bg-app border text-content text-xs font-bold rounded-xl p-3 outline-none transition-all focus:border-indigo-500",
+                                    validationErrors.department ? "border-eed-500/50" : "border-panel-hover"
+                                  )}
+                                >
+                                  <option value="">Select Target Entity</option>
+                                  {departments.map(dept => (
+                                    <option key={dept._id || dept.id} value={dept._id || dept.id}>{dept.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
 
                             {/* Subject Entity Selection */}
                             <div className="space-y-3">
@@ -799,6 +831,7 @@ export default function FormBuilderPage() {
                                   setSubjectRole(e.target.value as FormRole);
                                   setCourseId("");
                                   setInstructorId("");
+                                  setFacilityId("");
                                 }}
                                 className="w-full bg-app border border-panel-hover text-content text-xs font-bold rounded-xl p-3 outline-none focus:border-indigo-500 transition-all"
                               >
@@ -806,6 +839,7 @@ export default function FormBuilderPage() {
                                 <option value="COURSE">Course</option>
                                 <option value="INSTRUCTOR">Instructor</option>
                                 <option value="HOD">Head of Department</option>
+                                <option value="FACILITY">Facility</option>
                               </select>
                             </div>
 
@@ -951,25 +985,64 @@ export default function FormBuilderPage() {
                               )}
                             </AnimatePresence>
 
-                            <div className="space-y-3">
-                              <Label className="text-[10px] uppercase font-black text-content-muted tracking-widest ms-1">Evaluator Audience</Label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {["STUDENT", "INSTRUCTOR", "HOD"].map(role => (
-                                  <button
-                                    key={role}
-                                    onClick={() => toggleRole(role as FormRole)}
-                                    className={cn(
-                                      "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
-                                      evaluatorRoles.includes(role as FormRole)
-                                        ? "bg-indigo-600 border-indigo-500 text-content"
-                                        : "bg-app border-panel text-content-muted hover:text-content-muted"
-                                    )}
-                                  >
-                                    {role}
-                                  </button>
-                                ))}
+                            {/* 3. Cascading Logic: Select Facility */}
+                            <AnimatePresence>
+                              {subjectRole === "FACILITY" && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="space-y-3 overflow-hidden mt-4"
+                                >
+                                  <Label className={cn("text-[10px] uppercase font-black tracking-widest ms-1 transition-colors", validationErrors.facility ? "text-red-400" : "text-content-muted")}>
+                                    Target Facility
+                                  </Label>
+                                  <div className="relative">
+                                    <select
+                                      value={facilityId}
+                                      onChange={(e) => {
+                                        setFacilityId(e.target.value);
+                                        if (e.target.value) setValidationErrors(prev => ({ ...prev, facility: false }));
+                                      }}
+                                      className={cn(
+                                        "w-full bg-panel-hover/80 text-content text-sm border rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all",
+                                        validationErrors.facility ? "border-eed-500/50 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-panel-hover"
+                                      )}
+                                    >
+                                      <option value="" disabled hidden>Select Facility...</option>
+                                      {facilities.map(f => (
+                                        <option key={f._id || f.id} value={f._id || f.id}>
+                                          {f.name}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content/40 pointer-events-none" />
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+
+                            {subjectRole !== "FACILITY" && (
+                              <div className="space-y-3">
+                                <Label className="text-[10px] uppercase font-black text-content-muted tracking-widest ms-1">Evaluator Audience</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {["STUDENT", "INSTRUCTOR", "HOD"].map(role => (
+                                    <button
+                                      key={role}
+                                      onClick={() => toggleRole(role as FormRole)}
+                                      className={cn(
+                                        "px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all border",
+                                        evaluatorRoles.includes(role as FormRole)
+                                          ? "bg-indigo-600 border-indigo-500 text-content"
+                                          : "bg-app border-panel text-content-muted hover:text-content-muted"
+                                      )}
+                                    >
+                                      {role}
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </>
                         )}
                       </>

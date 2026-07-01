@@ -24,7 +24,7 @@ export type Question = {
   ai_tag?: string; // Optional utility
 };
 
-export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT" | "COURSE";
+export type FormRole = "ADMIN" | "HOD" | "INSTRUCTOR" | "STUDENT" | "COURSE" | "DEPARTMENT" | "FACILITY" | "GENERAL";
 
 export type FormSettings = {
   title: string;
@@ -37,6 +37,7 @@ export type FormSettings = {
   department_id?: string;
   course_id?: string;
   instructor_id?: string;
+  facility_id?: string;
 };
 
 export type Form = FormSettings & {

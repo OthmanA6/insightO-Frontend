@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom"
 import { 
   LayoutDashboard, FileText, BarChart3, Settings, 
-  Users, Building2, Calendar, ShieldCheck, BookOpen, ClipboardCheck, FileQuestion, Zap
+  Users, Building2, Building, Calendar, ShieldCheck, BookOpen, ClipboardCheck, FileQuestion, Zap
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { buttonVariants } from "@/shared/components/ui/button"
