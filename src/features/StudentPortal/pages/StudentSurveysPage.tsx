@@ -15,11 +15,19 @@ export default function StudentSurveysPage() {
     const fetchForms = async () => {
       try {
         const allForms = await getAllForms();
-        // Filter forms that are active and assigned to STUDENT
-        const studentForms = allForms.filter(f => 
-          f.is_active && 
-          f.evaluator_roles?.includes('STUDENT')
-        );
+        // Filter forms that are active, assigned to STUDENT, and match department
+        const studentForms = allForms.filter(f => {
+          const isStudentForm = f.is_active && f.evaluator_roles?.includes('STUDENT');
+          if (!isStudentForm) return false;
+          
+          if (f.department_id) {
+            const formDeptId = typeof f.department_id === 'object' ? (f.department_id as any)._id || (f.department_id as any).id : f.department_id;
+            const userDeptId = typeof user?.departmentId === 'object' ? (user.departmentId as any)._id || (user.departmentId as any).id : user?.departmentId;
+            return formDeptId === userDeptId;
+          }
+          
+          return true; // No department assigned means it's a general survey
+        });
         setForms(studentForms);
       } catch (error) {
         console.error('Failed to fetch student forms', error);
