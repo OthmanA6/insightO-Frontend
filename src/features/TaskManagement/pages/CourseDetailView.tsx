@@ -4,7 +4,8 @@ import * as courseApi from '@/shared/api/courseApi';
 import * as taskApi from '@/features/TaskManagement/api/taskApi';
 import type { Course } from '@/shared/api/courseApi';
 import type { Task } from '@/features/TaskManagement/api/taskApi';
-import { Loader2, ArrowLeft, ClipboardList, Clock, ArrowRight, Building2, User } from 'lucide-react';
+import { Loader2, ArrowLeft, ClipboardList, Clock, ArrowRight, Building2, User, Ban, FileText, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Button } from '@/shared/components/ui/button';
 import { SubmitTaskModal } from '@/features/TaskManagement/components/SubmitTaskModal';
@@ -17,6 +18,14 @@ export default function CourseDetailView() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [taskToSubmit, setTaskToSubmit] = useState<string | null>(null);
+
+  const getFullUrl = (url: string) => {
+    if (!url) return '#';
+    if (url.startsWith('http')) return url;
+    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') : 'http://localhost:5000';
+    const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+    return `${baseUrl}/${cleanUrl}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +50,21 @@ export default function CourseDetailView() {
     };
     fetchData();
   }, [courseId]);
+
+  const isExpired = (deadline: string) => deadline ? new Date(deadline) < new Date() : false;
+
+  const handleSubmitTask = (task: Task) => {
+    if (isExpired(task.deadline)) {
+      toast.error('Deadline Passed', { description: 'The deadline for this assignment has expired. Submissions are no longer accepted.' });
+      return;
+    }
+    const taskId = task.id || task._id || '';
+    if (task.task_type === 'QUIZ') {
+      navigate(`/dashboard/submit-quiz/${taskId}`);
+    } else {
+      setTaskToSubmit(taskId);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -140,36 +164,71 @@ export default function CourseDetailView() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tasks.map(task => (
-              <div key={task.id || task._id} className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+            {tasks.map(task => {
+              const expired = isExpired(task.deadline);
+              return (
+              <div key={task.id || task._id} className={`group p-6 bg-indigo-950/10 backdrop-blur-md border transition-all duration-300 shadow-xl rounded-3xl relative overflow-hidden flex flex-col justify-between ${
+                expired
+                  ? 'border-panel-hover opacity-60'
+                  : 'border-panel-hover hover:border-indigo-500/30 hover:shadow-indigo-500/10'
+              }`}>
                 <div className="space-y-4">
                   <h3 className="text-lg font-black tracking-tight text-content leading-tight">{task.title}</h3>
                   <p className="text-sm text-content-muted line-clamp-3 leading-relaxed">
                     {task.description}
                   </p>
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-400 bg-amber-500/10 w-fit px-3 py-1.5 rounded-lg border border-amber-500/20">
+                  
+                  {task.attachments && task.attachments.length > 0 && (
+                    <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-panel-hover/50">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted">Attachments</p>
+                      <div className="flex flex-col gap-2">
+                        {task.attachments.map((att: any, idx: number) => (
+                          <a 
+                            key={idx} 
+                            href={getFullUrl(att.url)} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center justify-between p-2 rounded-lg bg-indigo-950/20 border border-panel-hover hover:border-indigo-500/50 transition-colors group"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <FileText className="h-3.5 w-3.5 text-indigo-400 shrink-0"/>
+                              <span className="text-xs font-medium text-content-muted group-hover:text-content truncate">{att.fileName || `File ${idx + 1}`}</span>
+                            </div>
+                            <Download className="h-3 w-3 text-content-muted group-hover:text-indigo-400 transition-colors shrink-0" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={`flex items-center gap-2 text-xs font-bold w-fit px-3 py-1.5 rounded-lg border mt-2 ${
+                    expired
+                      ? 'text-red-400 bg-red-500/10 border-red-500/20'
+                      : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+                  }`}>
                     <Clock className="h-3.5 w-3.5" />
-                    Due {format(new Date(task.deadline), 'MMM d, h:mm a')}
+                    {expired ? 'Deadline Passed — ' : 'Due '}{format(new Date(task.deadline), 'MMM d, h:mm a')}
                   </div>
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-panel-hover">
-                  <Button 
-                    onClick={() => {
-                      const taskId = task.id || task._id || '';
-                      if (task.task_type === 'QUIZ') {
-                        navigate(`/dashboard/submit-quiz/${taskId}`);
-                      } else {
-                        setTaskToSubmit(taskId);
-                      }
-                    }}
-                    className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
-                  >
-                    Submit Assignment <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  {expired ? (
+                    <div className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-panel border border-panel-hover text-content-muted text-sm cursor-not-allowed">
+                      <Ban className="h-4 w-4" /> Expired
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handleSubmitTask(task)}
+                      className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
+                    >
+                      Submit Assignment <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

@@ -34,8 +34,8 @@ import InstructorCourseDetailView from '@/features/InstructorPortal/pages/Instru
 import AiUsageDashboardPage from '@/features/AIUsage/pages/AiUsageDashboardPage'
 import { UserDirectoryPage } from '@/features/UserManagement/components/UserDirectoryPage'
 import UserProfileViewPage from '@/features/UserManagement/pages/UserProfileViewPage'
-import HodDashboardPage from '@/features/HodPortal/pages/HodDashboardPage'
-
+import FacilitiesPage from '@/features/FacilityManagement/pages/FacilitiesPage'
+import FacilityViewPage from '@/features/FacilityManagement/pages/FacilityViewPage'
 function DashboardRouter() {
   const { user } = useAuth();
   if (user?.role === 'STUDENT') {
@@ -45,7 +45,7 @@ function DashboardRouter() {
     return <InstructorDashboardPage />;
   }
   if (user?.role === 'HOD') {
-    return <HodDashboardPage />;
+    // return <HodDashboardPage />;
   }
   return <DashboardPlaceholder />;
 }
@@ -104,6 +104,10 @@ function App() {
             <Route path="departments/:departmentId/courses/:courseId" element={<CourseTasksView />} />
             <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId" element={<TaskSubmissionsPage />} />
             <Route path="departments/:departmentId/courses/:courseId/tasks/:taskId/submissions/:submissionId/grade" element={<InstructorGradingPage />} />
+
+            {/* Custom Facilities */}
+            <Route path="facilities" element={<FacilitiesPage />} />
+            <Route path="facilities/:id" element={<FacilityViewPage />} />
 
             <Route path="ai-usage-dashboard" element={<AiUsageDashboardPage />} />
             <Route path="settings" element={<SettingsPage />} />

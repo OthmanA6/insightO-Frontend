@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
   User, Mail, BookOpen, Award, TrendingUp, AlertTriangle,
-  Target, Lightbulb, Loader2, Calendar, Briefcase, ChevronRight, Activity, BrainCircuit
+  Target, Lightbulb, Loader2, Calendar, Briefcase, ChevronRight, Activity, BrainCircuit,
+  Home, Users
 } from 'lucide-react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -96,7 +97,36 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 p-6 animate-in fade-in zoom-in-95 duration-200">
 
-      {/* Header Section */}
+      {/* ── Breadcrumb ─────────────────────────────────────── */}
+      <nav aria-label="breadcrumb">
+        <ol className="flex items-center gap-1.5 text-sm">
+          <li>
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-1.5 text-content-muted hover:text-indigo-400 transition-colors font-medium"
+            >
+              <Home className="w-3.5 h-3.5" />
+              Dashboard
+            </Link>
+          </li>
+          <li><ChevronRight className="w-3.5 h-3.5 text-content-muted/40" /></li>
+          <li>
+            <Link
+              to="/dashboard/directory"
+              className="flex items-center gap-1.5 text-content-muted hover:text-indigo-400 transition-colors font-medium"
+            >
+              <Users className="w-3.5 h-3.5" />
+              Students Directory
+            </Link>
+          </li>
+          <li><ChevronRight className="w-3.5 h-3.5 text-content-muted/40" /></li>
+          <li aria-current="page" className="text-indigo-400 font-semibold truncate max-w-[200px]">
+            {data.user.firstName} {data.user.lastName}
+          </li>
+        </ol>
+      </nav>
+
+
       <div className="relative p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-panel-hover shadow-2xl overflow-hidden group">
         <div className="absolute -end-24 -top-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
         <div className="absolute -start-24 -bottom-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-700" />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ChevronRight, User, Loader2, AlertTriangle, Briefcase } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card';
+import { Search, Filter, ChevronRight, User, Loader2, AlertTriangle, Briefcase, Home, Users } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
@@ -73,9 +73,33 @@ export const UserDirectoryPage: React.FC = () => {
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 animate-in fade-in zoom-in-95 duration-200">
+
+      {/* ── Breadcrumb ─────────────────────────────────────── */}
+      <nav aria-label="breadcrumb">
+        <ol className="flex items-center gap-1.5 text-sm">
+          <li>
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-1.5 text-content-muted hover:text-indigo-400 transition-colors font-medium"
+            >
+              <Home className="w-3.5 h-3.5" />
+              Dashboard
+            </Link>
+          </li>
+          <li>
+            <ChevronRight className="w-3.5 h-3.5 text-content-muted/40" />
+          </li>
+          <li aria-current="page" className="flex items-center gap-1.5 text-indigo-400 font-semibold">
+            <Users className="w-3.5 h-3.5" />
+            Students Directory
+          </li>
+        </ol>
+      </nav>
+
+      {/* ── Page Title ─────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">User Directory</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Students Directory</h2>
           <p className="text-muted-foreground mt-1">Browse and search for academic staff and students.</p>
         </div>
       </div>
