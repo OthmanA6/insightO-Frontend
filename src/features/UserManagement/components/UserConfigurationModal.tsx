@@ -133,7 +133,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
           lastName,
           email,
           password,
-          nationalId,
+          nationalId: Number(nationalId),
           role: selectedRole,
           departmentId: selectedDept,
           academicYear: selectedRole === 'STUDENT' ? Number(academicYear) : undefined,
