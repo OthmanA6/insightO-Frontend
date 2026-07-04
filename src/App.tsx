@@ -20,6 +20,7 @@ import TaskSubmissionsPage from '@/features/TaskManagement/pages/TaskSubmissions
 import QuizBuilderPage from '@/features/TaskManagement/pages/QuizBuilderPage'
 import SubmitQuizPage from '@/features/TaskManagement/pages/SubmitQuizPage'
 import InstructorGradingPage from '@/features/TaskManagement/pages/InstructorGradingPage'
+import TaskAnalyticsPage from '@/features/TaskManagement/pages/TaskAnalyticsPage'
 import { ProtectedRoute } from '@/shared/components/layout/ProtectedRoute'
 import StudentDashboardPage from '@/features/StudentPortal/pages/StudentDashboardPage'
 import StudentCoursesAndTasksPage from '@/features/StudentPortal/pages/StudentCoursesAndTasksPage'
@@ -112,6 +113,7 @@ function App() {
             <Route path="facilities/:id" element={<FacilityViewPage />} />
 
             <Route path="ai-usage-dashboard" element={<AiUsageDashboardPage />} />
+            <Route path="task-analytics" element={<TaskAnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="forms-results/:formId" element={<FormsResultsPage />} />
           </Route>

@@ -25,6 +25,8 @@ import * as taskApi from '../api/taskApi';
 import * as departmentApi from '@/shared/api/departmentApi';
 import * as courseApi from '@/shared/api/courseApi';
 import type { Task, CreateTaskPayload } from '../api/taskApi';
+import { TaskAnalyticsDashboard } from '../components/TaskAnalyticsDashboard';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 export default function CourseTasksView() {
  const { departmentId, courseId } = useParams<{
@@ -32,6 +34,8 @@ export default function CourseTasksView() {
  courseId: string;
  }>();
  const navigate = useNavigate();
+ const { user } = useAuth();
+ const canViewAnalytics = user?.role === 'ADMIN' || user?.role === 'INSTRUCTOR';
 
  const [tasks, setTasks] = useState<Task[]>([]);
  const [isLoading, setIsLoading] = useState(true);
@@ -188,21 +192,31 @@ export default function CourseTasksView() {
  </div>
  </div>
 
- <Tabs defaultValue="insights" className="w-full mt-4">
-    <TabsList className="bg-panel border border-panel p-1.5 rounded-2xl mb-8 inline-flex h-14 items-center justify-center">
-      <TabsTrigger 
-        value="insights" 
-        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
-      >
-        Analysis & Insights
-      </TabsTrigger>
-      <TabsTrigger 
-        value="tasks" 
-        className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
-      >
-        Tasks Management
-      </TabsTrigger>
-    </TabsList>
+  <Tabs defaultValue="insights" className="w-full mt-4">
+     <TabsList className="bg-panel border border-panel p-1.5 rounded-2xl mb-8 inline-flex h-14 items-center justify-center gap-1">
+       <TabsTrigger 
+         value="insights" 
+         className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
+       >
+         Analysis & Insights
+       </TabsTrigger>
+       <TabsTrigger 
+         value="tasks" 
+         className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm"
+       >
+         Tasks Management
+       </TabsTrigger>
+       {/* Task Analytics tab — visible to ADMIN and INSTRUCTOR only */}
+       {canViewAnalytics && (
+         <TabsTrigger 
+           value="analytics" 
+           className="rounded-xl px-8 py-2.5 text-sm font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-content text-content-muted hover:text-content transition-all shadow-sm flex items-center gap-2"
+         >
+           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+           Task Analytics
+         </TabsTrigger>
+       )}
+     </TabsList>
 
     <TabsContent value="insights" className="mt-0 outline-none">
       <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
@@ -210,7 +224,12 @@ export default function CourseTasksView() {
       </div>
     </TabsContent>
 
-    <TabsContent value="tasks" className="mt-0 outline-none space-y-8">
+     {/* ── Task Analytics Tab ─────────────────────────────────────── */}
+     <TabsContent value="analytics" className="mt-0 outline-none">
+       <TaskAnalyticsDashboard />
+     </TabsContent>
+
+     <TabsContent value="tasks" className="mt-0 outline-none space-y-8">
       {/* Control Bar */}
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-panel p-4 rounded-3xl border border-panel">
         <div className="w-full lg:w-96 relative group">

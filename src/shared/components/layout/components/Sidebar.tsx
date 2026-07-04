@@ -31,6 +31,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       items: [
         { name: "User Management", href: "/dashboard/users", icon: Users },
         { name: "Academic Entities", href: "/dashboard/departments", icon: Building2 },
+        { name: "Task Analytics", href: "/dashboard/task-analytics", icon: BarChart3 },
       ]
     },
     {
@@ -62,6 +63,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         { name: "Command Center", href: "/dashboard", icon: LayoutDashboard },
         { name: "My Courses", href: "/dashboard/courses", icon: BookOpen },
         { name: "Students Directory", href: "/dashboard/directory", icon: Users },
+        { name: "Task Analytics", href: "/dashboard/task-analytics", icon: BarChart3 },
         { name: "AI Quota", href: "/dashboard/ai-usage-dashboard", icon: Zap },
       ]
     }
