@@ -22,9 +22,7 @@ export default function DashboardPlaceholder() {
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex flex-col items-center justify-center p-6 font-sans">
       <div className="w-full max-w-md text-center space-y-6">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-            <BarChart3 className="text-content size-7" />
-          </div>
+          <img src="/logo.svg" alt="InsightO Logo" className="h-12 w-12 object-contain drop-shadow-md" />
           <h1 className="text-3xl font-bold text-slate-900 dark:text-content tracking-tight">
             insightO
           </h1>

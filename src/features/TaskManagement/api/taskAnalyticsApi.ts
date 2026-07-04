@@ -52,9 +52,14 @@ export interface TaskAnalyticsData {
 
 // ── API call ──────────────────────────────────────────────────────────────────
 
-export const getTaskAnalytics = async (): Promise<TaskAnalyticsData> => {
-  const response = await api.get<{ status: string; data: TaskAnalyticsData }>(
-    '/tasks/analytics',
-  );
+export const getTaskAnalytics = async (params?: { departmentId?: string; courseId?: string; taskId?: string }): Promise<TaskAnalyticsData> => {
+  const queryParams = new URLSearchParams();
+  if (params?.departmentId) queryParams.append('departmentId', params.departmentId);
+  if (params?.courseId) queryParams.append('courseId', params.courseId);
+  if (params?.taskId) queryParams.append('taskId', params.taskId);
+
+  const url = queryParams.toString() ? `/tasks/analytics?${queryParams.toString()}` : '/tasks/analytics';
+
+  const response = await api.get<{ status: string; data: TaskAnalyticsData }>(url);
   return response.data.data;
 };

@@ -20,6 +20,8 @@ import type { TaskSubmission } from '@/shared/api/taskSubmissionApi';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SystemFileViewer } from '@/shared/components/ui/SystemFileViewer';
 import { Modal } from '@/shared/components/ui/Modal';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import { TaskAnalyticsDashboard } from '@/features/TaskManagement/components/TaskAnalyticsDashboard';
 
 export default function TaskSubmissionsPage() {
   const { departmentId, courseId, taskId } = useParams<{
@@ -194,8 +196,25 @@ export default function TaskSubmissionsPage() {
         </div>
       )}
 
-      {/* Submissions List */}
-      <div className="space-y-6">
+      {/* Tabs */}
+      <Tabs defaultValue="submissions" className="w-full">
+        <TabsList className="bg-panel border border-panel p-1 mb-8 flex w-fit rounded-2xl">
+          <TabsTrigger value="submissions" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
+            Submissions
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-purple-600 data-[state=active]:text-content text-sm font-bold transition-all flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Task Analytics
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analytics" className="mt-0 outline-none">
+          <TaskAnalyticsDashboard taskId={taskId} />
+        </TabsContent>
+
+        <TabsContent value="submissions" className="mt-0 outline-none">
+          {/* Submissions List */}
+          <div className="space-y-6">
         {isLoading ? (
           <div className="py-20 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
@@ -386,6 +405,8 @@ export default function TaskSubmissionsPage() {
           })
         )}
       </div>
+      </TabsContent>
+      </Tabs>
 
       {/* File Viewer Modal */}
       <Modal

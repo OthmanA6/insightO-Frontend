@@ -83,3 +83,28 @@ export const getCourseInsights = async (id: string, forceAI: boolean = false): P
   );
   return response.data.data;
 };
+
+// ─── GET /api/courses/:id/analytics ───────────────────────────────────────────
+export interface CourseAnalyticsResult {
+  kpis: {
+    totalEnrolled: number;
+    totalTasks: number;
+    completionRate: number;
+    averageGrade: number;
+  };
+  students: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    tasksCompleted: number;
+    averageGrade: number;
+  }[];
+}
+
+export const getCourseAnalytics = async (id: string): Promise<CourseAnalyticsResult> => {
+  const response = await api.get<{ status: string; data: CourseAnalyticsResult }>(
+    `/courses/${id}/analytics`
+  );
+  return response.data.data;
+};

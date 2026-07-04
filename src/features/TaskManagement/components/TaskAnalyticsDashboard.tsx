@@ -160,7 +160,7 @@ function SectionHeader({
 
 type SortKey = 'studentName' | 'taskTitle' | 'status' | 'submissionDate' | 'finalGrade';
 
-export function TaskAnalyticsDashboard() {
+export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { departmentId?: string; courseId?: string; taskId?: string }) {
   const [data, setData] = useState<TaskAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -175,7 +175,7 @@ export function TaskAnalyticsDashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const result = await getTaskAnalytics();
+        const result = await getTaskAnalytics({ departmentId, courseId, taskId });
         setData(result);
       } catch (err: any) {
         setError(err?.response?.data?.message ?? 'Failed to load analytics');
@@ -183,7 +183,7 @@ export function TaskAnalyticsDashboard() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [departmentId, courseId, taskId]);
 
   // ── Loading state ───────────────────────────────────────────────────────────
   if (loading) {

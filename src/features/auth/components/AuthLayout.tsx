@@ -35,9 +35,7 @@ export default function AuthLayout({
 
         <div className="relative z-10 max-w-xl">
           <Link to="/" className="flex items-center gap-3 mb-12">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-              <BarChart3 className="text-content size-7" />
-            </div>
+            <img src="/logo.svg" alt="InsightO Logo" className="h-12 w-12 object-contain drop-shadow-md" />
             <h2 className="text-content text-3xl font-bold tracking-tight">
               insightO
             </h2>
@@ -87,9 +85,7 @@ export default function AuthLayout({
           {/* Mobile logo */}
           <div className="mb-8 lg:hidden">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-indigo-500/20">
-                <BarChart3 className="text-content size-5" />
-              </div>
+              <img src="/logo.svg" alt="InsightO Logo" className="h-10 w-10 object-contain drop-shadow-md" />
               <h2 className="text-slate-900 dark:text-content text-2xl font-bold tracking-tight">
                 insightO
               </h2>

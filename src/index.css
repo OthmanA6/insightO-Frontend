@@ -3,7 +3,6 @@
 @import "@fontsource-variable/geist";
 
 @config "../tailwind.config.js";
-
 @layer base {
   :root {
     --background: oklch(1 0 0);

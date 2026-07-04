@@ -185,9 +185,7 @@ export default function FormsResultsPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex h-10 items-center justify-center gap-2 rounded-xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-panel-hover px-4 text-sm font-bold text-slate-900 dark:text-content transition-all hover:bg-slate-50 dark:hover:bg-panel-hover shadow-sm">
-              <Download className="h-4 w-4" /> Export Results
-            </button>
+
           </div>
         </div>
 
@@ -325,69 +323,69 @@ export default function FormsResultsPage() {
                         ) : (
                           Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
                             <div key={tag} className="p-5 rounded-2xl bg-panel-hover0 dark:bg-panel-hover border border-slate-200 dark:border-panel">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
-                              <Badge className={cn(
-                                "text-[8px] font-black uppercase border-none px-2 rounded-full",
-                                result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
-                                  result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                                    "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                              )}>
-                                {result.sentiment}
-                              </Badge>
-                              {result.score !== undefined && (
-                                <span className="text-[9px] font-black text-purple-500 uppercase">Score: {result.score}%</span>
-                              )}
-                            </div>
-                            <p className="text-sm text-slate-700 dark:text-content-muted font-medium leading-relaxed">{result.summary}</p>
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
+                                <Badge className={cn(
+                                  "text-[8px] font-black uppercase border-none px-2 rounded-full",
+                                  result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
+                                    result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                      "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                )}>
+                                  {result.sentiment}
+                                </Badge>
+                                {result.score !== undefined && (
+                                  <span className="text-[9px] font-black text-purple-500 uppercase">Score: {result.score}%</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-slate-700 dark:text-content-muted font-medium leading-relaxed">{result.summary}</p>
 
-                            {/* Strengths / Weaknesses / Action Items */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                              {result.strengths?.length > 0 && (
-                                <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-3">
-                                  <p className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                    <TrendingUp className="h-3 w-3" /> Strengths
-                                  </p>
-                                  <ul className="space-y-1.5">
-                                    {result.strengths.map((s, i) => (
-                                      <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              {result.weaknesses?.length > 0 && (
-                                <div className="rounded-xl bg-red-500/5 border border-eed-500/15 p-3">
-                                  <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                    <TrendingDown className="h-3 w-3" /> Weaknesses
-                                  </p>
-                                  <ul className="space-y-1.5">
-                                    {result.weaknesses.map((w, i) => (
-                                      <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                              {result.action_items?.length > 0 && (
-                                <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-3">
-                                  <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                    <Zap className="h-3 w-3" /> Action Items
-                                  </p>
-                                  <ul className="space-y-1.5">
-                                    {result.action_items.map((a, i) => (
-                                      <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                        <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
+                              {/* Strengths / Weaknesses / Action Items */}
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                                {result.strengths?.length > 0 && (
+                                  <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-3">
+                                    <p className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                      <TrendingUp className="h-3 w-3" /> Strengths
+                                    </p>
+                                    <ul className="space-y-1.5">
+                                      {result.strengths.map((s, i) => (
+                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
+                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {result.weaknesses?.length > 0 && (
+                                  <div className="rounded-xl bg-red-500/5 border border-eed-500/15 p-3">
+                                    <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                      <TrendingDown className="h-3 w-3" /> Weaknesses
+                                    </p>
+                                    <ul className="space-y-1.5">
+                                      {result.weaknesses.map((w, i) => (
+                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
+                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {result.action_items?.length > 0 && (
+                                  <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-3">
+                                    <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                      <Zap className="h-3 w-3" /> Action Items
+                                    </p>
+                                    <ul className="space-y-1.5">
+                                      {result.action_items.map((a, i) => (
+                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
+                                          <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          ))
                         )}
                       </div>
                     </div>
@@ -694,8 +692,8 @@ export default function FormsResultsPage() {
                             Generate Deep AI Insights
                           </h3>
                           <p className="text-indigo-100/90 font-medium leading-relaxed max-w-2xl mx-auto text-lg">
-                            {submissions.length === 0 
-                              ? "There is No responses to analyze please wait until the form goes Viral xD" 
+                            {submissions.length === 0
+                              ? "There is No responses to analyze please wait until the form goes Viral xD"
                               : "Activate our advanced neural engine to synthesize qualitative responses, extract sentiment vectors, and reveal actionable operational intelligence from your survey data."}
                           </p>
                         </div>
@@ -883,10 +881,10 @@ export default function FormsResultsPage() {
               </div>
             )}
 
-              </div>
+          </div>
         </div>
-        </div>
-        <style>{`
+      </div>
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.1); border-eadius: 10px; }
@@ -908,6 +906,6 @@ export default function FormsResultsPage() {
           animation: pulse-subtle 2s ease-in-out infinite;
         }
       `}</style>
-      </div>
-      )
+    </div>
+  )
 }

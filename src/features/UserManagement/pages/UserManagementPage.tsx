@@ -157,7 +157,6 @@ export default function UserManagementPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-foreground">User Management</h2>
-          <p className="text-muted-foreground mt-1">Mirroring Backend API v1.0 Administration.</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto items-center">
           {selectedIds.length > 0 && (
@@ -176,9 +175,7 @@ export default function UserManagementPage() {
               </div>
             </div>
           )}
-          <Button variant="outline" className="flex items-center gap-2 border-panel-hover hover:bg-panel-hover">
-            <Download className="h-4 w-4" /> Export
-          </Button>
+
           <Button
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
             onClick={() => {

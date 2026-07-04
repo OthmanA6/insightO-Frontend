@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom"
-import { 
-  LayoutDashboard, FileText, BarChart3, Settings, 
+import {
+  LayoutDashboard, FileText, BarChart3, Settings,
   Users, Building2, Building, Calendar, ShieldCheck, BookOpen, ClipboardCheck, FileQuestion, Zap
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
@@ -8,7 +8,7 @@ import { buttonVariants } from "@/shared/components/ui/button"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
-export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {}
+export interface SidebarProps extends React.HTMLAttributes<HTMLElement> { }
 
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { user } = useAuth();
@@ -80,14 +80,12 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       {...props}
     >
       <div className="flex h-16 items-center border-b border-sidebar-border px-8">
-        <div className="flex items-center gap-3 font-black text-xl tracking-tighter text-sidebar-foreground">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
+        <div className="flex items-center gap-2 font-bold text-xl tracking-tighter text-sidebar-foreground">
+          <img src="/logo.svg" alt="InsightO Logo" className="h-9 w-9 object-contain drop-shadow-sm" />
           insightO
         </div>
       </div>
-      
+
       <ScrollArea className="flex-1 px-4 py-8">
         <nav className="flex flex-col gap-8">
           {navGroups.map((group) => (
@@ -103,8 +101,8 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                       cn(
                         buttonVariants({ variant: isActive ? "outline" : "ghost" }),
                         "w-full justify-start gap-4 h-11 px-4 rounded-xl transition-all font-bold text-xs",
-                        isActive 
-                          ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20" 
+                        isActive
+                          ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20"
                           : "text-content-muted hover:text-content hover:bg-panel-hover"
                       )
                     }

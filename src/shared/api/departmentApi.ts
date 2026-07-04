@@ -70,3 +70,61 @@ export const updateDepartment = async (
 export const deleteDepartment = async (departmentId: string): Promise<void> => {
   await api.delete(`/admin/departments/${departmentId}`);
 };
+
+// ─── Global Analytics ────────────────────────────────────────────────────────
+export interface GlobalDepartmentAnalytics {
+  kpis: {
+    totalDepartments: number;
+    totalCourses: number;
+    totalStudents: number;
+    totalInstructors: number;
+  };
+  comparisons: {
+    departmentId: string;
+    departmentName: string;
+    enrollmentCount: number;
+    courseCount: number;
+    completionRate: number;
+    submissionCount: number;
+  }[];
+}
+
+let cachedAnalyticsPromise: Promise<GlobalDepartmentAnalytics> | null = null;
+
+export const getGlobalAnalytics = async (): Promise<GlobalDepartmentAnalytics> => {
+  if (!cachedAnalyticsPromise) {
+    cachedAnalyticsPromise = api.get<{ status: string; data: GlobalDepartmentAnalytics }>(
+      '/admin/departments/analytics/global',
+    ).then(res => res.data.data).catch(err => {
+      cachedAnalyticsPromise = null;
+      throw err;
+    });
+  }
+  return cachedAnalyticsPromise;
+};
+
+// ─── Department Specific Analytics ─────────────────────────────────────────────
+export interface DepartmentSpecificAnalyticsResult {
+  kpis: {
+    totalEnrolled: number;
+    totalCourses: number;
+    totalTasks: number;
+    completionRate: number;
+    averageGrade: number;
+  };
+  students: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    tasksCompleted: number;
+    averageGrade: number;
+  }[];
+}
+
+export const getDepartmentAnalytics = async (departmentId: string): Promise<DepartmentSpecificAnalyticsResult> => {
+  const response = await api.get<{ status: string; data: DepartmentSpecificAnalyticsResult }>(
+    `/admin/departments/${departmentId}/analytics`,
+  );
+  return response.data.data;
+};
