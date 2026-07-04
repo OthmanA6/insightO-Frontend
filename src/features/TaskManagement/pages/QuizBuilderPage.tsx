@@ -87,6 +87,7 @@ export default function QuizBuilderPage() {
   // AI Generator state
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState("")
+  const [aiFile, setAiFile] = useState<File | null>(null)
   const [isAIGenerating, setIsAIGenerating] = useState(false)
   const [aiStep, setAiStep] = useState(0)
 
@@ -222,6 +223,8 @@ export default function QuizBuilderPage() {
         const payload: any = { label: q.label, type: q.type, required: q.required, order: q.order }
         if (q.type === 'multiple_choice' || q.type === 'checkbox') payload.options = q.options
         if (q.type === 'linear_scale') payload.scale = q.scale
+        if (q.type === 'file') payload.file_config = q.file_config
+        if (q.type === 'short_text' && q.text_validation) payload.text_validation = q.text_validation
         await formApi.addQuestion(currentFormId, payload)
       }
 
@@ -253,8 +256,8 @@ export default function QuizBuilderPage() {
   }
 
   const handleAIGenerate = async () => {
-    if (!aiPrompt.trim()) {
-      toast.error("Please describe what you want the AI to generate.")
+    if (!aiPrompt.trim() && !aiFile) {
+      toast.error("Please provide a prompt or upload a file.")
       return
     }
     setIsAIGenerating(true)
@@ -267,7 +270,9 @@ export default function QuizBuilderPage() {
     }, 900)
 
     try {
-      const generated = await formApi.generateAIForm(aiPrompt)
+      const generated = aiFile 
+        ? await formApi.generateAIFormFromFile(aiFile, aiPrompt)
+        : await formApi.generateAIForm(aiPrompt);
       clearInterval(interval)
       const mappedQuestions = generated.questions.map((q: any, idx: number) => ({
         id: `q-ai-${Math.random().toString(36).substr(2, 9)}`,
@@ -552,6 +557,25 @@ export default function QuizBuilderPage() {
                   </div>
                 </div>
 
+                {activeQuestion.type === "short_text" && (
+                  <div>
+                    <h4 className="text-[10px] font-black text-content-muted uppercase tracking-widest mb-4">Text Validation (Optional)</h4>
+                    <div className="relative">
+                      <select
+                        value={activeQuestion.text_validation?.type || "text"}
+                        onChange={(e) => updateQuestion(activeQuestion.id!, { text_validation: { type: e.target.value as any } })}
+                        className="w-full bg-panel text-content text-sm border border-panel-hover rounded-xl p-3 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all"
+                      >
+                        <option value="text">Free Text</option>
+                        <option value="email">Email Address</option>
+                        <option value="number">Numeric Value</option>
+                        <option value="phone">Phone Number</option>
+                        <option value="url">Website URL</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {(activeQuestion.type === "multiple_choice" || activeQuestion.type === "checkbox") && (
                   <div className="space-y-4">
                     <h4 className="text-[10px] font-black text-content-muted uppercase tracking-widest">Option Topology</h4>
@@ -614,7 +638,16 @@ export default function QuizBuilderPage() {
         <div className="p-6 space-y-6">
           {!isAIGenerating ? (
             <div className="space-y-4">
-              <Label className="text-sm font-bold text-content-muted">Synthesis Prompt</Label>
+              <div className="space-y-2">
+                <Label className="text-sm font-bold text-content-muted">Source File (Optional)</Label>
+                <input
+                  type="file"
+                  accept=".pdf,.pptx,.ppt"
+                  onChange={(e) => setAiFile(e.target.files?.[0] || null)}
+                  className="w-full bg-panel border border-panel-hover text-content text-sm font-medium rounded-xl p-4 outline-none focus:border-purple-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer"
+                />
+              </div>
+              <Label className="text-sm font-bold text-content-muted">Synthesis Prompt (Optional if File is uploaded)</Label>
               <Textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}

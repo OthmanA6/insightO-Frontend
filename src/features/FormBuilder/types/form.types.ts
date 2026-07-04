@@ -21,6 +21,7 @@ export type Question = {
   options?: QuestionOption[]; // For multiple_choice
   scale?: { min: number; max: number }; // For linear_scale
   file_config?: { allowed_types: string[]; max_size: number }; // For file
+  text_validation?: { type: "text" | "email" | "phone" | "number" | "url" }; // For short_text
   ai_tag?: string; // Optional utility
 };
 
@@ -63,7 +64,7 @@ export type UpdateFormSettingsPayload = Partial<Pick<FormSettings,
 
 // Partial update payload for PATCH /v1/questions/:id
 export type UpdateQuestionPayload = Partial<Pick<Question,
-  'label' | 'required' | 'order' | 'options' | 'scale' | 'file_config' | 'ai_tag'
+  'label' | 'required' | 'order' | 'options' | 'scale' | 'file_config' | 'text_validation' | 'ai_tag'
 >>;
 
 // Payload item for PATCH /v1/questions/:formId/questions/reorder
