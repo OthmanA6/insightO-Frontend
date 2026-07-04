@@ -70,3 +70,16 @@ export const deleteCourse = async (id: string): Promise<void> => {
   await api.delete(`/courses/${id}`);
 };
 
+// ─── GET /api/courses/:id/insights ────────────────────────────────────────────
+export interface CourseInsightsResponse {
+  chartData: any[];
+  aiInsights: any;
+  ai_status: string;
+}
+
+export const getCourseInsights = async (id: string, forceAI: boolean = false): Promise<CourseInsightsResponse> => {
+  const response = await api.get<{ status: string; data: CourseInsightsResponse }>(
+    `/courses/${id}/insights${forceAI ? '?forceAI=true' : ''}`
+  );
+  return response.data.data;
+};

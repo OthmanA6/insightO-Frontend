@@ -16,9 +16,9 @@ export interface TaskHistoryItem {
 
 export interface ProfileAnalyticsResponse {
   user: { _id: string; firstName: string; lastName: string; email: string; role: string; };
-  profile?: { 
-    academicYear?: number; 
-    departmentId?: { name: string } | string; 
+  profile?: {
+    academicYear?: number;
+    departmentId?: { name: string } | string;
     teachingCourses?: any[];
     enrolledCourses?: any[];
   };

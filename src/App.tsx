@@ -36,6 +36,7 @@ import { UserDirectoryPage } from '@/features/UserManagement/components/UserDire
 import UserProfileViewPage from '@/features/UserManagement/pages/UserProfileViewPage'
 import FacilitiesPage from '@/features/FacilityManagement/pages/FacilitiesPage'
 import FacilityViewPage from '@/features/FacilityManagement/pages/FacilityViewPage'
+import HodDashboardPage from './features/HodPortal/pages/HodDashboardPage'
 function DashboardRouter() {
   const { user } = useAuth();
   if (user?.role === 'STUDENT') {
@@ -45,7 +46,7 @@ function DashboardRouter() {
     return <InstructorDashboardPage />;
   }
   if (user?.role === 'HOD') {
-    // return <HodDashboardPage />;
+    return <HodDashboardPage />;
   }
   return <DashboardPlaceholder />;
 }
