@@ -147,6 +147,7 @@ export default function FormBuilderPage() {
   // AI Generator state
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState("")
+  const [aiFile, setAiFile] = useState<File | null>(null)
 
   // Sidebar Tabs
   const [sidebarTab, setSidebarTab] = useState<'form' | 'field'>('form')
@@ -394,6 +395,7 @@ export default function FormBuilderPage() {
         if (q.type === 'multiple_choice' || q.type === 'checkbox') payload.options = q.options
         if (q.type === 'linear_scale') payload.scale = q.scale
         if (q.type === 'file') payload.file_config = q.file_config
+        if (q.type === 'short_text' && q.text_validation) payload.text_validation = q.text_validation
 
         // If it has a MongoDB ID, it's an existing question
         const qId = q._id || (q.id?.length === 24 ? q.id : null);
@@ -455,8 +457,8 @@ export default function FormBuilderPage() {
   }
 
   const handleAIGenerate = async () => {
-    if (!aiPrompt.trim()) {
-      toast.error("Please describe what you want the AI to generate.");
+    if (!aiPrompt.trim() && !aiFile) {
+      toast.error("Please provide a prompt or upload a file.");
       return;
     }
 
@@ -482,7 +484,9 @@ export default function FormBuilderPage() {
     }, 900);
 
     try {
-      const generated = await formApi.generateAIForm(aiPrompt);
+      const generated = aiFile 
+        ? await formApi.generateAIFormFromFile(aiFile, aiPrompt)
+        : await formApi.generateAIForm(aiPrompt);
       clearInterval(interval);
 
       const { title, description, questions: generatedQuestions } = generated;
@@ -1091,6 +1095,26 @@ export default function FormBuilderPage() {
                       <Switch checked={activeQuestion.required} onCheckedChange={(val) => updateQuestion(activeQuestion.id!, { required: val })} />
                     </div>
 
+                    {activeQuestion.type === "short_text" && (
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase font-black text-content-muted tracking-widest ms-1">Text Validation (Optional)</Label>
+                        <div className="relative">
+                          <select
+                            value={activeQuestion.text_validation?.type || "text"}
+                            onChange={(e) => updateQuestion(activeQuestion.id!, { text_validation: { type: e.target.value as any } })}
+                            className="w-full bg-panel-hover/80 text-content text-sm border border-panel-hover rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all"
+                          >
+                            <option value="text">Free Text</option>
+                            <option value="email">Email Address</option>
+                            <option value="number">Numeric Value</option>
+                            <option value="phone">Phone Number</option>
+                            <option value="url">Website URL</option>
+                          </select>
+                          <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content/40 pointer-events-none" />
+                        </div>
+                      </div>
+                    )}
+
                     {activeQuestion.type === "linear_scale" && (
                       <div className="space-y-3">
                         <Label className="text-[10px] uppercase font-black text-content-muted tracking-widest ms-1">Scale Amplitude (1-10)</Label>
@@ -1212,9 +1236,16 @@ export default function FormBuilderPage() {
                         <div className="ps-12">
                           {q.type === 'short_text' && (
                             <Input
+                              type={q.text_validation?.type === 'phone' ? 'tel' : (q.text_validation?.type || 'text')}
                               value={previewAnswers[q._id || q.id!] || ""}
                               onChange={(e) => setPreviewAnswers(prev => ({ ...prev, [q._id || q.id!]: e.target.value }))}
-                              placeholder="Short response text"
+                              placeholder={
+                                q.text_validation?.type === 'email' ? 'e.g., user@example.com' :
+                                q.text_validation?.type === 'number' ? 'e.g., 42' :
+                                q.text_validation?.type === 'phone' ? 'e.g., +123456789' :
+                                q.text_validation?.type === 'url' ? 'e.g., https://example.com' :
+                                'Short response text'
+                              }
                               className="bg-transparent border-slate-300 dark:border-panel-hover"
                             />
                           )}
@@ -1451,18 +1482,28 @@ export default function FormBuilderPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-content-muted ms-1">Generation Prompt</Label>
-                <textarea
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  className="w-full h-32 bg-app border border-panel-hover text-content text-sm font-medium rounded-2xl p-4 outline-none focus:border-purple-500 transition-all resize-none custom-scrollbar shadow-inner"
-                  placeholder="Describe what kind of evaluation or survey you want to generate. e.g., 'Generate an evaluation for a programming course with practical assignments, rating their instructor and code quality...'"
-                />
-              </div>
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-content-muted ms-1">Source File (Optional)</Label>
+                  <input
+                    type="file"
+                    accept=".pdf,.pptx,.ppt"
+                    onChange={(e) => setAiFile(e.target.files?.[0] || null)}
+                    className="w-full bg-app border border-panel-hover text-content text-sm font-medium rounded-2xl p-4 outline-none focus:border-purple-500 transition-all shadow-inner file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer"
+                  />
+                  <p className="text-xs text-content-muted ms-1 mt-1">Upload a PDF or PPTX to generate a quiz directly from its content.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-content-muted ms-1">Generation Prompt (Optional if File is uploaded)</Label>
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    className="w-full h-32 bg-app border border-panel-hover text-content text-sm font-medium rounded-2xl p-4 outline-none focus:border-purple-500 transition-all resize-none custom-scrollbar shadow-inner"
+                    placeholder="Describe what kind of evaluation or survey you want to generate. e.g., 'Generate an evaluation for a programming course with practical assignments, rating their instructor and code quality...'"
+                  />
+                </div>
 
-              <div className="flex gap-3 justify-end pt-2">
+                <div className="flex gap-3 justify-end pt-2">
                 <Button
                   variant="ghost"
                   onClick={() => setIsAIModalOpen(false)}

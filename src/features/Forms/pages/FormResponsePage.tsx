@@ -11,6 +11,8 @@ import { Badge } from "@/shared/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, ArrowRight, AlertCircle, FileText, Upload, Trash2, Check } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+import { PhoneInput } from "@/shared/components/ui/phone-input";
+import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 
 export default function FormResponsePage() {
   const { formId } = useParams<{ formId: string }>();
@@ -21,7 +23,7 @@ export default function FormResponsePage() {
   const [isSuccess, setIsSuccess] = useState(false);
   
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string | boolean>>({});
 
   useEffect(() => {
     const loadForm = async () => {
@@ -48,14 +50,37 @@ export default function FormResponsePage() {
   const handleSubmit = async () => {
     if (!form || !formId) return;
 
-    // Validate required fields
-    const errors: Record<string, boolean> = {};
+    // Validate required fields and formats
+    const errors: Record<string, string> = {};
     form.questions.forEach(q => {
       const qId = q._id || q.id!;
       const val = answers[qId];
+      
       if (q.required) {
         if (val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0)) {
-          errors[qId] = true;
+          errors[qId] = "This field is required";
+          return;
+        }
+      }
+
+      if (val && typeof val === 'string' && q.type === 'short_text') {
+        if (q.text_validation?.type === 'email') {
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          if (!emailRegex.test(val)) {
+            errors[qId] = "Invalid email format";
+          }
+        }
+        if (q.text_validation?.type === 'phone') {
+          const phoneNumber = parsePhoneNumberFromString(val);
+          if (!phoneNumber || !phoneNumber.isValid()) {
+            errors[qId] = "Invalid phone number format";
+          }
+        }
+        if (q.text_validation?.type === 'url') {
+          const urlRegex = /^https?:\/\/.+/;
+          if (!urlRegex.test(val)) {
+            errors[qId] = "Invalid URL format";
+          }
         }
       }
     });
@@ -144,9 +169,11 @@ export default function FormResponsePage() {
             <h2 className="text-3xl font-black text-content">Thank You!</h2>
             <p className="text-content-muted text-sm font-medium">Your response has been recorded successfully.</p>
           </div>
-          <Button onClick={() => navigate('/dashboard')} variant="outline" className="w-full mt-4 h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold transition-all">
-            Return to Dashboard
-          </Button>
+          {form?.category !== 'GENERAL' && (
+            <Button onClick={() => navigate('/dashboard')} variant="outline" className="w-full mt-4 h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold transition-all">
+              Return to Dashboard
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -183,7 +210,7 @@ export default function FormResponsePage() {
         </div>
 
         {/* Questions */}
-        <div className="space-y-6">
+        <form noValidate onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
           {form.questions.map((q, idx) => {
             const qId = q._id || q.id!;
             const hasError = validationErrors[qId];
@@ -195,7 +222,7 @@ export default function FormResponsePage() {
                 id={`question-${qId}`}
                 className={cn(
                   "p-8 sm:p-10 rounded-3xl bg-panel border transition-all duration-300",
-                  hasError ? "border-eed-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-panel shadow-xl hover:border-panel-hover"
+                  hasError ? "border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-panel shadow-xl hover:border-panel-hover"
                 )}
               >
                 <div className="space-y-6">
@@ -208,16 +235,31 @@ export default function FormResponsePage() {
                   </div>
 
                   {q.type === 'short_text' && (
-                    <Input 
-                      value={val || ''}
-                      onChange={(e) => handleAnswerChange(qId, e.target.value)}
-                      placeholder="Your answer..."
-                      className="bg-app border-panel-hover h-14 rounded-xl text-content px-4 focus:ring-indigo-500 transition-all text-base shadow-inner"
-                    />
+                    q.text_validation?.type === 'phone' ? (
+                      <PhoneInput
+                        required={q.required}
+                        value={val || ''}
+                        onChange={(value) => handleAnswerChange(qId, value)}
+                        className={hasError ? "border-red-500/50" : ""}
+                      />
+                    ) : (
+                      <Input 
+                        type={q.text_validation?.type || 'text'}
+                        required={q.required}
+                        value={val || ''}
+                        onChange={(e) => handleAnswerChange(qId, e.target.value)}
+                        className={cn(
+                          "h-14 bg-app border-panel-hover text-content px-4 focus:ring-indigo-500 rounded-xl transition-all shadow-inner",
+                          hasError && "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-500/5"
+                        )}
+                        placeholder="Your answer"
+                      />
+                    )
                   )}
 
                   {q.type === 'long_text' && (
                     <textarea 
+                      required={q.required}
                       value={val || ''}
                       onChange={(e) => handleAnswerChange(qId, e.target.value)}
                       placeholder="Your detailed answer..."
@@ -241,6 +283,7 @@ export default function FormResponsePage() {
                               type="radio" 
                               name={`q-${qId}`} 
                               value={opt}
+                              required={q.required && !val}
                               checked={isSelected}
                               onChange={() => handleAnswerChange(qId, opt)}
                               className="sr-only"
@@ -349,6 +392,7 @@ export default function FormResponsePage() {
                         </div>
                         <input 
                           type="file" 
+                          required={q.required && !val}
                           className="hidden" 
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
@@ -386,27 +430,28 @@ export default function FormResponsePage() {
 
                   {hasError && (
                     <div className="flex items-center gap-2 text-red-400 text-xs font-bold uppercase tracking-widest mt-4">
-                      <AlertCircle className="h-4 w-4" /> This field is required
+                      <AlertCircle className="h-4 w-4" /> {typeof hasError === 'string' ? hasError : 'This field is required'}
                     </div>
                   )}
                 </div>
               </div>
             );
           })}
-        </div>
+        
 
-        {/* Action Bar */}
-        <div className="pt-6 pb-20">
-          <Button 
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-lg shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3"
-          >
-            {isSubmitting ? <Loader2 className="h-6 w-6 animate-spin" /> : (
-              <>Finalize Submission <ArrowRight className="h-5 w-5" /></>
-            )}
-          </Button>
-        </div>
+          {/* Action Bar */}
+          <div className="pt-6 pb-20">
+            <Button 
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-16 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-lg shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3"
+            >
+              {isSubmitting ? <Loader2 className="h-6 w-6 animate-spin" /> : (
+                <>Finalize Submission <ArrowRight className="h-5 w-5" /></>
+              )}
+            </Button>
+          </div>
+        </form>
 
       </div>
 

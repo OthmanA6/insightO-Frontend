@@ -112,3 +112,17 @@ export const generateAIForm = async (prompt: string): Promise<{ title: string; d
   const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-form', { prompt });
   return response.data.data;
 };
+
+// ── #20: POST /v1/ai/generate-from-file ──────────────────────────────────────
+export const generateAIFormFromFile = async (file: File, prompt: string): Promise<{ title: string; description: string; questions: Question[] }> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('prompt', prompt);
+  
+  const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-from-file', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data.data;
+};

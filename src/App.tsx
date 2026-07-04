@@ -31,6 +31,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import InstructorDashboardPage from '@/features/InstructorPortal/pages/InstructorDashboardPage'
 import InstructorCourseManagement from '@/features/InstructorPortal/pages/InstructorCourseManagement'
 import InstructorCourseDetailView from '@/features/InstructorPortal/pages/InstructorCourseDetailView'
+import AdminDashboardPage from '@/features/Analytics/pages/AdminDashboardPage'
 import AiUsageDashboardPage from '@/features/AIUsage/pages/AiUsageDashboardPage'
 import { UserDirectoryPage } from '@/features/UserManagement/components/UserDirectoryPage'
 import UserProfileViewPage from '@/features/UserManagement/pages/UserProfileViewPage'
@@ -45,8 +46,8 @@ function DashboardRouter() {
   if (user?.role === 'INSTRUCTOR') {
     return <InstructorDashboardPage />;
   }
-  if (user?.role === 'HOD') {
-    return <HodDashboardPage />;
+  if (user?.role === 'ADMIN' || user?.role === 'HOD') {
+    return <AdminDashboardPage />;
   }
   return <DashboardPlaceholder />;
 }

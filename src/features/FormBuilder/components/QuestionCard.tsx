@@ -246,6 +246,24 @@ export function QuestionCard({
               </DropdownMenu>
             </div>
 
+            {/* ── Inline Text Validation Dropdown (for short_text) ─────────────────────────── */}
+            {question.type === 'short_text' && (
+              <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+                <select
+                  value={question.text_validation?.type || "text"}
+                  onChange={(e) => onUpdate(question.id!, { text_validation: { type: e.target.value as any } })}
+                  className="bg-app border border-panel-hover hover:border-indigo-500/50 rounded-lg pl-3 pr-7 py-2.5 text-[10px] uppercase font-bold tracking-wider text-content-muted transition-all appearance-none outline-none focus:ring-1 focus:ring-indigo-500/50"
+                >
+                  <option value="text">Free Text</option>
+                  <option value="email">Email</option>
+                  <option value="number">Number</option>
+                  <option value="phone">Phone</option>
+                  <option value="url">URL</option>
+                </select>
+                <ChevronDown className="absolute end-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none" />
+              </div>
+            )}
+
             {/* Delete button — visible on hover */}
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(question.id!) }}
