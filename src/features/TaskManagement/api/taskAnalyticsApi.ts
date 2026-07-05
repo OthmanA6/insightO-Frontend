@@ -33,6 +33,10 @@ export interface DailySubmissionStat {
 }
 
 export interface SubmissionTableRow {
+  submissionId: string;
+  taskId: string;
+  courseId?: string;
+  departmentId?: string;
   studentName: string;
   taskTitle: string;
   status: string;

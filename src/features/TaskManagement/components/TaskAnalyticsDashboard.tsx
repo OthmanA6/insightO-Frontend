@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   PieChart,
   Pie,
@@ -161,6 +162,7 @@ function SectionHeader({
 type SortKey = 'studentName' | 'taskTitle' | 'status' | 'submissionDate' | 'finalGrade';
 
 export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { departmentId?: string; courseId?: string; taskId?: string }) {
+  const navigate = useNavigate();
   const [data, setData] = useState<TaskAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -461,10 +463,20 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                     key={i}
                     className="hover:bg-panel-hover/20 transition-colors group"
                   >
-                    <td className="p-4 font-bold text-content group-hover:text-indigo-300 transition-colors whitespace-nowrap">
+                    <td className="p-4 font-bold text-content group-hover:text-indigo-300 transition-colors whitespace-nowrap cursor-pointer hover:underline decoration-indigo-500/30 underline-offset-4"
+                      onClick={() => {
+                        const tId = row.taskId || taskId;
+                        const cId = row.courseId || courseId;
+                        const dId = row.departmentId || departmentId;
+                        const targetUrl = dId
+                          ? `/dashboard/departments/${dId}/courses/${cId}/tasks/${tId}/submissions/${row.submissionId}/grade`
+                          : `/dashboard/courses/${cId}/tasks/${tId}/submissions/${row.submissionId}/grade`;
+                        navigate(targetUrl);
+                      }}
+                    >
                       {row.studentName || '—'}
                     </td>
-                    <td className="p-4 text-content-muted max-w-[200px] truncate">
+                    <td className="p-4 text-content-muted max-w-[200px] truncate" title={row.taskTitle}>
                       {row.taskTitle || '—'}
                     </td>
                     <td className="p-4">
