@@ -148,48 +148,6 @@ export default function LoginForm() {
           )}
         </button>
 
-        {/* ── Divider ────────────────────────────────────────────── */}
-        <div className="relative py-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200 dark:border-slate-800" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white dark:bg-bg-dark px-4 text-xs font-semibold text-content-muted uppercase tracking-widest">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        {/* ── SSO Button ─────────────────────────────────────────── */}
-        <button
-          type="button"
-          className="w-full py-3.5 bg-slate-50 dark:bg-surface-dark border-2 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-content font-bold rounded-xl transition-all flex items-center justify-center gap-3"
-        >
-          <svg
-            className="w-5 h-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.8 15.7 17.58V20.34H19.27C21.36 18.42 22.56 15.6 22.56 12.25Z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23C14.97 23 17.46 22.02 19.27 20.34L15.7 17.58C14.72 18.24 13.46 18.66 12 18.66C9.18 18.66 6.78 16.75 5.91 14.19H2.22V17.06C4.02 20.62 7.73 23 12 23Z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.91 14.19C5.69 13.52 5.56 12.78 5.56 12C5.56 11.22 5.69 10.48 5.91 9.81V6.94H2.22C1.48 8.42 1.05 10.15 1.05 12C1.05 13.85 1.48 15.58 2.22 17.06L5.91 14.19Z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.34C13.62 5.34 15.07 5.89 16.21 6.98L19.34 3.85C17.45 2.09 14.97 1 12 1C7.73 1 4.02 3.38 2.22 6.94L5.91 9.81C6.78 7.25 9.18 5.34 12 5.34Z"
-              fill="#EA4335"
-            />
-          </svg>
-          Single Sign-On (SSO)
-        </button>
 
         <p className="text-center text-sm text-slate-600 dark:text-content-muted pt-2">
           Don&apos;t have an enterprise account?{' '}

@@ -9,7 +9,6 @@ import FormsSurveysPage from '@/features/Forms/pages/FormsSurveysPage'
 import FormBuilderPage from '@/features/FormBuilder/pages/FormBuilderPage'
 import UserManagementPage from '@/features/UserManagement/pages/UserManagementPage'
 import ProfilePage from '@/features/Settings/pages/ProfilePage'
-import SettingsPage from '@/features/Settings/pages/SettingsPage'
 import FormsResultsPage from '@/features/Forms/pages/FormsResultsPage'
 import FormResponsePage from '@/features/Forms/pages/FormResponsePage'
 import PublicFormViewPage from '@/features/Forms/pages/PublicFormViewPage'
@@ -114,7 +113,6 @@ function App() {
 
             <Route path="ai-usage-dashboard" element={<AiUsageDashboardPage />} />
             <Route path="task-analytics" element={<TaskAnalyticsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
             <Route path="forms-results/:formId" element={<FormsResultsPage />} />
           </Route>
         </Route>

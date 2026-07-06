@@ -12,13 +12,12 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { buttonVariants } from "@/shared/components/ui/button"
-import { ThemeToggle } from "@/shared/components/ui/ThemeToggle"
 // 1️⃣ استيراد الـ Hook الذكي والـ Auth المصلح
-import { useAuth } from "@/features/auth/hooks/useAuth" 
+import { useAuth } from "@/features/auth/hooks/useAuth"
 
 export function Navbar() {
   // 2️⃣ استخراج دالة الـ logout وبيانات اليوزر الحالية
-  const { logout, user } = useAuth() 
+  const { logout, user } = useAuth()
 
   // حساب الحروف الأولى للاسم للـ Fallback (مثلاً Amr Khaled -> AK)
   const userInitials = user ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}` : 'JD'
@@ -26,12 +25,12 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur-md">
-      
+
       {/* Left side: Search */}
       <div className="flex w-full max-w-sm items-center">
-        <Input 
-          type="search" 
-          placeholder="Search..." 
+        <Input
+          type="search"
+          placeholder="Search..."
           startIcon={<Search className="h-4 w-4" />}
           className="bg-background/50 backdrop-blur-sm"
         />
@@ -39,15 +38,8 @@ export function Navbar() {
 
       {/* Right side: Notifications & User Profile */}
       <div className="flex items-center gap-4">
-        
-        <ThemeToggle />
 
-        {/* Notification Bell */}
-        <button className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "relative h-9 w-9 p-0 rounded-full")}>
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          <span className="absolute end-1.5 top-1.5 flex h-2 w-2 rounded-full bg-red-500"></span>
-          <span className="sr-only">Notifications</span>
-        </button>
+
 
         {/* User Dropdown */}
         <DropdownMenu>
@@ -68,17 +60,11 @@ export function Navbar() {
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer focus:bg-panel-hover">
-              <Link to="/dashboard/settings" className="w-full flex items-center">
-                <Settings className="me-2 h-4 w-4 text-content-muted" />
-                <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-panel-hover" />
-            
+
             {/* 5️⃣ السحر هنا: ربط حدث الـ onClick بالدالة القوية المصلحة فوراً */}
-            <DropdownMenuItem 
-              onClick={logout} 
+            <DropdownMenuItem
+              onClick={logout}
               className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive font-bold"
             >
               <LogOut className="me-2 h-4 w-4" />

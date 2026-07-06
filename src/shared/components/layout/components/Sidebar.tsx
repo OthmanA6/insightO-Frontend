@@ -37,9 +37,8 @@ export function Sidebar({ className, ...props }: SidebarProps) {
     {
       title: "System",
       items: [
-        { name: "Security & Logs", href: "/dashboard/settings", icon: ShieldCheck },
         { name: "AI Token Usage", href: "/dashboard/ai-usage-dashboard", icon: Zap },
-        { name: "Settings", href: "/dashboard/settings", icon: Settings },
+        { name: "Settings", href: "/dashboard/profile", icon: Settings },
       ]
     }
   ];
@@ -53,6 +52,12 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         { name: "My Evaluations", href: "/dashboard/student-evaluations", icon: ClipboardCheck },
         { name: "Pending Surveys", href: "/dashboard/student-surveys", icon: FileQuestion },
       ]
+    },
+    {
+      title: "Account",
+      items: [
+        { name: "Settings", href: "/dashboard/profile", icon: Settings },
+      ]
     }
   ];
 
@@ -65,6 +70,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
         { name: "Students Directory", href: "/dashboard/directory", icon: Users },
         { name: "Task Analytics", href: "/dashboard/task-analytics", icon: BarChart3 },
         { name: "AI Quota", href: "/dashboard/ai-usage-dashboard", icon: Zap },
+        { name: "Settings", href: "/dashboard/profile", icon: Settings },
       ]
     }
   ];

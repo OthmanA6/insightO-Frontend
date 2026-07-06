@@ -6,8 +6,9 @@ import { Label } from '@/shared/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Badge } from '@/shared/components/ui/badge';
 import { Modal } from '@/shared/components/ui/Modal';
-import { User as UserIcon, Mail, Camera, Loader2, Shield, Building2, Calendar, Fingerprint, Lock, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
+import { User as UserIcon, Mail, Camera, Loader2, Shield, Building2, Calendar, Fingerprint, Lock, Eye, EyeOff, CheckCircle2, XCircle, Palette } from 'lucide-react';
 import * as authApi from '@/features/auth/api/authApi';
+import { ThemeToggle } from '@/shared/components/ui/ThemeToggle';
 import type { User } from '@/features/auth/types';
 import { toast } from 'sonner';
 
@@ -357,6 +358,23 @@ export default function ProfilePage() {
               >
                 Change Password
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-panel border-panel border-s-4 border-s-indigo-500/50 shadow-xl overflow-hidden">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-500">
+                  <Palette className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-content tracking-tight">Appearance</h4>
+                  <p className="text-xs text-content-muted font-medium">Toggle between Light and Dark mode for the system.</p>
+                </div>
+              </div>
+              <div className="bg-panel-hover border border-panel rounded-xl flex items-center justify-center shadow-inner">
+                <ThemeToggle />
+              </div>
             </CardContent>
           </Card>
         </div>

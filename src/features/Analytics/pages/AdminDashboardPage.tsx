@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '@/shared/api/axiosInstance';
 import { 
@@ -84,6 +84,19 @@ export default function AdminDashboardPage() {
     fetchMetrics();
   }, []);
 
+  const pieCells = useMemo(() => {
+    if (!data?.charts?.userRoles) return [];
+    return data.charts.userRoles.map((entry: any, index: number) => {
+      let color = '#6366f1';
+      const roleName = String(entry.name || '').toUpperCase();
+      if (roleName === 'STUDENT') color = '#10b981'; // Emerald
+      else if (roleName === 'INSTRUCTOR') color = '#f59e0b'; // Amber
+      else if (roleName === 'HOD') color = '#a855f7'; // Purple
+      else if (roleName === 'ADMIN') color = '#f43f5e'; // Rose
+      return <Cell key={`cell-${roleName}-${index}`} fill={color} />;
+    });
+  }, [data?.charts?.userRoles]);
+
   if (loading || !data) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
@@ -133,15 +146,9 @@ export default function AdminDashboardPage() {
                     paddingAngle={3} 
                     dataKey="value"
                     stroke="none"
+                    // Re-enabled entrance animation!
                   >
-                    {charts.userRoles.map((entry: any, index: number) => {
-                      let color = '#6366f1';
-                      if (entry.name === 'STUDENT') color = '#10b981'; // Emerald
-                      if (entry.name === 'INSTRUCTOR') color = '#f59e0b'; // Amber
-                      if (entry.name === 'HOD') color = '#a855f7'; // Purple
-                      if (entry.name === 'ADMIN') color = '#f43f5e'; // Rose
-                      return <Cell key={`cell-${index}`} fill={color} />;
-                    })}
+                    {pieCells}
                   </Pie>
                   <RechartsTooltip content={<CustomPieTooltip />} cursor={{ fill: 'transparent' }} />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" formatter={(value) => {
