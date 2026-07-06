@@ -161,7 +161,7 @@ export default function FormBuilderPage() {
   const shareUrl = effectiveFormId
     ? (category === "GENERAL"
       ? `${window.location.origin}/public/form/${effectiveFormId}`
-      : `${window.location.origin}/dashboard/forms/${effectiveFormId}`)
+      : `${window.location.origin}/form/${effectiveFormId}`)
     : `${window.location.origin}/form/preview`;
 
   useEffect(() => {

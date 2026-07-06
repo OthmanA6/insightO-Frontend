@@ -70,6 +70,9 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
+        {/* Support legacy/specialized form links */}
+        <Route path="/dashboard/forms/:formId" element={<FormResponsePage />} />
+
         {/* Dashboard layout (Protected) */}
         <Route path="/dashboard" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route index element={<DashboardRouter />} />

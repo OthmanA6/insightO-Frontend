@@ -3,6 +3,7 @@ import { getAllForms } from '@/features/FormBuilder/api/formApi';
 import type { Form } from '@/features/FormBuilder/types/form.types';
 import { getMyFormSubmissions } from '@/shared/api/submissionApi';
 import type { Submission } from '@/shared/api/submissionApi';
+import { getCourses } from '@/shared/api/courseApi';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { Loader2, FileQuestion, Calendar, ArrowRight, CheckCircle2, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -18,12 +19,15 @@ export default function StudentSurveysPage() {
   useEffect(() => {
     const fetchForms = async () => {
       try {
-        const [allForms, mySubmissions] = await Promise.all([
+        const [allForms, mySubmissions, enrolledCourses] = await Promise.all([
           getAllForms(),
-          getMyFormSubmissions()
+          getMyFormSubmissions(),
+          getCourses()
         ]);
         setSubmissions(mySubmissions);
         
+        const enrolledCourseIds = new Set(enrolledCourses.map(c => c.id || c._id));
+
         // Extract IDs of forms the user has already submitted
         const submittedFormIds = new Set(
           mySubmissions.map(s => {
@@ -32,21 +36,32 @@ export default function StudentSurveysPage() {
           }).filter(Boolean)
         );
 
-        // Filter forms that are active, assigned to STUDENT, and match department
+        // Filter forms based on type and student enrollment
         const studentForms = allForms.filter(f => {
           const formId = f.id || f._id;
           if (submittedFormIds.has(formId)) return false; // Already submitted
 
+          // 1. Facility Forms: Show to all students (regardless of evaluator_roles)
+          if (f.subject_role === 'FACILITY') return f.is_active;
+
           const isStudentForm = f.is_active && f.evaluator_roles?.includes('STUDENT');
           if (!isStudentForm) return false;
+
+          // 2. Course Forms: Show only if student is enrolled in the course
+          if (f.course_id) {
+            const courseId = typeof f.course_id === 'object' ? (f.course_id as any)._id || (f.course_id as any).id : f.course_id;
+            return enrolledCourseIds.has(courseId);
+          }
           
+          // 3. Department Forms: Show only if student is in the department
           if (f.department_id) {
             const formDeptId = typeof f.department_id === 'object' ? (f.department_id as any)._id || (f.department_id as any).id : f.department_id;
             const userDeptId = typeof user?.departmentId === 'object' ? (user.departmentId as any)._id || (user.departmentId as any).id : user?.departmentId;
             return formDeptId === userDeptId;
           }
           
-          return true; // No department assigned means it's a general survey
+          // 4. General Forms (no course, no dept, no facility)
+          return true;
         });
         setForms(studentForms);
       } catch (error) {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts'
 import {
   Download, Sparkles, ArrowUp, Brain, Star,
   ChevronLeft, ChevronRight, User, Calendar, Network, Lightbulb, CheckCircle2, ArrowLeft, Loader2, FileText, Meh,
@@ -16,6 +17,26 @@ import { analyzeFormDeep, analyzeForm } from "@/features/Forms/api/formAiApi"
 import type { FormDeepAnalysisPayload, FormAnalysisPayload } from "@/features/Forms/api/formAiApi"
 
 type TabKey = "summary" | "questions" | "individual" | "ai"
+
+const renderAiListItem = (item: any) => {
+  if (typeof item === 'string') return item;
+  if (typeof item === 'object' && item !== null) {
+    if (item.title && item.description) return <span className="block"><strong>{item.title}</strong>: {item.description}</span>;
+    if (item.step && item.action) return <span className="block"><strong>Step {item.step}</strong>: {item.action}</span>;
+    
+    // Dynamic fallback for any other object shape (like {step, rationale, metrics})
+    return (
+      <div className="flex flex-col gap-1.5 mt-2 bg-slate-50 dark:bg-black/20 p-4 rounded-xl border border-slate-200 dark:border-panel w-full shadow-sm">
+        {Object.entries(item).map(([key, value]) => (
+          <span key={key} className="block text-sm text-slate-700 dark:text-content-muted leading-relaxed">
+            <strong className="capitalize text-slate-900 dark:text-content">{String(key).replace(/_/g, ' ')}:</strong> {String(value)}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  return String(item);
+}
 
 export default function FormsResultsPage() {
   const navigate = useNavigate()
@@ -75,11 +96,18 @@ export default function FormsResultsPage() {
       return { counts, total: answers.length }
     }
 
-    if (question.type === 'multiple_choice') {
+    if (question.type === 'multiple_choice' || question.type === 'checkbox') {
       const counts: Record<string, number> = {}
       answers.forEach(val => {
-        const s = String(val)
-        counts[s] = (counts[s] || 0) + 1
+        if (Array.isArray(val)) {
+          val.forEach(v => {
+            const s = String(v)
+            counts[s] = (counts[s] || 0) + 1
+          })
+        } else {
+          const s = String(val)
+          counts[s] = (counts[s] || 0) + 1
+        }
       })
       return { counts, total: answers.length }
     }
@@ -133,6 +161,54 @@ export default function FormsResultsPage() {
     }
   }
 
+  const handleExportCSV = () => {
+    if (!form || submissions.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    // Headers
+    const headers = ["Timestamp"];
+    form.questions.forEach((q) => headers.push(q.label || "Untitled Question"));
+
+    // Rows
+    const rows = submissions.map((sub) => {
+      const row = [`"${new Date(sub.createdAt).toLocaleString()}"`];
+      form.questions.forEach((q) => {
+        const qId = q._id || q.id;
+        const answer = sub.answers.find((a: any) => {
+          const aId = a.question_id?._id || a.question_id;
+          return aId === qId;
+        });
+        let val = answer?.value;
+        if (Array.isArray(val)) val = val.join(" | ");
+        if (typeof val === 'object' && val !== null) {
+          val = (val as any).fileName || (val as any).url || JSON.stringify(val);
+        }
+        if (val === undefined || val === null) val = "";
+        
+        // Escape quotes and wrap in quotes to handle commas in text
+        row.push(`"${String(val).replace(/"/g, '""')}"`);
+      });
+      return row;
+    });
+
+    const csvContent = [
+      headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(","),
+      ...rows.map(e => e.join(","))
+    ].join("\n");
+
+    // Add BOM for UTF-8 (Excel Arabic support)
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${form.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_responses.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-bg-dark">
@@ -185,7 +261,13 @@ export default function FormsResultsPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-
+            <button
+              onClick={handleExportCSV}
+              disabled={submissions.length === 0}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold shadow-md hover:opacity-90 disabled:opacity-50 transition-all"
+            >
+              <Download className="h-4 w-4" /> Export CSV
+            </button>
           </div>
         </div>
 
@@ -214,8 +296,8 @@ export default function FormsResultsPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-32">
-        <div className="mx-auto max-w-7xl h-full">
-          <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col gap-10 h-full">
+        <div className="mx-auto max-w-7xl">
+          <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col gap-10">
 
             {/* SUMMARY TAB */}
             {activeTab === "summary" && (
@@ -299,9 +381,6 @@ export default function FormsResultsPage() {
                             <h4 className="text-xl font-black text-slate-900 dark:text-content uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
                             <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-full">Neural Core Active</Badge>
                           </div>
-                          <pre className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-eed-200 overflow-auto w-full font-mono mt-4">
-                            {JSON.stringify(summaryAiData, null, 2)}
-                          </pre>
                         </div>
                         <button
                           onClick={handleGenerateSummaryAi}
@@ -316,9 +395,6 @@ export default function FormsResultsPage() {
                         {Object.entries(summaryAiData.tags || {}).length === 0 ? (
                           <div className="text-center py-6 text-content-muted dark:text-content-muted">
                             <p className="text-xs font-bold uppercase tracking-widest mb-2">No category summaries generated</p>
-                            <pre className="text-[10px] bg-slate-100 dark:bg-black/30 p-4 rounded-xl text-start overflow-x-auto font-mono">
-                              {JSON.stringify(summaryAiData, null, 2)}
-                            </pre>
                           </div>
                         ) : (
                           Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
@@ -349,7 +425,7 @@ export default function FormsResultsPage() {
                                     <ul className="space-y-1.5">
                                       {result.strengths.map((s, i) => (
                                         <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
+                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{renderAiListItem(s)}
                                         </li>
                                       ))}
                                     </ul>
@@ -363,7 +439,7 @@ export default function FormsResultsPage() {
                                     <ul className="space-y-1.5">
                                       {result.weaknesses.map((w, i) => (
                                         <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
+                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{renderAiListItem(w)}
                                         </li>
                                       ))}
                                     </ul>
@@ -377,7 +453,7 @@ export default function FormsResultsPage() {
                                     <ul className="space-y-1.5">
                                       {result.action_items.map((a, i) => (
                                         <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
+                                          <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{renderAiListItem(a)}
                                         </li>
                                       ))}
                                     </ul>
@@ -394,15 +470,17 @@ export default function FormsResultsPage() {
 
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-black text-content-muted uppercase tracking-widest ms-1">Key Performance Metrics</h3>
-                  {form.questions.slice(0, 3).map((q, idx) => {
+                  {form.questions.filter(q => q.type !== 'short_text' && q.type !== 'long_text' && q.type !== 'file').slice(0, 3).map((q, idx) => {
                     const stats = getQuestionStats(q) as any
+                    if (q.type === 'short_text' || q.type === 'long_text' || q.type === 'file') return null
+
                     return (
                       <div key={idx} className="rounded-2xl border border-slate-200 bg-white dark:border-panel-hover dark:bg-surface-dark p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-900 dark:text-content mb-6 flex items-center gap-2">
                           <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 text-[10px] font-black">{idx + 1}</span>
                           {q.label}
                         </h3>
-                        {q.type === 'linear_scale' ? (
+                        {q.type === 'linear_scale' && (
                           <div className="space-y-4">
                             {[5, 4, 3, 2, 1].map((rating) => {
                               const count = stats.counts[rating] || 0
@@ -423,9 +501,39 @@ export default function FormsResultsPage() {
                               )
                             })}
                           </div>
-                        ) : (
-                          <div className="p-4 rounded-xl bg-slate-50 dark:bg-bg-dark border border-slate-200 dark:border-panel">
-                            <p className="text-xs text-content-muted italic">Quantitative analysis restricted to scale-based inquiries. Qualitative synthesis available in Question Deep Dive.</p>
+                        )}
+                        {(q.type === 'multiple_choice' || q.type === 'checkbox') && (
+                          <div className="h-64 w-full mt-4 flex justify-center">
+                            {Object.keys(stats.counts || {}).length > 0 ? (
+                              <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                  <Pie
+                                    data={Object.entries(stats.counts).map(([name, value]) => ({ name, value }))}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    labelLine={false}
+                                  >
+                                    {Object.keys(stats.counts).map((_, index) => {
+                                      const colors = ['#6366f1', '#a855f7', '#ec4899', '#3b82f6', '#10b981', '#f59e0b']
+                                      return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                    })}
+                                  </Pie>
+                                  <RechartsTooltip 
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+                                    itemStyle={{ color: '#1e293b', fontWeight: 'bold' }}
+                                  />
+                                </PieChart>
+                              </ResponsiveContainer>
+                            ) : (
+                              <div className="flex items-center justify-center h-full w-full opacity-50">
+                                <p className="text-xs font-bold uppercase tracking-widest text-content-muted">No data points</p>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -788,7 +896,7 @@ export default function FormsResultsPage() {
                             {aiData.global.key_problems.length ? aiData.global.key_problems.map((p, i) => (
                               <li key={i} className="flex items-start gap-3 text-sm text-slate-700 dark:text-content-muted">
                                 <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
-                                {p}
+                                {renderAiListItem(p)}
                               </li>
                             )) : <li className="text-xs text-content-muted italic">No major systemic issues identified.</li>}
                           </ul>
@@ -801,7 +909,7 @@ export default function FormsResultsPage() {
                             {aiData.global.recommendations.length ? aiData.global.recommendations.map((r, i) => (
                               <li key={i} className="flex items-start gap-3 text-sm text-slate-700 dark:text-content-muted">
                                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 mt-0.5" />
-                                {r}
+                                {renderAiListItem(r)}
                               </li>
                             )) : <li className="text-xs text-content-muted italic">No recommendations at this time.</li>}
                           </ul>
@@ -844,7 +952,7 @@ export default function FormsResultsPage() {
                             <ul className="space-y-2">
                               {result.strengths.length ? result.strengths.map((s, i) => (
                                 <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{s}
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{renderAiListItem(s)}
                                 </li>
                               )) : <li className="text-xs text-content-muted italic">None identified</li>}
                             </ul>
@@ -856,7 +964,7 @@ export default function FormsResultsPage() {
                             <ul className="space-y-2">
                               {result.weaknesses.length ? result.weaknesses.map((w, i) => (
                                 <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{w}
+                                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{renderAiListItem(w)}
                                 </li>
                               )) : <li className="text-xs text-content-muted italic">None identified</li>}
                             </ul>
@@ -868,7 +976,7 @@ export default function FormsResultsPage() {
                             <ul className="space-y-2">
                               {result.action_items.length ? result.action_items.map((a, i) => (
                                 <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                  <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{a}
+                                  <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{renderAiListItem(a)}
                                 </li>
                               )) : <li className="text-xs text-content-muted italic">None identified</li>}
                             </ul>
