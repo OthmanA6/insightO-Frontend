@@ -249,7 +249,7 @@ export default function InstructorDashboardPage() {
                       </div>
                       <div className="shrink-0">
                         <Link
-                          to={`/dashboard/departments/all/courses/${courseId}/tasks/${task.id || task._id}`}
+                          to={`/dashboard/courses/${courseId}/tasks/${task.id || task._id}`}
                         >
                           <Button
                             className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-panel-hover text-content-muted hover:bg-indigo-600 hover:text-content transition-colors flex items-center gap-2 border border-panel-hover shadow-none hover:shadow-[0_0_15px_rgba(79,70,229,0.3)]"
