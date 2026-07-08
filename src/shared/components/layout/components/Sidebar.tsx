@@ -108,7 +108,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
                         buttonVariants({ variant: isActive ? "outline" : "ghost" }),
                         "w-full justify-start gap-4 h-11 px-4 rounded-xl transition-all font-bold text-xs",
                         isActive
-                          ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20"
+                          ? "bg-indigo-600/15 dark:bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20"
                           : "text-content-muted hover:text-content hover:bg-panel-hover"
                       )
                     }

@@ -178,7 +178,7 @@ export default function CourseTasksView() {
               setEditingTask(null);
               setIsSelectorOpen(true);
             }}
-            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-indigo-500/20 transition-[border-color,background-color] flex items-center gap-2"
+            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-sm transition-[border-color,background-color] flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             Create Task

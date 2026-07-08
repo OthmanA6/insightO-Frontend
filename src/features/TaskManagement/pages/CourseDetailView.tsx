@@ -109,13 +109,13 @@ export default function CourseDetailView() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-panel-hover p-8 md:p-12 shadow-xl hover:shadow-indigo-500/10 transition-all duration-300">
+      <section className="relative overflow-hidden rounded-3xl bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover p-8 md:p-12 shadow-sm transition-all duration-300">
         <div className="absolute top-0 end-0 p-8 opacity-10">
           <Building2 className="h-48 w-48 text-content" />
         </div>
         <div className="relative z-10 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/20 w-fit px-3 py-1 rounded-lg border border-indigo-500/30">
+            <span className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-500/20 w-fit px-3 py-1 rounded-lg border border-indigo-500/30">
               {course?.courseCode}
             </span>
             <h1 className="text-3xl md:text-5xl font-black text-content tracking-tight">{course?.name}</h1>
@@ -124,13 +124,13 @@ export default function CourseDetailView() {
           <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-content-muted">
             <div className="flex items-center gap-2 bg-panel-hover px-4 py-2 rounded-xl border border-panel-hover text-content">
               <div className="h-5 w-5 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-indigo-500/30">
-                <User className="h-3 w-3 text-indigo-400" />
+                <User className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
               </div>
               {instructorName}
             </div>
             {course?.credits && (
               <div className="flex items-center gap-2 bg-panel-hover px-4 py-2 rounded-xl border border-panel-hover text-content">
-                <span className="font-bold text-indigo-400">{course?.credits}</span> Credits
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">{course?.credits}</span> Credits
               </div>
             )}
           </div>
@@ -158,7 +158,7 @@ export default function CourseDetailView() {
         </div>
 
         {tasks.length === 0 ? (
-          <div className="p-16 text-center rounded-3xl border border-panel-hover bg-indigo-950/10 backdrop-blur-md flex flex-col items-center gap-4">
+          <div className="p-16 text-center rounded-3xl border border-panel-hover bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md flex flex-col items-center gap-4">
             <ClipboardList className="h-12 w-12 text-content-muted/50" />
             <p className="text-content-muted font-medium">No active tasks assigned to this course right now.</p>
           </div>
@@ -167,10 +167,10 @@ export default function CourseDetailView() {
             {tasks.map(task => {
               const expired = isExpired(task.deadline);
               return (
-              <div key={task.id || task._id} className={`group p-6 bg-indigo-950/10 backdrop-blur-md border transition-all duration-300 shadow-xl rounded-3xl relative overflow-hidden flex flex-col justify-between ${
+              <div key={task.id || task._id} className={`group p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border transition-all duration-300 shadow-sm rounded-3xl relative overflow-hidden flex flex-col justify-between ${
                 expired
                   ? 'border-panel-hover opacity-60'
-                  : 'border-panel-hover hover:border-indigo-500/30 hover:shadow-indigo-500/10'
+                  : 'border-panel-hover hover:border-indigo-500/30'
               }`}>
                 <div className="space-y-4">
                   <h3 className="text-lg font-black tracking-tight text-content leading-tight">{task.title}</h3>
@@ -192,7 +192,7 @@ export default function CourseDetailView() {
                             className="flex items-center justify-between p-2 rounded-lg bg-indigo-950/20 border border-panel-hover hover:border-indigo-500/50 transition-colors group"
                           >
                             <div className="flex items-center gap-2 min-w-0">
-                              <FileText className="h-3.5 w-3.5 text-indigo-400 shrink-0"/>
+                              <FileText className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400 shrink-0"/>
                               <span className="text-xs font-medium text-content-muted group-hover:text-content truncate">{att.fileName || `File ${idx + 1}`}</span>
                             </div>
                             <Download className="h-3 w-3 text-content-muted group-hover:text-indigo-400 transition-colors shrink-0" />
@@ -220,7 +220,7 @@ export default function CourseDetailView() {
                   ) : (
                     <Button
                       onClick={() => handleSubmitTask(task)}
-                      className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors"
+                      className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-500/50 shadow-sm transition-colors"
                     >
                       Submit Assignment <ArrowRight className="h-4 w-4" />
                     </Button>

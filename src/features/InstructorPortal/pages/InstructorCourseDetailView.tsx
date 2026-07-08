@@ -87,18 +87,18 @@ export default function InstructorCourseDetailView() {
 />
 
       {/* Majestic Glassmorphism Header */}
-      <div className="relative rounded-3xl overflow-hidden bg-indigo-950/20 border border-panel-hover p-8 shadow-2xl backdrop-blur-md">
+      <div className="relative rounded-3xl overflow-hidden bg-white/80 dark:bg-indigo-950/20 border border-panel-hover p-8 shadow-sm backdrop-blur-md">
         <div className="absolute -top-24 -end-24 h-64 w-64 bg-indigo-600/20 blur-3xl rounded-full pointer-events-none" />
         <div className="absolute -bottom-24 -start-24 h-64 w-64 bg-purple-600/10 blur-3xl rounded-full pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="flex items-center gap-6">
-            <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 flex items-center justify-center text-indigo-400 border border-panel-hover shadow-inner">
+            <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-panel-hover shadow-inner">
               <BookOpen className="h-10 w-10" />
             </div>
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 font-black tracking-widest uppercase">
+                <Badge variant="outline" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 font-black tracking-widest uppercase">
                   {course?.courseCode}
                 </Badge>
                 <span className="text-xs font-bold text-content-muted uppercase tracking-widest">
@@ -119,9 +119,8 @@ export default function InstructorCourseDetailView() {
         </div>
       </div>
 
-      {/* Tabs Layout */}
       <Tabs defaultValue="tasks" className="w-full space-y-8">
-        <TabsList className="bg-indigo-950/20 border border-panel p-1 h-14 rounded-2xl">
+        <TabsList className="bg-slate-100/80 dark:bg-indigo-950/20 border border-panel p-1 h-14 rounded-2xl">
           <TabsTrigger value="tasks" className="rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-content-muted font-bold px-8 h-full flex items-center gap-2">
             <Target className="h-4 w-4" /> Active Tasks
           </TabsTrigger>
@@ -139,9 +138,9 @@ export default function InstructorCourseDetailView() {
               });
               
               return (
-                <div key={task.id || task._id} className="group rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 shadow-xl transition-all p-6 flex flex-col h-full">
+                <div key={task.id || task._id} className="group rounded-3xl bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 shadow-sm transition-all p-6 flex flex-col h-full">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                    <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                       <Target className="h-6 w-6" />
                     </div>
                     <Badge variant="outline" className={task.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-content-muted border-slate-500/20'}>
@@ -181,7 +180,7 @@ export default function InstructorCourseDetailView() {
         </TabsContent>
 
         <TabsContent value="students" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-panel-hover shadow-xl overflow-hidden">
+          <div className="rounded-3xl bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-start text-sm text-content-muted">
                 <thead className="bg-panel-hover text-xs uppercase font-black text-content-muted border-b border-panel-hover">
@@ -203,7 +202,7 @@ export default function InstructorCourseDetailView() {
                       <tr key={sub.id || sub._id} className="hover:bg-panel-hover transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-black text-indigo-400">
+                            <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-black text-indigo-600 dark:text-indigo-400">
                               {student?.firstName?.charAt(0) || '?'}
                             </div>
                             <div className="flex flex-col">
@@ -233,7 +232,7 @@ export default function InstructorCourseDetailView() {
                         </td>
                         <td className="px-6 py-4 text-end">
                           <Link to={`/dashboard/courses/${courseId}/tasks/${typeof sub.task_id === 'object' ? (sub.task_id as any)._id : sub.task_id}`}>
-                            <Button variant="ghost" size="sm" className="h-8 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-xs">
+                            <Button variant="ghost" size="sm" className="h-8 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-xs">
                               Review
                             </Button>
                           </Link>
