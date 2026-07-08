@@ -52,6 +52,9 @@ export default {
         'content': 'var(--text-primary)',
         'content-muted': 'var(--text-secondary)',
         'panel-hover': 'var(--hover-panel)',
+        'chart-grid': 'var(--chart-grid)',
+        'chart-axis': 'var(--chart-axis-text)',
+        'chart-tooltip': 'var(--chart-tooltip-bg)',
       },
       borderColor: {
         'panel': 'var(--border-panel)',

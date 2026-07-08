@@ -42,7 +42,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
             className={cn(
               "flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all",
               viewMode === 'ai' 
-                ? "bg-indigo-600 text-white shadow-md" 
+                ? "bg-indigo-600 text-white shadow-sm" 
                 : "text-content-muted hover:text-content hover:bg-panel-hover"
             )}
           >
@@ -54,7 +54,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
             className={cn(
               "flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all",
               viewMode === 'stats' 
-                ? "bg-purple-600 text-white shadow-md" 
+                ? "bg-purple-600 text-white shadow-sm" 
                 : "text-content-muted hover:text-content hover:bg-panel-hover"
             )}
           >
@@ -65,7 +65,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
       </div>
 
       {viewMode === 'ai' && (
-        <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
+        <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-sm relative">
           <EntityInsightsView entityType="COURSE" entityId={courseId} />
         </div>
       )}
@@ -81,7 +81,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
       
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-indigo-500/50 transition-all">
+        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-indigo-500/50 transition-all">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500">
               <Users className="h-6 w-6" />
@@ -93,7 +93,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
           </div>
         </div>
 
-        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-purple-500/50 transition-all">
+        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-purple-500/50 transition-all">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-500">
               <FileText className="h-6 w-6" />
@@ -105,7 +105,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
           </div>
         </div>
 
-        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-emerald-500/50 transition-all">
+        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-emerald-500/50 transition-all">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
               <CheckCircle className="h-6 w-6" />
@@ -117,7 +117,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
           </div>
         </div>
 
-        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-blue-500/50 transition-all">
+        <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-blue-500/50 transition-all">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
               <TrendingUp className="h-6 w-6" />
@@ -131,7 +131,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
       </div>
 
       {/* Threshold Control */}
-      <div className="rounded-3xl bg-panel border border-panel p-6 shadow-2xl">
+      <div className="rounded-3xl bg-panel border border-panel p-6 shadow-sm">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-black text-content flex items-center gap-2">
@@ -161,7 +161,7 @@ export function CourseAnalyticsDashboard({ courseId }: { courseId: string }) {
       </div>
 
       {/* Student Roster Table */}
-      <div className="rounded-3xl bg-panel border border-panel shadow-2xl overflow-hidden">
+      <div className="rounded-3xl bg-panel border border-panel shadow-sm overflow-hidden">
         <div className="p-6 border-b border-panel flex justify-between items-center">
           <div>
             <h3 className="text-xl font-black text-content">Student Performance Roster</h3>

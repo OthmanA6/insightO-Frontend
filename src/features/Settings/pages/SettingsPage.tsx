@@ -69,7 +69,7 @@ export default function SettingsPage() {
               variant={activeTab === tab.id ? "primary" : "ghost"}
               className={`w-full justify-start font-bold h-12 rounded-xl transition-all ${
                 activeTab === tab.id 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" 
+                ? "bg-indigo-600 text-white shadow-sm" 
                 : "text-content-muted hover:text-content hover:bg-panel-hover"
               }`}
               onClick={() => setActiveTab(tab.id as SettingsTab)}
@@ -83,7 +83,7 @@ export default function SettingsPage() {
         {/* Settings Content */}
         <div className="lg:col-span-3 space-y-6">
           {activeTab === 'notifications' && (
-            <Card className="bg-panel border-panel shadow-2xl overflow-hidden animate-in slide-in-from-right-4">
+            <Card className="bg-panel border-panel shadow-sm overflow-hidden animate-in slide-in-from-right-4">
               <CardHeader className="bg-panel-hover border-b border-panel p-8">
                 <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                   <Bell className="h-5 w-5 text-indigo-500" /> Notifications
@@ -123,14 +123,14 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
               <CardFooter className="bg-app/50 border-t border-panel p-6 flex justify-end">
-                <Button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-11 px-8 rounded-xl shadow-lg">Save Preferences</Button>
+                <Button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-11 px-8 rounded-xl shadow-sm">Save Preferences</Button>
               </CardFooter>
             </Card>
           )}
 
           {activeTab === 'security' && (
             <div className="space-y-6 animate-in slide-in-from-right-4">
-              <Card className="bg-panel border-panel shadow-2xl overflow-hidden">
+              <Card className="bg-panel border-panel shadow-sm overflow-hidden">
                 <CardHeader className="bg-panel-hover border-b border-panel p-8">
                   <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                     <Key className="h-5 w-5 text-indigo-500" /> Change Password
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                     <Button 
                       type="submit" 
                       disabled={isSaving}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2"
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-11 px-8 rounded-xl shadow-sm transition-all flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                       Update Credentials
@@ -194,7 +194,7 @@ export default function SettingsPage() {
                 </form>
               </Card>
 
-              <Card className="bg-panel border-panel shadow-xl overflow-hidden border-s-4 border-s-indigo-500">
+              <Card className="bg-panel border-panel shadow-sm overflow-hidden border-s-4 border-s-indigo-500">
                 <CardContent className="p-8 flex items-center justify-between">
                   <div className="flex items-center gap-6">
                     <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
@@ -211,7 +211,7 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-panel border-panel shadow-xl overflow-hidden">
+              <Card className="bg-panel border-panel shadow-sm overflow-hidden">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-bold uppercase tracking-widest text-content-muted flex items-center gap-2">
                     <History className="h-4 w-4 text-indigo-500" /> Recent Security Activity

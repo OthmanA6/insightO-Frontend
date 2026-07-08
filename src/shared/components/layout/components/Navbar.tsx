@@ -47,7 +47,7 @@ export function Navbar() {
             <Avatar className="h-9 w-9 border border-border cursor-pointer">
               <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="@user" />
               {/* 3️⃣ جعل الـ Fallback ديناميكي باسم الطالب أو الدكتور الحقيقي */}
-              <AvatarFallback className="bg-indigo-600/20 text-indigo-400 font-bold text-xs uppercase">{userInitials}</AvatarFallback>
+              <AvatarFallback className="bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase">{userInitials}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-panel border-panel text-content">

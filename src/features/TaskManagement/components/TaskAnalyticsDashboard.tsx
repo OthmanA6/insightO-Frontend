@@ -41,7 +41,7 @@ import { getTaskAnalytics, type TaskAnalyticsData } from '../api/taskAnalyticsAp
 
 // ── Colour palette (matches the rest of the app's indigo/purple scheme) ─────
 const PALETTE = ['#6366f1', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#14b8a6'];
-const PIE_COLORS = { Submitted: '#6366f1', 'Not Submitted': '#334155' };
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sub-components
@@ -64,7 +64,7 @@ function SummaryCard({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl p-6 border border-panel-hover bg-panel shadow-xl flex flex-col gap-3 group hover:border-indigo-500/40 transition-all duration-300`}
+      className={`relative overflow-hidden rounded-3xl p-6 border border-panel-hover bg-panel shadow-sm flex flex-col gap-3 group hover:border-indigo-500/40 transition-all duration-300`}
     >
       {/* decorative glow */}
       <div
@@ -91,12 +91,12 @@ const PieTooltip = ({ active, payload }: any) => {
   if (active && payload?.length) {
     const d = payload[0];
     return (
-      <div className="bg-panel border border-panel-hover p-3 rounded-2xl shadow-2xl text-sm font-bold text-content flex items-center gap-2">
+      <div className="bg-panel border border-panel-hover p-3 rounded-2xl shadow-sm text-sm font-bold text-content flex items-center gap-2">
         <span
           className="inline-block w-3 h-3 rounded-full"
           style={{ background: d.payload.fill ?? d.fill }}
         />
-        {d.name}: <span className="text-indigo-400">{d.value}</span>
+        {d.name}: <span className="text-indigo-600 dark:text-indigo-400">{d.value}</span>
       </div>
     );
   }
@@ -107,7 +107,7 @@ const PieTooltip = ({ active, payload }: any) => {
 const GenericTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-panel/95 backdrop-blur-md border border-panel-hover p-4 rounded-2xl shadow-2xl">
+      <div className="bg-panel/95 backdrop-blur-md border border-panel-hover p-4 rounded-2xl shadow-sm">
         <p className="text-xs font-black text-content-muted uppercase tracking-wider mb-2">
           {label}
         </p>
@@ -125,11 +125,11 @@ const GenericTooltip = ({ active, payload, label }: any) => {
 // Status badge with colour coding
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
-    SUBMITTED: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20',
-    AI_GRADED: 'bg-purple-500/15 text-purple-400 border-purple-500/20',
-    FINALIZED: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+    SUBMITTED: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+    AI_GRADED: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    FINALIZED: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
   };
-  const cls = map[status] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/20';
+  const cls = map[status] ?? 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/20';
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${cls}`}>
       {status}
@@ -141,7 +141,7 @@ function StatusBadge({ status }: { status: string }) {
 function SectionHeader({
   icon: Icon,
   title,
-  color = 'text-indigo-400',
+  color = 'text-indigo-600 dark:text-indigo-400',
 }: {
   icon: React.ElementType;
   title: string;
@@ -261,21 +261,21 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
           label="Total Tasks"
           value={summary.totalTasks}
           icon={ClipboardList}
-          color="text-indigo-400"
+          color="text-indigo-600 dark:text-indigo-400"
           gradient="bg-indigo-500"
         />
         <SummaryCard
           label="Submissions"
           value={summary.submittedCount}
           icon={ClipboardCheck}
-          color="text-emerald-400"
+          color="text-emerald-600 dark:text-emerald-400"
           gradient="bg-emerald-500"
         />
         <SummaryCard
           label="Not Submitted"
           value={summary.notSubmittedCount}
           icon={ClipboardX}
-          color="text-rose-400"
+          color="text-rose-600 dark:text-rose-400"
           gradient="bg-rose-500"
         />
         <SummaryCard
@@ -283,7 +283,7 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
           value={`${summary.submissionRate}%`}
           sub={`${summary.submittedCount} of ${summary.totalTasks} tasks covered`}
           icon={TrendingUp}
-          color="text-purple-400"
+          color="text-purple-600 dark:text-purple-400"
           gradient="bg-purple-500"
         />
       </div>
@@ -292,8 +292,8 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Pie: Submitted vs Not Submitted */}
-        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-xl flex flex-col">
-          <SectionHeader icon={PieIcon} title="Submitted vs Not" color="text-indigo-400" />
+        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-sm flex flex-col">
+          <SectionHeader icon={PieIcon} title="Submitted vs Not" color="text-indigo-600 dark:text-indigo-400" />
           <div className="flex-1 min-h-[220px]">
             {charts.submittedVsNotSubmitted.every((d) => d.value === 0) ? (
               <EmptyChart />
@@ -313,7 +313,7 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                     {charts.submittedVsNotSubmitted.map((entry) => (
                       <Cell
                         key={entry.name}
-                        fill={PIE_COLORS[entry.name as keyof typeof PIE_COLORS] ?? '#6366f1'}
+                        fill={entry.name === 'Submitted' ? '#6366f1' : 'var(--chart-grid)'}
                       />
                     ))}
                   </Pie>
@@ -331,8 +331,8 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
         </div>
 
         {/* Bar: Submissions per Student */}
-        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-xl flex flex-col">
-          <SectionHeader icon={BarChart3} title="Submissions / Student" color="text-emerald-400" />
+        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-sm flex flex-col">
+          <SectionHeader icon={BarChart3} title="Submissions / Student" color="text-emerald-600 dark:text-emerald-400" />
           <div className="flex-1 min-h-[220px]">
             {charts.submissionsPerStudent.length === 0 ? (
               <EmptyChart />
@@ -342,18 +342,18 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                   data={charts.submissionsPerStudent.slice(0, 10)}
                   margin={{ top: 10, right: 10, left: -20, bottom: 30 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e2e48" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                   <XAxis
                     dataKey="studentName"
-                    tick={{ fill: '#888', fontSize: 10 }}
+                    tick={{ fill: 'var(--chart-axis-text)', fontSize: 10 }}
                     tickLine={false}
                     axisLine={false}
                     angle={-30}
                     textAnchor="end"
                     interval={0}
                   />
-                  <YAxis tick={{ fill: '#888', fontSize: 10 }} tickLine={false} axisLine={false} />
-                  <Tooltip content={<GenericTooltip />} cursor={{ fill: '#2e2e48', opacity: 0.4 }} />
+                  <YAxis tick={{ fill: 'var(--chart-axis-text)', fontSize: 10 }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<GenericTooltip />} cursor={{ fill: 'var(--chart-grid)', opacity: 0.4 }} />
                   <Bar dataKey="submittedCount" name="Submissions" radius={[4, 4, 0, 0]} maxBarSize={40}>
                     {charts.submissionsPerStudent.slice(0, 10).map((_e, i) => (
                       <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
@@ -366,8 +366,8 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
         </div>
 
         {/* Line: Submissions over time */}
-        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-xl flex flex-col">
-          <SectionHeader icon={LineIcon} title="Submissions Over Time" color="text-purple-400" />
+        <div className="bg-panel rounded-3xl border border-panel-hover p-6 shadow-sm flex flex-col">
+          <SectionHeader icon={LineIcon} title="Submissions Over Time" color="text-purple-600 dark:text-purple-400" />
           <div className="flex-1 min-h-[220px]">
             {charts.submissionsOverTime.length === 0 ? (
               <EmptyChart />
@@ -377,15 +377,15 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                   data={charts.submissionsOverTime}
                   margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e2e48" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fill: '#888', fontSize: 10 }}
+                    tick={{ fill: 'var(--chart-axis-text)', fontSize: 10 }}
                     tickLine={false}
                     axisLine={false}
                     interval="preserveStartEnd"
                   />
-                  <YAxis tick={{ fill: '#888', fontSize: 10 }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fill: 'var(--chart-axis-text)', fontSize: 10 }} tickLine={false} axisLine={false} />
                   <Tooltip content={<GenericTooltip />} />
                   <Line
                     type="monotone"
@@ -393,7 +393,7 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                     name="Submissions"
                     stroke="#a855f7"
                     strokeWidth={3}
-                    dot={{ r: 4, fill: '#a855f7', stroke: '#181825', strokeWidth: 2 }}
+                    dot={{ r: 4, fill: '#a855f7', stroke: 'var(--bg-panel)', strokeWidth: 2 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -404,15 +404,15 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
       </div>
 
       {/* ── Submissions Table ────────────────────────────────────────────────── */}
-      <div className="bg-panel rounded-3xl border border-panel-hover shadow-xl overflow-hidden">
+      <div className="bg-panel rounded-3xl border border-panel-hover shadow-sm overflow-hidden">
         {/* Table header */}
         <div className="p-6 border-b border-panel-hover flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Table2 className="h-4 w-4 text-indigo-400" />
+            <Table2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             <h3 className="text-sm font-black text-content uppercase tracking-widest">
               Submission Details
             </h3>
-            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/20 text-indigo-400 text-[10px] font-black">
+            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black">
               {filteredRows.length} rows
             </span>
           </div>
@@ -487,7 +487,7 @@ export function TaskAnalyticsDashboard({ departmentId, courseId, taskId }: { dep
                     </td>
                     <td className="p-4 text-center">
                       {row.finalGrade != null ? (
-                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-black">
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
                           {row.finalGrade}
                         </span>
                       ) : (

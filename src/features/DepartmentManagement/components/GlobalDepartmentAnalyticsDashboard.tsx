@@ -46,7 +46,7 @@ function SummaryCard({
   gradient: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-panel border border-panel p-6 shadow-2xl transition-all hover:border-panel-hover group">
+    <div className="relative overflow-hidden rounded-3xl bg-panel border border-panel p-6 shadow-sm transition-all hover:border-panel-hover group">
       <div className={`absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-10 blur-2xl transition-all group-hover:opacity-20 ${gradient}`} />
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex flex-col gap-1">
@@ -58,7 +58,7 @@ function SummaryCard({
           </div>
           {sub && <span className="text-xs font-bold text-slate-500 mt-2">{sub}</span>}
         </div>
-        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${color} shadow-lg backdrop-blur-xl border border-white/5`}>
+        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${color} shadow-sm backdrop-blur-xl border border-white/5`}>
           <Icon className="h-6 w-6" />
         </div>
       </div>
@@ -94,7 +94,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-96 flex-col items-center justify-center gap-4 bg-panel border border-panel rounded-3xl shadow-2xl">
+      <div className="flex h-96 flex-col items-center justify-center gap-4 bg-panel border border-panel rounded-3xl shadow-sm">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
         <p className="text-sm font-bold tracking-widest uppercase text-content-muted">
           Synthesizing Global Insights...
@@ -105,12 +105,12 @@ export function GlobalDepartmentAnalyticsDashboard() {
 
   if (error || !data) {
     return (
-      <div className="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-red-500/10 border border-red-500/20 p-8 text-center text-red-500 shadow-2xl">
+      <div className="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-red-500/10 border border-red-500/20 p-8 text-center text-red-500 shadow-sm">
         <AlertCircle className="h-12 w-12" />
         <p className="text-lg font-black tracking-tight">{error || 'Data Unavailable'}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-6 py-2 rounded-xl bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-500/20 hover:bg-red-600 transition-colors"
+          className="mt-4 px-6 py-2 rounded-xl bg-red-500 text-white font-bold text-sm shadow-sm shadow-red-500/20 hover:bg-red-600 transition-colors"
         >
           Retry Connection
         </button>
@@ -167,7 +167,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
           className={cn(
             'flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all',
             activeView === 'charts'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+              ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20'
               : 'text-content-muted hover:text-content hover:bg-panel-hover'
           )}
         >
@@ -178,7 +178,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
           className={cn(
             'flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all',
             activeView === 'table'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+              ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20'
               : 'text-content-muted hover:text-content hover:bg-panel-hover'
           )}
         >
@@ -191,7 +191,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Enrollment Comparison */}
-          <div className="rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-2xl flex flex-col gap-8 h-[450px]">
+          <div className="rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-sm flex flex-col gap-8 h-[450px]">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black tracking-tight text-content">Enrollment by Department</h3>
@@ -250,7 +250,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
           </div>
 
           {/* Activity Comparison */}
-          <div className="rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-2xl flex flex-col gap-8 h-[450px]">
+          <div className="rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-sm flex flex-col gap-8 h-[450px]">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black tracking-tight text-content">Activity & Engagement</h3>
@@ -309,7 +309,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
           </div>
 
           {/* Performance Comparison (Full Width) */}
-          <div className="lg:col-span-2 rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-2xl flex flex-col gap-8 h-[450px]">
+          <div className="lg:col-span-2 rounded-3xl bg-panel border border-panel p-6 sm:p-8 shadow-sm flex flex-col gap-8 h-[450px]">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black tracking-tight text-content">Task Completion Rate</h3>
@@ -365,7 +365,7 @@ export function GlobalDepartmentAnalyticsDashboard() {
           
         </div>
       ) : (
-        <div className="rounded-3xl bg-panel border border-panel shadow-2xl overflow-hidden">
+        <div className="rounded-3xl bg-panel border border-panel shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-panel-hover/50 text-content-muted uppercase tracking-widest text-[10px] font-black">

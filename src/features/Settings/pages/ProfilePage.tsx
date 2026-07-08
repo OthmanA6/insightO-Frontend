@@ -182,15 +182,15 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Card & Quick Info */}
         <div className="lg:col-span-1 space-y-8">
-          <Card className="bg-panel border-panel shadow-2xl overflow-hidden group">
+          <Card className="bg-panel border-panel shadow-sm overflow-hidden group">
             <div className="h-24 bg-gradient-to-r from-indigo-600 to-purple-600 relative">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
             </div>
             <CardContent className="relative pt-0 flex flex-col items-center text-center">
               <div className="relative -mt-12 mb-4">
-                <Avatar className="h-32 w-32 border-8 border-[#1e1b2e] shadow-2xl ring-2 ring-white/5 transition-transform group-hover:scale-105 duration-500">
+                <Avatar className="h-32 w-32 border-8 border-white dark:border-[#1e1b2e] shadow-sm ring-2 ring-white/5 transition-transform group-hover:scale-105 duration-500">
                   <AvatarImage src={avatarSrc} alt="Profile" />
-                  <AvatarFallback className="text-4xl bg-indigo-500/20 text-indigo-400 font-black">{user.firstName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-4xl bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-black">{user.firstName.charAt(0)}</AvatarFallback>
                 </Avatar>
 
                 {/* Hidden file input for avatar upload */}
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleAvatarClick}
                   disabled={isUploadingAvatar}
-                  className="absolute bottom-1 end-1 p-2.5 rounded-full bg-indigo-600 border-4 border-[#1e1b2e] text-content hover:bg-indigo-500 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute bottom-1 end-1 p-2.5 rounded-full bg-indigo-600 border-4 border-white dark:border-[#1e1b2e] text-content hover:bg-indigo-500 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Upload profile picture"
                 >
                   {isUploadingAvatar ? (
@@ -231,7 +231,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-panel border-panel shadow-xl">
+          <Card className="bg-panel border-panel shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-content-muted flex items-center gap-2">
                 <Shield className="h-4 w-4 text-indigo-500" /> Administrative Info
@@ -275,7 +275,7 @@ export default function ProfilePage() {
 
         {/* Right Column - Edit Form */}
         <div className="lg:col-span-2 space-y-8">
-          <Card className="bg-panel border-panel shadow-2xl overflow-hidden">
+          <Card className="bg-panel border-panel shadow-sm overflow-hidden">
             <CardHeader className="bg-panel-hover border-b border-panel p-8">
               <CardTitle className="text-xl font-bold text-content flex items-center gap-3">
                 <UserIcon className="h-5 w-5 text-indigo-500" /> Personal Identity
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                 <Button 
                   type="submit" 
                   disabled={isSaving}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white h-11 px-8 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white h-11 px-8 rounded-xl font-bold shadow-sm transition-all flex items-center gap-2"
                 >
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   Update Digital Profile
@@ -340,7 +340,7 @@ export default function ProfilePage() {
             </form>
           </Card>
 
-          <Card className="bg-panel border-panel border-s-4 border-s-amber-500/50 shadow-xl overflow-hidden">
+          <Card className="bg-panel border-panel border-s-4 border-s-amber-500/50 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500">
@@ -361,7 +361,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-panel border-panel border-s-4 border-s-indigo-500/50 shadow-xl overflow-hidden">
+          <Card className="bg-panel border-panel border-s-4 border-s-indigo-500/50 shadow-sm overflow-hidden">
             <CardContent className="p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-500">
@@ -407,7 +407,7 @@ export default function ProfilePage() {
               type="submit"
               form="change-password-form"
               disabled={!passwordFormValid || isChangingPassword}
-              className="bg-amber-500 hover:bg-amber-400 text-black h-10 px-6 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 disabled:opacity-40"
+              className="bg-amber-500 hover:bg-amber-400 text-black h-10 px-6 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 disabled:opacity-40"
             >
               {isChangingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Update Password

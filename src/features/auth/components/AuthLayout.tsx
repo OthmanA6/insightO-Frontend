@@ -25,12 +25,12 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen w-full overflow-hidden font-sans transition-colors duration-300">
       {/* ── Left Brand Panel ──────────────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-app border-e border-slate-800/50 overflow-hidden items-center justify-center p-20">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-app border-e border-slate-300/50 dark:border-slate-800/50 overflow-hidden items-center justify-center p-20">
         <div className="absolute inset-0 brand-pattern z-0 pointer-events-none" />
 
         <div className="absolute top-0 start-0 w-full h-full opacity-40 z-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-600/30 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[30rem] h-[30rem] bg-purple-600/20 rounded-full blur-[150px]" />
+          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-500/20 dark:bg-indigo-600/30 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[30rem] h-[30rem] bg-purple-500/20 dark:bg-purple-600/20 rounded-full blur-[150px]" />
         </div>
 
         <div className="relative z-10 max-w-xl">

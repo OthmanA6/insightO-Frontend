@@ -74,13 +74,13 @@ export default function InstructorCourseManagement() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredCourses.map(course => (
-          <Link to={`/dashboard/courses/${course.id || course._id}`} key={course.id || course._id} className="group rounded-3xl bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 shadow-xl transition-all p-8 flex flex-col justify-between relative overflow-hidden block">
+          <Link to={`/dashboard/courses/${course.id || course._id}`} key={course.id || course._id} className="group rounded-3xl bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 shadow-sm transition-all p-8 flex flex-col justify-between relative overflow-hidden block">
              <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity pointer-events-none">
               <BookOpen className="h-32 w-32 text-content" />
             </div>
             
             <div className="relative z-10 space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{course.courseCode}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">{course.courseCode}</span>
               <h3 className="text-xl font-bold text-content">{course.name}</h3>
               <p className="text-sm text-content-muted line-clamp-2">{course.description || 'No description provided.'}</p>
               
