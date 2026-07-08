@@ -53,7 +53,7 @@ export const registerSchema = baseRegisterSchema
   })
   .refine(
     (data) => {
-      if (data.role !== 'ADMIN') return !!data.departmentId?.trim();
+      if (data.role === 'INSTRUCTOR' || data.role === 'HOD') return !!data.departmentId?.trim();
       return true;
     },
     { message: 'Department is required for this role', path: ['departmentId'] },

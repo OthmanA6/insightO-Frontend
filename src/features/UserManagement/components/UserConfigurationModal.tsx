@@ -65,7 +65,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
   useEffect(() => {
     if (pendingUser) {
       setSelectedRole(pendingUser.role || 'STUDENT');
-      setNationalId(pendingUser.nationalId || '');
+      setNationalId(pendingUser.nationalId ? String(pendingUser.nationalId) : '');
       setSelectedDept(resolveDepartmentId(pendingUser.departmentId));
       if (pendingUser.academicYear != null) setAcademicYear(String(pendingUser.academicYear));
     } else {
@@ -89,7 +89,8 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
       }
     }
     
-    if (nationalId.length !== 14 || !/^\d+$/.test(nationalId)) {
+    const nidStr = String(nationalId);
+    if (nidStr.length !== 14 || !/^\d+$/.test(nidStr)) {
       toast.error('National ID must be exactly 14 digits');
       return false;
     }

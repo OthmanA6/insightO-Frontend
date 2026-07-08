@@ -63,7 +63,7 @@ const buildRegisterPayload = (data: RegisterFormData): RegisterPayload => {
     password: data.password,
     nationalId: data.nationalId,
     role: data.role,
-    ...(data.role !== 'ADMIN' && trimmedDepartmentId ? { departmentId: trimmedDepartmentId } : {}),
+    ...((data.role === 'INSTRUCTOR' || data.role === 'HOD') && trimmedDepartmentId ? { departmentId: trimmedDepartmentId } : {}),
     ...(data.role === 'STUDENT' && !Number.isNaN(parsedAcademicYear)
       ? { academicYear: parsedAcademicYear }
       : {}),
@@ -151,17 +151,23 @@ export default function RegisterForm() {
       const error = err as AxiosError<ApiErrorResponse>;
       const message = error.response?.data?.message;
       const details = error.response?.data?.error;
-      const duplicateNationalId = details?.includes('nationalId_1');
-      const duplicateEmail = details?.includes('email_1');
-      toast.error(
-        duplicateNationalId
-          ? 'This national ID is already registered'
-          : duplicateEmail
-            ? 'This email is already registered'
-            : message === 'Server error during registration' && details
-          ? details
-          : message || 'Failed to register',
-      );
+      
+      const isDuplicate = 
+        details?.includes('nationalId_1') || 
+        details?.includes('email_1') || 
+        details?.includes('already registered');
+
+      let errorMessage = 'Failed to register';
+      
+      if (isDuplicate) {
+        errorMessage = 'This email or National ID is already registered or pending verification';
+      } else if (details && typeof details === 'string') {
+        errorMessage = details;
+      } else if (message && typeof message === 'string') {
+        errorMessage = message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsSendingOtp(false);
     }
@@ -340,7 +346,7 @@ export default function RegisterForm() {
                 </div>
                 <select className={`${inputClass} appearance-none cursor-pointer`} defaultValue="" {...step1Form.register('role')}>
                   <option value="" disabled>Select your role</option>
-                  {USER_ROLES.map((role) => (
+                  {USER_ROLES.filter(role => role === 'STUDENT' || role === 'INSTRUCTOR').map((role) => (
                     <option key={role} value={role}>{ROLE_LABELS[role]}</option>
                   ))}
                 </select>
@@ -354,7 +360,7 @@ export default function RegisterForm() {
             </div>
 
             {/* Department (conditional) */}
-            {selectedRole && selectedRole !== 'ADMIN' && (
+            {(selectedRole === 'INSTRUCTOR' || selectedRole === 'HOD') && (
               <div className="space-y-2 animate-fade-in">
                 <label className="text-sm font-semibold text-slate-700 dark:text-content-muted ms-1">Department</label>
                 <div className="relative group">
