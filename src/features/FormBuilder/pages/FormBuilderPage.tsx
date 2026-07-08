@@ -580,12 +580,15 @@ export default function FormBuilderPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
+          <button
             onClick={() => setIsAIModalOpen(true)}
-            className="h-10 flex items-center gap-2 rounded-xl bg-purple-500/10 border border-purple-500/30 px-4 text-xs font-bold text-purple-400 transition-all hover:bg-purple-500 hover:text-content"
+            className="relative inline-flex h-10 overflow-hidden rounded-xl p-[2px] focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-50 group shadow-lg hover:shadow-purple-500/40 transition-all duration-300 hover:-translate-y-1"
           >
-            <Zap className="h-4 w-4" /> AI Generate
-          </Button>
+            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#ffffff_0%,#9333ea_50%,#ffffff_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <span className="inline-flex h-full w-full items-center justify-center rounded-[10px] bg-gradient-to-r from-purple-500 to-indigo-600 px-4 font-black text-white backdrop-blur-3xl transition-all text-xs">
+              <Zap className="me-2 h-4 w-4 text-white" /> AI Generate
+            </span>
+          </button>
           <div className="h-6 w-px bg-white/10 mx-2"></div>
           {(formId || generatedFormId) && (
             <Button

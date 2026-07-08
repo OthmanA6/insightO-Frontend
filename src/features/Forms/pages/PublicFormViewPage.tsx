@@ -108,7 +108,6 @@ export default function PublicFormViewPage() {
          };
       });
 
-      // Helper to extract raw ID string from populated objects or strings
       const getRawId = (val: any) => {
         if (!val) return undefined;
         if (typeof val === 'object' && val._id) return val._id;
@@ -116,7 +115,13 @@ export default function PublicFormViewPage() {
         return val;
       };
 
-      const subject_id = getRawId(form.instructor_id) || getRawId(form.course_id) || getRawId(form.department_id) || form._id || form.id;
+      let subject_id;
+      if (form.subject_role === 'COURSE') subject_id = getRawId(form.course_id);
+      else if (form.subject_role === 'INSTRUCTOR') subject_id = getRawId(form.instructor_id);
+      else if (form.subject_role === 'DEPARTMENT') subject_id = getRawId(form.department_id);
+      else if (form.subject_role === 'FACILITY') subject_id = getRawId(form.facility_id);
+      else subject_id = getRawId(form.instructor_id) || getRawId(form.course_id) || getRawId(form.department_id) || form._id || form.id;
+
 
       await createPublicSubmission(formId, {
         subject_id: subject_id,
