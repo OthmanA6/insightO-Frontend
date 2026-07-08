@@ -112,29 +112,29 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
           <li><ChevronRight className="w-3.5 h-3.5 text-content-muted/40" /></li>
           <li>
             <Link
-              to="/dashboard/directory"
+              to={currentUser?.role === 'INSTRUCTOR' ? "/dashboard/directory" : "/dashboard/users"}
               className="flex items-center gap-1.5 text-content-muted hover:text-indigo-400 transition-colors font-medium"
             >
               <Users className="w-3.5 h-3.5" />
-              Students Directory
+              {currentUser?.role === 'INSTRUCTOR' ? "Students Directory" : "User Management"}
             </Link>
           </li>
           <li><ChevronRight className="w-3.5 h-3.5 text-content-muted/40" /></li>
-          <li aria-current="page" className="text-indigo-400 font-semibold truncate max-w-[200px]">
+          <li aria-current="page" className="text-indigo-600 dark:text-indigo-400 font-semibold truncate max-w-[200px]">
             {data.user.firstName} {data.user.lastName}
           </li>
         </ol>
       </nav>
 
 
-      <div className="relative p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#0f111a] border border-panel-hover shadow-2xl overflow-hidden group">
+      <div className="relative p-8 rounded-3xl bg-gradient-to-br from-white to-slate-50 dark:from-[#12131f] dark:to-[#0f111a] border border-panel-hover shadow-sm overflow-hidden group">
         <div className="absolute -end-24 -top-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
         <div className="absolute -start-24 -bottom-24 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 transition-all duration-700" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-          <Avatar className="w-28 h-28 ring-4 ring-[#13151f] border border-indigo-500/30 shadow-2xl shadow-indigo-500/20">
+          <Avatar className="w-28 h-28 ring-4 ring-white dark:ring-[#13151f] border border-indigo-500/30 shadow-sm">
             <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${data.user.firstName} ${data.user.lastName}`} />
-            <AvatarFallback className="text-4xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 text-indigo-300 font-black">{initials}</AvatarFallback>
+            <AvatarFallback className="text-4xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 text-indigo-600 dark:text-indigo-300 font-black">{initials}</AvatarFallback>
           </Avatar>
 
           <div className="flex-1 space-y-3 text-center md:text-left">
@@ -146,13 +146,13 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </div>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-content-muted font-medium">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Mail className="w-4 h-4 text-indigo-400" /> {data.user.email}</div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><User className="w-4 h-4 text-indigo-400" /> <span className="capitalize">{data.user.role.toLowerCase()}</span></div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Mail className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> {data.user.email}</div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> <span className="capitalize">{data.user.role.toLowerCase()}</span></div>
               {data.profile?.departmentId && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Briefcase className="w-4 h-4 text-indigo-400" /> {departmentName}</div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Briefcase className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> {departmentName}</div>
               )}
               {data.profile?.academicYear && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Calendar className="w-4 h-4 text-indigo-400" /> Year {data.profile.academicYear}</div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel-hover border border-panel"><Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Year {data.profile.academicYear}</div>
               )}
             </div>
           </div>
@@ -164,26 +164,26 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
         <div className="space-y-6">
           {/* كروت المعلومات الأساسية */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex items-center justify-between relative overflow-hidden">
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm flex items-center justify-between relative overflow-hidden">
               <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
               <div>
                 <span className="block text-[10px] text-content-muted font-bold uppercase tracking-widest mb-1">Role Type</span>
                 <h4 className="text-2xl font-black text-content capitalize">{data.user.role.toLowerCase()}</h4>
                 <p className="text-xs text-content-muted mt-1">Managing courses and departmental tasks.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+              <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                 <Briefcase className="w-6 h-6" />
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex items-center justify-between relative overflow-hidden">
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm flex items-center justify-between relative overflow-hidden">
               <div className="absolute -end-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
               <div>
                 <span className="block text-[10px] text-content-muted font-bold uppercase tracking-widest mb-1">Assigned Courses</span>
                 <h4 className="text-2xl font-black text-content">{data.profile?.teachingCourses?.length || 0}</h4>
                 <p className="text-xs text-content-muted mt-1">Active courses being managed.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                 <BookOpen className="w-6 h-6" />
               </div>
             </div>
@@ -193,7 +193,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
           <div className="mt-8">
             <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
               <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                <BrainCircuit className="h-5 w-5 text-indigo-400" />
+                <BrainCircuit className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
                 <h3 className="text-xl font-black text-content">Performance Insights</h3>
@@ -202,7 +202,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </div>
 
             {/* زرعنا الكومبوننت الجوكر هنا وباصينا الـ userId الحقيقي */}
-            <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
+            <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-sm relative">
               <EntityInsightsView entityType="INSTRUCTOR" entityId={userId} />
             </div>
           </div>
@@ -212,22 +212,22 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
         <>
           {/* Metrics Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
               <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
                 <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Total Submissions</span>
-                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                   <BookOpen className="w-4 h-4" />
                 </div>
               </div>
               <div className="text-3xl font-black text-content relative z-10">{data.aggregated_metrics.total_submissions}</div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
               <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
                 <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Average AI Grade</span>
-                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                   <Award className="w-4 h-4" />
                 </div>
               </div>
@@ -236,11 +236,11 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
+            <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm flex flex-col justify-center relative overflow-hidden group hover:border-indigo-500/20 transition-all">
               <div className="absolute -end-8 -top-8 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-all" />
               <div className="flex items-center justify-between mb-4 relative z-10">
                 <span className="text-[10px] text-content-muted font-bold uppercase tracking-widest">AI Confidence Index</span>
-                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                   <Target className="w-4 h-4" />
                 </div>
               </div>
@@ -252,10 +252,10 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           {/* AI Synthesis Highlight Section */}
           {data.ai_synthesis ? (
-            <div className="p-6 rounded-3xl bg-panel/60 border border-panel-hover shadow-lg space-y-6 animate-in fade-in duration-500">
+            <div className="p-6 rounded-3xl bg-panel/80 border border-panel-hover shadow-sm space-y-6 animate-in fade-in duration-500">
               <div className="flex items-center gap-3 border-b border-panel pb-4">
                 <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                  <BrainCircuit className="h-5 w-5 text-indigo-400" />
+                  <BrainCircuit className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-content">Senior Academic Advisor Synthesis</h3>
@@ -269,22 +269,22 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Strengths */}
-                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#121a18] to-[#12131a] border border-emerald-500/10 hover:border-emerald-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
+                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-50/50 to-white dark:from-[#121a18] dark:to-[#12131a] border border-emerald-500/10 hover:border-emerald-500/20 shadow-sm relative overflow-hidden transition-all duration-300 group">
                   <div className="absolute -end-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
                   <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-content uppercase tracking-wider">Core Strengths</h4>
-                      <p className="text-[9px] text-emerald-400/80 font-mono uppercase tracking-widest mt-0.5">Key Capabilities</p>
+                      <p className="text-[9px] text-emerald-600 dark:text-emerald-400/80 font-mono uppercase tracking-widest mt-0.5">Key Capabilities</p>
                     </div>
                   </div>
                   <div className="space-y-3.5 relative z-10 pt-4">
                     {data.ai_synthesis.core_strengths.length > 0 ? (
                       data.ai_synthesis.core_strengths.map((strength, i) => (
                         <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-emerald-500/10 transition-all duration-300 group/item">
-                          <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-400 shrink-0">
+                          <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
@@ -299,22 +299,22 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                 </div>
 
                 {/* Weaknesses */}
-                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1c131a] to-[#12131a] border border-rose-500/10 hover:border-rose-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
+                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-rose-50/50 to-white dark:from-[#1c131a] dark:to-[#12131a] border border-rose-500/10 hover:border-rose-500/20 shadow-sm relative overflow-hidden transition-all duration-300 group">
                   <div className="absolute -end-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
                   <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
-                    <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
+                    <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
                       <AlertTriangle className="h-5 w-5" />
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-content uppercase tracking-wider">Persistent Weaknesses</h4>
-                      <p className="text-[9px] text-rose-400/80 font-mono uppercase tracking-widest mt-0.5">Areas for Improvement</p>
+                      <p className="text-[9px] text-rose-600 dark:text-rose-400/80 font-mono uppercase tracking-widest mt-0.5">Areas for Improvement</p>
                     </div>
                   </div>
                   <div className="space-y-3.5 relative z-10 pt-4">
                     {data.ai_synthesis.persistent_weaknesses.length > 0 ? (
                       data.ai_synthesis.persistent_weaknesses.map((weakness, i) => (
                         <div key={i} className="flex items-start gap-4 p-3.5 rounded-2xl bg-app/40 border border-panel hover:border-rose-500/10 transition-all duration-300 group/item">
-                          <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono font-bold text-rose-400 shrink-0">
+                          <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 shrink-0">
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
@@ -330,22 +330,22 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
               </div>
 
               {/* Action Plan */}
-              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#12131f] to-[#12131a] border border-indigo-500/10 hover:border-indigo-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group">
+              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-50/50 to-white dark:from-[#12131f] dark:to-[#12131a] border border-indigo-500/10 hover:border-indigo-500/20 shadow-sm relative overflow-hidden transition-all duration-300 group">
                 <div className="absolute -start-12 -bottom-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/15 transition-all duration-500 pointer-events-none" />
                 <div className="flex items-center gap-3 border-b border-panel pb-4 relative z-10">
-                  <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                  <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                     <Target className="h-5 w-5" />
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-content uppercase tracking-wider">Action Plan</h4>
-                    <p className="text-[9px] text-indigo-400/80 font-mono uppercase tracking-widest mt-0.5">Targeted Next Steps</p>
+                    <p className="text-[9px] text-indigo-600 dark:text-indigo-400/80 font-mono uppercase tracking-widest mt-0.5">Targeted Next Steps</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10 pt-4">
                   {data.ai_synthesis.action_plan.length > 0 ? (
                     data.ai_synthesis.action_plan.map((action, i) => (
                       <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-app/40 border border-panel hover:border-indigo-500/10 transition-all duration-300 group/item">
-                        <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-mono font-bold text-indigo-400 shrink-0 mt-0.5">
+                        <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5">
                           {String(i + 1).padStart(2, '0')}
                         </span>
                         <p className="text-xs text-content-muted leading-relaxed font-medium group-hover/item:text-content transition-colors">
@@ -369,17 +369,17 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
 
           {/* Detail Tabs */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-3 mb-4 bg-panel border border-panel p-1">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">Overview</TabsTrigger>
-              <TabsTrigger value="skills" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">Mastery</TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-content">History</TabsTrigger>
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-4 bg-panel-hover border border-panel p-1">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-content-muted hover:text-content">Overview</TabsTrigger>
+              <TabsTrigger value="skills" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-content-muted hover:text-content">Mastery</TabsTrigger>
+              <TabsTrigger value="history" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-content-muted hover:text-content">History</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
-              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm">
                 <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                    <Activity className="h-5 w-5 text-indigo-400" />
+                    <Activity className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-content">Grade Progression</h3>
@@ -390,16 +390,16 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                   {chartDataHistory.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={chartDataHistory} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff0a" vertical={false} />
-                        <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickMargin={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#64748b" fontSize={10} domain={[0, 100]} tickLine={false} axisLine={false} tickMargin={12} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+                        <XAxis dataKey="name" stroke="var(--chart-axis-text)" fontSize={10} tickMargin={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="var(--chart-axis-text)" fontSize={10} domain={[0, 100]} tickLine={false} axisLine={false} tickMargin={12} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: '#0f111a', border: '1px solid #1e293b', color: '#f8fafc', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          contentStyle={{ backgroundColor: 'var(--chart-tooltip-bg)', border: '1px solid var(--border-panel)', color: 'var(--text-primary)', borderRadius: '12px' }}
                           labelStyle={{ color: '#818cf8', fontWeight: 'bold', marginBottom: '8px', fontSize: '12px' }}
-                          formatter={(value: any, name: string) => [
-                            <span className={name === 'final' ? 'text-emerald-400 font-bold' : 'text-indigo-400 font-bold'}>{value}</span>,
+                          formatter={(value: any, name: any) => [
+                            <span className={name === 'final' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-indigo-600 dark:text-indigo-400 font-bold'}>{value}</span>,
                             <span className="text-content-muted">{name === 'final' ? 'Final Grade' : 'AI Grade'}</span>
-                          ]}
+                          ] as any}
                           labelFormatter={(label, payload) => payload?.[0]?.payload?.taskName || label}
                         />
                         <Legend wrapperStyle={{ paddingTop: '24px', fontSize: '12px', color: '#94a3b8' }} />
@@ -418,10 +418,10 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </TabsContent>
 
             <TabsContent value="skills">
-              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm">
                 <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                    <Target className="h-5 w-5 text-indigo-400" />
+                    <Target className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-content">Concept Mastery</h3>
@@ -432,12 +432,12 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                   {chartDataMastery.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartDataMastery} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={true} vertical={false} />
-                        <XAxis type="number" domain={[0, 100]} stroke="#94a3b8" fontSize={12} />
-                        <YAxis dataKey="concept" type="category" stroke="#94a3b8" fontSize={12} width={100} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" horizontal={true} vertical={false} />
+                        <XAxis type="number" domain={[0, 100]} stroke="var(--chart-axis-text)" fontSize={12} />
+                        <YAxis dataKey="concept" type="category" stroke="var(--chart-axis-text)" fontSize={12} width={100} />
                         <Tooltip
-                          cursor={{ fill: '#334155', opacity: 0.4 }}
-                          contentStyle={{ backgroundColor: '#0f111a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px' }}
+                          cursor={{ fill: 'var(--chart-grid)', opacity: 0.4 }}
+                          contentStyle={{ backgroundColor: 'var(--chart-tooltip-bg)', borderColor: 'var(--border-panel)', color: 'var(--text-primary)', borderRadius: '8px' }}
                           formatter={(value: any) => [`${value}%`, 'Mastery']}
                           labelFormatter={(label, payload) => payload?.[0]?.payload?.fullConcept || label}
                         />
@@ -455,10 +455,10 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
             </TabsContent>
 
             <TabsContent value="history">
-              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-md">
+              <div className="p-6 rounded-3xl bg-panel border border-panel-hover shadow-sm">
                 <div className="flex items-center gap-3 border-b border-panel pb-4 mb-6">
                   <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                    <BookOpen className="h-5 w-5 text-indigo-400" />
+                    <BookOpen className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-content">Submission History</h3>
@@ -493,7 +493,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                                 <td className="px-4 py-3 font-medium">
                                   <Link
                                     to={taskLink}
-                                    className="text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors flex items-center gap-1"
                                   >
                                     {item.task_id?.title || 'Unknown Task'}
                                     <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -508,7 +508,7 @@ export const StudentProfileDashboard: React.FC<StudentProfileDashboardProps> = (
                                 <td className="px-4 py-3 text-end font-medium text-content">
                                   {item.ai_suggested_grade !== undefined && item.ai_suggested_grade !== null ? `${item.ai_suggested_grade}` : '-'}
                                 </td>
-                                <td className="px-4 py-3 text-end font-bold text-emerald-400">
+                                <td className="px-4 py-3 text-end font-bold text-emerald-600 dark:text-emerald-400">
                                   {item.final_grade !== undefined && item.final_grade !== null ? `${item.final_grade}` : '-'}
                                 </td>
                                 <td className="px-4 py-3 text-end text-content-muted whitespace-nowrap">

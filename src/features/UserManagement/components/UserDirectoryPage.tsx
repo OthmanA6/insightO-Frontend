@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ChevronRight, User, Loader2, AlertTriangle, Briefcase, Home, Users } from 'lucide-react';
+import { Search, ChevronRight, User, Loader2, AlertTriangle, Briefcase, Home, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
-import { Badge } from '@/shared/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 
 // We import the getAllUsers as a placeholder. In a real scenario, this might be 
@@ -16,15 +15,20 @@ export const UserDirectoryPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('ALL');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
         const data = await getAllUsers();
-        setUsers(data);
-        setFilteredUsers(data);
+        // Robust filter to ensure only actual students are shown
+        const students = data.filter(user => {
+          if (!user || !user.role) return false;
+          const roleStr = String(user.role).trim().toUpperCase();
+          return roleStr === 'STUDENT';
+        });
+        setUsers(students);
+        setFilteredUsers(students);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch the user directory');
       } finally {
@@ -46,12 +50,8 @@ export const UserDirectoryPage: React.FC = () => {
       );
     }
 
-    if (roleFilter !== 'ALL') {
-      result = result.filter(user => user.role === roleFilter);
-    }
-
     setFilteredUsers(result);
-  }, [searchQuery, roleFilter, users]);
+  }, [searchQuery, users]);
 
   if (loading) {
     return (
@@ -100,7 +100,7 @@ export const UserDirectoryPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-foreground">Students Directory</h2>
-          <p className="text-muted-foreground mt-1">Browse and search for academic staff and students.</p>
+          <p className="text-muted-foreground mt-1">Browse and search for active student records.</p>
         </div>
       </div>
 
@@ -110,27 +110,13 @@ export const UserDirectoryPage: React.FC = () => {
             <div className="relative w-full md:w-96">
               <Input
                 type="search"
-                placeholder="Search users by name or email..."
+                placeholder="Search students by name or email..."
                 className="w-full bg-app border-panel-hover text-content placeholder:text-content-muted ps-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search className="h-4 w-4 text-content-muted absolute start-3 top-3" />
             </div>
-            
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <Filter className="w-4 h-4 text-content-muted" />
-              <select 
-                className="bg-app border-panel-hover text-content-muted text-sm rounded-md h-10 px-3 focus:ring-1 focus:ring-indigo-500"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-            >
-              <option value="ALL">All Roles</option>
-              <option value="STUDENT">Students</option>
-              <option value="INSTRUCTOR">Instructors</option>
-              <option value="HOD">HODs</option>
-            </select>
-          </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">

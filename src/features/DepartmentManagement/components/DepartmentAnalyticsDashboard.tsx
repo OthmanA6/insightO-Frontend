@@ -70,7 +70,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
       </div>
 
       {viewMode === 'ai' && (
-        <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-2xl relative">
+        <div className="rounded-[2.5rem] overflow-hidden border border-panel bg-app shadow-sm relative">
           <EntityInsightsView entityType="DEPARTMENT" entityId={departmentId} />
         </div>
       )}
@@ -85,7 +85,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
             <>
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-indigo-500/50 transition-all">
+                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-indigo-500/50 transition-all">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500">
                       <Users className="h-6 w-6" />
@@ -97,7 +97,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
                   </div>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-blue-500/50 transition-all">
+                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-blue-500/50 transition-all">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
                       <BookOpen className="h-6 w-6" />
@@ -109,7 +109,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
                   </div>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-purple-500/50 transition-all">
+                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-purple-500/50 transition-all">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-500">
                       <FileText className="h-6 w-6" />
@@ -121,7 +121,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
                   </div>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-emerald-500/50 transition-all">
+                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-emerald-500/50 transition-all">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
                       <CheckCircle className="h-6 w-6" />
@@ -133,7 +133,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
                   </div>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col justify-between group hover:border-amber-500/50 transition-all">
+                <div className="p-6 rounded-3xl bg-panel border border-panel shadow-sm flex flex-col justify-between group hover:border-amber-500/50 transition-all">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-500">
                       <TrendingUp className="h-6 w-6" />
@@ -147,7 +147,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
               </div>
 
               {/* Threshold Control */}
-              <div className="rounded-3xl bg-panel border border-panel p-6 shadow-2xl">
+              <div className="rounded-3xl bg-panel border border-panel p-6 shadow-sm">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-black text-content flex items-center gap-2">
@@ -177,7 +177,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
               </div>
 
               {/* Student Roster Table */}
-              <div className="rounded-3xl bg-panel border border-panel shadow-2xl overflow-hidden">
+              <div className="rounded-3xl bg-panel border border-panel shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-panel flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-black text-content">Department Student Roster</h3>
@@ -190,7 +190,7 @@ export function DepartmentAnalyticsDashboard({ departmentId }: { departmentId: s
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-app/50 text-content-muted font-black uppercase tracking-widest text-[10px]">
+                    <thead className="bg-panel-hover text-content-muted font-black uppercase tracking-widest text-[10px]">
                       <tr>
                         <th className="px-6 py-5">Student Name</th>
                         <th className="px-6 py-5">Email</th>

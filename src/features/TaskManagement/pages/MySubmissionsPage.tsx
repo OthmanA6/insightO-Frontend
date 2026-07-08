@@ -11,6 +11,8 @@ export default function MySubmissionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<{ url: string; name: string } | null>(null);
 
+  const [filter, setFilter] = useState<'ALL' | 'GRADED' | 'UNDER_REVIEW'>('ALL');
+
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
@@ -24,6 +26,12 @@ export default function MySubmissionsPage() {
     };
     fetchSubmissions();
   }, []);
+
+  const filteredSubmissions = submissions.filter(sub => {
+    if (filter === 'GRADED') return sub.status === 'FINALIZED';
+    if (filter === 'UNDER_REVIEW') return sub.status === 'SUBMITTED' || sub.status === 'AI_GRADED';
+    return true; // ALL
+  });
 
   if (isLoading) {
     return (
@@ -40,22 +48,46 @@ export default function MySubmissionsPage() {
     <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-500 max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
       
       <section className="flex flex-col gap-2 pb-6 border-b border-border">
-        <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
-          <ClipboardCheck className="h-8 w-8 text-primary" /> My Evaluations
-        </h1>
-        <p className="text-sm font-medium text-muted-foreground">
-          Historical record of your submissions and received academic feedback.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-foreground tracking-tight flex items-center gap-3">
+              <ClipboardCheck className="h-8 w-8 text-primary" /> My Evaluations
+            </h1>
+            <p className="text-sm font-medium text-muted-foreground mt-2">
+              Historical record of your submissions and received academic feedback.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-panel p-1 rounded-xl border border-panel">
+            <button
+              onClick={() => setFilter('ALL')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filter === 'ALL' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content hover:bg-panel-hover'}`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilter('UNDER_REVIEW')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filter === 'UNDER_REVIEW' ? 'bg-amber-500 text-white shadow-sm' : 'text-content-muted hover:text-content hover:bg-panel-hover'}`}
+            >
+              Under Review
+            </button>
+            <button
+              onClick={() => setFilter('GRADED')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${filter === 'GRADED' ? 'bg-emerald-500 text-white shadow-sm' : 'text-content-muted hover:text-content hover:bg-panel-hover'}`}
+            >
+              Graded
+            </button>
+          </div>
+        </div>
       </section>
 
-      {submissions.length === 0 ? (
+      {filteredSubmissions.length === 0 ? (
         <div className="p-12 text-center rounded-3xl border border-border bg-card flex flex-col items-center gap-4">
           <FileText className="h-10 w-10 text-muted-foreground/50" />
-          <p className="text-sm font-medium text-muted-foreground">No submissions found. Start working on your active tasks!</p>
+          <p className="text-sm font-medium text-muted-foreground">No submissions found matching this filter.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {submissions.map((sub) => {
+          {filteredSubmissions.map((sub) => {
             const task = typeof sub.task_id === 'object' ? sub.task_id as any : { title: 'Unknown Task' };
             
             return (
