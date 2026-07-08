@@ -42,6 +42,7 @@ export default function InstructorGradingPage() {
   const [submission, setSubmission] = useState<TaskSubmission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEvaluatingAI, setIsEvaluatingAI] = useState(false);
   const [selectedFile, setSelectedFile] = useState<{ url: string; name: string } | null>(null);
 
   // Grading form state
@@ -138,6 +139,27 @@ export default function InstructorGradingPage() {
       toast.error(error.response?.data?.message || 'Failed to finalize grade');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAIEvaluate = async () => {
+    if (!submissionId) return;
+    setIsEvaluatingAI(true);
+    try {
+      toast.info('AI is analyzing the submission...');
+      const updatedSubmission = await taskSubmissionApi.evaluateSubmissionAI(submissionId);
+      setSubmission(updatedSubmission);
+      
+      if (updatedSubmission.ai_evaluation?.suggested_grade !== undefined) {
+        setGrade(String(updatedSubmission.ai_evaluation.suggested_grade));
+        toast.success(`AI Evaluation complete! Applied grade: ${updatedSubmission.ai_evaluation.suggested_grade}`);
+      } else {
+        toast.warning('AI evaluation completed but no grade was suggested.');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to trigger AI evaluation');
+    } finally {
+      setIsEvaluatingAI(false);
     }
   };
 
@@ -280,15 +302,17 @@ export default function InstructorGradingPage() {
             </div>
 
             {/* AI Co-Pilot Row */}
-            {aiEvaluation && submission.status !== 'FINALIZED' && (
+            {submission.status !== 'FINALIZED' && (
               <div className="bg-indigo-500/5 border border-indigo-500/10 p-2.5 rounded-xl flex items-center justify-between animate-in fade-in duration-300">
                 <div className="flex items-center gap-2">
                   <BrainCircuit className="h-4 w-4 text-indigo-400 shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-[12px] font-bold text-indigo-300">AI Suggest: {aiEvaluation.suggested_grade ?? '—'}/100</span>
+                    <span className="text-[12px] font-bold text-indigo-300">
+                      AI Suggest: {aiEvaluation?.suggested_grade ?? '—'}/100
+                    </span>
                     <span className="text-[10px] text-content-muted font-mono">
                       Conf: {
-                        (aiEvaluation as any).confidence_score !== undefined
+                        aiEvaluation && (aiEvaluation as any).confidence_score !== undefined
                           ? `${Math.round((aiEvaluation as any).confidence_score <= 1 ? (aiEvaluation as any).confidence_score * 100 : (aiEvaluation as any).confidence_score)}%`
                           : '—'
                       }
@@ -297,15 +321,19 @@ export default function InstructorGradingPage() {
                 </div>
                 <Button
                   type="button"
+                  disabled={isEvaluatingAI}
                   onClick={() => {
-                    if (aiEvaluation.suggested_grade !== undefined) {
+                    if (aiEvaluation?.suggested_grade !== undefined) {
                       setGrade(String(aiEvaluation.suggested_grade));
                       toast.success(`Applied AI suggested grade: ${aiEvaluation.suggested_grade}`);
+                    } else {
+                      handleAIEvaluate();
                     }
                   }}
-                  className="h-7 px-2.5 text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition-colors border-none"
+                  className="h-7 px-2.5 text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg transition-colors border-none flex items-center gap-1.5"
                 >
-                  Apply
+                  {isEvaluatingAI ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                  {aiEvaluation?.suggested_grade !== undefined ? 'Apply' : 'Evaluate'}
                 </Button>
               </div>
             )}
@@ -409,7 +437,7 @@ export default function InstructorGradingPage() {
                     {form.questions.map((q, idx) => {
                       const qId = q._id || q.id!;
                       const ans = submission.form_answers?.find(a => {
-                        const targetQuestionId = a.question_id?._id || a.question_id?.id || a.question_id;
+                        const targetQuestionId = (a.question_id as any)?._id || (a.question_id as any)?.id || a.question_id;
                         return String(targetQuestionId) === String(q._id || q.id);
                       });
                       const val = ans ? ans.value : undefined;

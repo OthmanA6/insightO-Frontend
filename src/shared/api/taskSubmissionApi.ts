@@ -88,3 +88,13 @@ export const getMySubmissions = async (): Promise<TaskSubmission[]> => {
   );
   return response.data.data.submissions;
 };
+
+// ─── POST /api/task-submissions/:submissionId/evaluate-ai ─────────────────────
+export const evaluateSubmissionAI = async (
+  submissionId: string,
+): Promise<TaskSubmission> => {
+  const response = await api.post<{ status: string; data: { submission: TaskSubmission } }>(
+    `/task-submissions/${submissionId}/evaluate-ai`,
+  );
+  return response.data.data.submission;
+};
