@@ -37,6 +37,7 @@ export default function TaskSubmissionsPage() {
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<{ url: string; name: string } | null>(null);
+  const [enrolledStudents, setEnrolledStudents] = useState<any[]>([]);
 
   // Breadcrumb context
   const [departmentName, setDepartmentName] = useState('');
@@ -54,6 +55,7 @@ export default function TaskSubmissionsPage() {
         if (courseId) {
           const course = await courseApi.getCourseById(courseId);
           setCourseName(course.name);
+          setEnrolledStudents(course.enrolledStudents || []);
         }
       } catch {
         // Breadcrumb will show fallback
@@ -96,6 +98,20 @@ export default function TaskSubmissionsPage() {
         return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
     }
   };
+
+  const submittedStudentIds = new Set(
+    submissions.map((s) => {
+      if (typeof s.submitter_id === 'object' && s.submitter_id !== null) {
+        return (s.submitter_id as any)._id || (s.submitter_id as any).id;
+      }
+      return s.submitter_id;
+    })
+  );
+
+  const pendingStudents = enrolledStudents.filter((student) => {
+    const sid = student._id || student.id;
+    return sid && !submittedStudentIds.has(sid);
+  });
 
   return (
     <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-500 max-w-7xl mx-auto">
@@ -147,10 +163,12 @@ export default function TaskSubmissionsPage() {
 
       {/* Task Info Card */}
       {task && (
-        <div className="p-6 rounded-3xl bg-panel border border-panel-hover">
-          <p className="text-sm text-content-muted leading-relaxed italic mb-4">
-            "{task.description || 'No instructions provided.'}"
-          </p>
+        <div className="p-6 rounded-3xl bg-panel border border-panel-hover flex flex-col gap-4">
+          <div className="max-h-48 overflow-y-auto custom-scrollbar pr-2">
+            <p className="text-sm text-content-muted leading-relaxed italic whitespace-pre-wrap break-words">
+              "{task.description || 'No instructions provided.'}"
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-4">
             <Badge
               variant="outline"
@@ -198,15 +216,20 @@ export default function TaskSubmissionsPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="submissions" className="w-full">
-        <TabsList className="bg-panel border border-panel p-1 mb-8 flex w-fit rounded-2xl">
-          <TabsTrigger value="submissions" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
-            Submissions
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-purple-600 data-[state=active]:text-content text-sm font-bold transition-all flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            Task Analytics
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto custom-scrollbar mb-8 pb-2">
+          <TabsList className="bg-panel border border-panel p-1 flex w-fit rounded-2xl min-w-max">
+            <TabsTrigger value="submissions" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-content text-sm font-bold transition-all">
+              Submissions
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-amber-600 data-[state=active]:text-content text-sm font-bold transition-all flex items-center gap-2">
+              Pending ({pendingStudents.length})
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-purple-600 data-[state=active]:text-content text-sm font-bold transition-all flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Task Analytics
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="analytics" className="mt-0 outline-none">
           <TaskAnalyticsDashboard taskId={taskId} />
@@ -214,198 +237,226 @@ export default function TaskSubmissionsPage() {
 
         <TabsContent value="submissions" className="mt-0 outline-none">
           {/* Submissions List */}
-          <div className="space-y-6">
-        {isLoading ? (
-          <div className="py-20 flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-            <p className="text-sm font-bold text-content-muted uppercase tracking-widest">
-              Loading Submissions...
-            </p>
-          </div>
-        ) : submissions.length === 0 ? (
-          <div className="py-20 flex flex-col items-center gap-4 opacity-20">
-            <FileText className="h-16 w-16 text-content-muted" />
-            <p className="text-lg font-bold text-content-muted">
-              No submissions received yet
-            </p>
-          </div>
-        ) : (
-          submissions.map((sub) => {
-            const subId = sub.id || sub._id!;
-            const student =
-              typeof sub.submitter_id === 'object'
-                ? sub.submitter_id
-                : null;
+          <div className={cn(
+            "w-full transition-all",
+            !isLoading && submissions.length > 0 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : ""
+          )}>
+            {isLoading ? (
+              <div className="py-20 flex flex-col items-center gap-4 w-full">
+                <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
+                <p className="text-sm font-bold text-content-muted uppercase tracking-widest">
+                  Loading Submissions...
+                </p>
+              </div>
+            ) : submissions.length === 0 ? (
+              <div className="py-20 flex flex-col items-center gap-4 opacity-20 w-full">
+                <FileText className="h-16 w-16 text-content-muted" />
+                <p className="text-lg font-bold text-content-muted">
+                  No submissions received yet
+                </p>
+              </div>
+            ) : (
+              submissions.map((sub) => {
+                const subId = sub.id || sub._id!;
+                const student = typeof sub.submitter_id === 'object' ? sub.submitter_id : null;
 
-            return (
-              <div
-                key={subId}
-                className="group rounded-3xl bg-panel border border-panel-hover hover:border-indigo-500/50 transition-[border-color,background-color] p-8"
-              >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                  {/* Student Info */}
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel shrink-0">
-                      <User className="h-7 w-7" />
+                return (
+                  <div
+                    key={subId}
+                    className="group rounded-3xl bg-panel border border-panel-hover hover:border-indigo-500/50 transition-[border-color,background-color] p-6 flex flex-col h-full shadow-sm hover:shadow-xl hover:shadow-indigo-500/5"
+                  >
+                    {/* Header: Student Info & Status */}
+                    <div className="flex items-start justify-between gap-4 mb-4 border-b border-panel pb-4">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel shrink-0">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <h3 className="text-sm font-black text-content truncate">
+                            {student ? `${student.firstName} ${student.lastName}` : 'Unknown'}
+                          </h3>
+                          <p className="text-[10px] text-content-muted font-mono truncate">
+                            {student?.email || '—'}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'text-[9px] font-black uppercase px-2 py-0.5 h-fit shrink-0',
+                          getStatusColor(sub.status)
+                        )}
+                      >
+                        {sub.status}
+                      </Badge>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-black text-content">
-                        {student
-                          ? `${student.firstName} ${student.lastName}`
-                          : 'Unknown Student'}
-                      </h3>
-                      <p className="text-xs text-content-muted font-mono">
-                        {student?.email || '—'}
-                      </p>
 
-                      {/* Submitted content */}
+                    {/* Body: Content Summary */}
+                    <div className="flex-1 flex flex-col gap-4">
                       {task?.task_type === 'QUIZ' && sub.form_answers && sub.form_answers.length > 0 ? (
-                        <div className="mt-4 space-y-4 p-5 rounded-2xl bg-app border border-panel">
+                        <div className="p-3 rounded-2xl bg-app border border-panel h-24 overflow-y-auto custom-scrollbar">
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Quiz Responses</span>
+                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400">Quiz Snapshot</span>
                           </div>
-                          {sub.form_answers.map((ans: any, i: number) => {
-                            // 👈 التعديل هنا: بنقرأ الـ label من الـ Object اللي رجع من الـ Populate!
-                            const qLabel = ans.question_id?.label || form?.questions.find((q) => String(q.id || q._id) === String(ans.question_id))?.label || `Question ${i + 1}`;
-
+                          {sub.form_answers.slice(0, 2).map((ans: any, i: number) => {
+                            const qLabel = ans.question_id?.label || form?.questions.find((q) => String(q.id || q._id) === String(ans.question_id))?.label || `Q${i + 1}`;
                             return (
-                              <div key={i} className="space-y-1">
-                                <p className="text-xs font-bold text-content-muted">{qLabel}</p>
-                                <p className="text-sm text-content">
+                              <div key={i} className="mb-2 last:mb-0">
+                                <p className="text-[10px] font-bold text-content-muted truncate">{qLabel}</p>
+                                <p className="text-xs text-content truncate">
                                   {Array.isArray(ans.value) ? ans.value.join(', ') : String(ans.value)}
                                 </p>
                               </div>
                             );
                           })}
+                          {sub.form_answers.length > 2 && (
+                            <p className="text-[10px] text-content-muted italic">+{sub.form_answers.length - 2} more answers...</p>
+                          )}
                         </div>
                       ) : (
-                        <div className="mt-4 p-4 rounded-2xl bg-app border border-panel">
-                          <p className="text-sm text-content-muted leading-relaxed">
-                            {sub.content || 'No content provided.'}
+                        <div className="p-3 rounded-2xl bg-app border border-panel h-24 overflow-y-auto custom-scrollbar">
+                          <p className="text-xs text-content-muted leading-relaxed break-words whitespace-pre-wrap">
+                            {sub.content || 'No text content provided.'}
                           </p>
                         </div>
                       )}
 
-                      {/* Attachments */}
-                      {sub.attachments && sub.attachments.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {sub.attachments.map((att, i) => (
-                            <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel border border-panel group-hover:border-indigo-500/20 transition-colors">
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setSelectedFile({ url: att.url, name: att.fileName || 'Attachment' });
-                                }}
-                                className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
-                                title="Smart View"
-                              >
-                                <FileText className="h-3 w-3" />
-                                {att.fileName || 'Attachment'}
-                              </button>
-                              <div className="w-px h-3 bg-white/10 mx-1"></div>
-                              <a
-                                href={new URL(att.url, import.meta.env.VITE_API_URL || 'http://localhost:5000').href}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                                title="Download"
-                              >
-                                <Download className="h-3 w-3" />
-                              </a>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right side: Grading info + actions */}
-                  <div className="flex flex-col items-end gap-4 shrink-0">
-                    {/* Status */}
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        'text-[10px] font-black uppercase px-3 py-1',
-                        getStatusColor(sub.status),
-                      )}
-                    >
-                      {sub.status}
-                    </Badge>
-
-                    {/* Submitted time */}
-                    <span className="text-[10px] text-slate-600 font-bold">
-                      {sub.createdAt
-                        ? new Date(sub.createdAt).toLocaleString()
-                        : '—'}
-                    </span>
-
-                    {/* Grades */}
-                    <div className="space-y-2 text-end">
-                      {sub.ai_evaluation?.suggested_grade !== undefined && sub.ai_evaluation?.suggested_grade !== null && (
-                        <div className="flex items-center gap-2">
-                          <Star className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-xs font-bold text-content-muted">
-                            AI Grade:{' '}
-                            <span className="text-amber-400 font-black">
-                              {sub.ai_evaluation.suggested_grade}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                      {sub.final_grade !== undefined && sub.final_grade !== null && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                          <span className="text-xs font-bold text-content-muted">
-                            Final Grade:{' '}
-                            <span className="text-emerald-400 font-black">
-                              {sub.final_grade}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Feedback */}
-                    {sub.instructor_feedback && (
-                      <div className="flex items-start gap-2 max-w-xs">
-                        <MessageSquare className="h-3.5 w-3.5 text-indigo-400 mt-0.5 shrink-0" />
-                        <p className="text-xs text-content-muted italic">
-                          "{sub.instructor_feedback}"
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Action */}
-                    {(user?.role === 'ADMIN' || user?.role === 'INSTRUCTOR' || user?.role === 'HOD') && (
-                      <Button
-                        variant={sub.status === 'FINALIZED' ? "outline" : "ghost"}
-                        className={cn(
-                          "h-9 px-4 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-[border-color,background-color]",
-                          sub.status === 'FINALIZED'
-                            ? "text-content-muted border-panel-hover hover:bg-panel hover:text-content"
-                            : "text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
+                      {/* Attachments & Time */}
+                      <div className="flex flex-col gap-3 mt-auto pt-2">
+                        {sub.attachments && sub.attachments.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {sub.attachments.map((att, i) => (
+                              <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-panel-hover border border-panel group-hover:border-indigo-500/20 transition-colors max-w-full">
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setSelectedFile({ url: att.url, name: att.fileName || 'Attachment' });
+                                  }}
+                                  className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer truncate"
+                                  title={att.fileName || 'Attachment'}
+                                >
+                                  <FileText className="h-3 w-3 shrink-0" />
+                                  <span className="truncate max-w-[120px]">{att.fileName || 'Attachment'}</span>
+                                </button>
+                                <div className="w-px h-2 bg-white/20 shrink-0"></div>
+                                <a
+                                  href={new URL(att.url, import.meta.env.VITE_API_URL || 'http://localhost:5000').href}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-indigo-400 hover:text-indigo-300 transition-colors shrink-0"
+                                  title="Download"
+                                >
+                                  <Download className="h-3 w-3" />
+                                </a>
+                              </div>
+                            ))}
+                          </div>
                         )}
-                        onClick={() => {
-                          const subId = sub.id || sub._id;
-                          const targetUrl = departmentId
-                            ? `/dashboard/departments/${departmentId}/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`
-                            : `/dashboard/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`;
-                          navigate(targetUrl);
-                        }}
-                      >
-                        <Star className="me-1.5 h-3.5 w-3.5" />
-                        {sub.status === 'FINALIZED' ? 'Update Evaluation' : 'Finalize Grade'}
-                      </Button>
-                    )}
+                        
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-[9px] font-bold text-slate-500">
+                            {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : '—'}
+                          </span>
+                        {/* Grades compact */}
+                        <div className="flex items-center gap-2">
+                          {sub.ai_evaluation?.suggested_grade !== undefined && sub.ai_evaluation?.suggested_grade !== null && (
+                            <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-lg border border-amber-500/20" title="AI Suggested Grade">
+                              <Star className="h-3 w-3" />
+                              <span className="text-[10px] font-black">{sub.ai_evaluation.suggested_grade}</span>
+                            </div>
+                          )}
+                          {sub.final_grade !== undefined && sub.final_grade !== null && (
+                            <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-lg border border-emerald-500/20" title="Final Grade">
+                              <CheckCircle2 className="h-3 w-3" />
+                              <span className="text-[10px] font-black">{sub.final_grade}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+
+                  {/* Footer Actions */}
+                    <div className="mt-4 pt-4 border-t border-panel flex flex-col gap-2">
+                       {/* Feedback compact */}
+                       {sub.instructor_feedback && (
+                        <div className="flex items-start gap-1.5 p-2 rounded-xl bg-indigo-500/5 border border-indigo-500/10 mb-2">
+                          <MessageSquare className="h-3 w-3 text-indigo-400 mt-0.5 shrink-0" />
+                          <p className="text-[10px] text-content-muted italic line-clamp-2">
+                            "{sub.instructor_feedback}"
+                          </p>
+                        </div>
+                      )}
+                      {(user?.role === 'ADMIN' || user?.role === 'INSTRUCTOR' || user?.role === 'HOD') && (
+                        <Button
+                          variant={sub.status === 'FINALIZED' ? "outline" : "ghost"}
+                          className={cn(
+                            "w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all",
+                            sub.status === 'FINALIZED'
+                              ? "text-content-muted border-panel-hover hover:bg-panel hover:text-content"
+                              : "text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
+                          )}
+                          onClick={() => {
+                            const subId = sub.id || sub._id;
+                            const targetUrl = departmentId
+                              ? `/dashboard/departments/${departmentId}/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`
+                              : `/dashboard/courses/${courseId}/tasks/${taskId}/submissions/${subId}/grade`;
+                            navigate(targetUrl);
+                          }}
+                        >
+                          <Star className="me-1.5 h-3.5 w-3.5" />
+                          {sub.status === 'FINALIZED' ? 'Update Evaluation' : 'Finalize Grade'}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="pending" className="mt-0 outline-none">
+          <div className="p-8 rounded-3xl bg-panel border border-panel-hover flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-black text-content">Pending Submissions</h3>
+                <p className="text-xs font-bold text-content-muted uppercase tracking-widest mt-1">
+                  Students who haven't submitted yet
+                </p>
               </div>
-            );
-          })
-        )}
-      </div>
-      </TabsContent>
+              <Badge variant="outline" className="h-8 px-3 text-amber-400 border-amber-500/20 bg-amber-500/10 font-bold">
+                {pendingStudents.length} Pending
+              </Badge>
+            </div>
+
+            {pendingStudents.length === 0 ? (
+              <div className="py-12 flex flex-col items-center gap-4 opacity-50">
+                <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+                <p className="text-sm font-bold text-content-muted">All enrolled students have submitted!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {pendingStudents.map(student => (
+                  <div key={student._id || student.id} className="flex items-center gap-3 p-4 rounded-2xl bg-app border border-panel">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-600/10 flex items-center justify-center text-amber-400 border border-panel shrink-0">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <h4 className="text-sm font-bold text-content truncate">
+                        {student.firstName} {student.lastName}
+                      </h4>
+                      <p className="text-[10px] text-content-muted font-mono truncate">
+                        {student.email}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* File Viewer Modal */}
