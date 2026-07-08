@@ -66,14 +66,9 @@ export function DepartmentModal({ open, onClose, department, onSave }: Departmen
       toast.error('Name and Code are required');
       return;
     }
-    if (!hodId) {
-      toast.error('Head of Department must be selected');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      await onSave({ name, code, description, hodId });
+      await onSave({ name, code, description, hodId: hodId || undefined });
       onClose();
     } catch (error) {
       // Error handled by parent
@@ -135,7 +130,7 @@ export function DepartmentModal({ open, onClose, department, onSave }: Departmen
           {/* ── HOD Dropdown ── */}
           <div className="flex flex-col gap-2">
             <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">
-              Head of Department (HOD)
+              Head of Department (HOD) - <span className="text-indigo-400">Optional</span>
             </Label>
             <div className="relative">
               <UserIcon className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted pointer-events-none z-10" />

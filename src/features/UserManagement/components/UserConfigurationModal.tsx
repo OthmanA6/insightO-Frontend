@@ -7,7 +7,7 @@ import { Label } from '@/shared/components/ui/label';
 import { Badge } from '@/shared/components/ui/badge';
 import { 
   User, Mail, Building2, Shield, Settings, 
-  CheckCircle2, FileText, Loader2, Calendar, Lock
+  CheckCircle2, FileText, Loader2, Calendar, Lock, Plus
 } from 'lucide-react';
 import * as departmentApi from '@/shared/api/departmentApi';
 import * as authApi from '@/features/auth/api/authApi';
@@ -32,10 +32,11 @@ interface UserConfigurationModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  pendingUser?: any; // If provided, we are in Approval Mode
+  user?: any; // The user to edit or approve
+  mode?: 'create' | 'approve' | 'edit';
 }
 
-export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }: UserConfigurationModalProps) {
+export function UserConfigurationModal({ open, onClose, onSuccess, user, mode = 'create' }: UserConfigurationModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form State
@@ -48,6 +49,11 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
   const [selectedRole, setSelectedRole] = useState<UserRole>('STUDENT');
   const [academicYear, setAcademicYear] = useState<string>('');
   const [nationalId, setNationalId] = useState<string>('');
+  
+  // Inline Department Creation State
+  const [showNewDeptForm, setShowNewDeptForm] = useState(false);
+  const [newDeptName, setNewDeptName] = useState('');
+  const [newDeptCode, setNewDeptCode] = useState('');
 
   useEffect(() => {
     const fetchDepts = async () => {
@@ -61,13 +67,22 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
     if (open) fetchDepts();
   }, [open]);
 
-  // Sync initial values if pendingUser is provided
+  // Sync initial values
   useEffect(() => {
-    if (pendingUser) {
-      setSelectedRole(pendingUser.role || 'STUDENT');
-      setNationalId(pendingUser.nationalId ? String(pendingUser.nationalId) : '');
-      setSelectedDept(resolveDepartmentId(pendingUser.departmentId));
-      if (pendingUser.academicYear != null) setAcademicYear(String(pendingUser.academicYear));
+    if (user && (mode === 'approve' || mode === 'edit')) {
+      setSelectedRole(user.role || 'STUDENT');
+      setNationalId(user.nationalId ? String(user.nationalId) : '');
+      const deptId = user.profile?.data?.departmentId?._id || user.profile?.data?.departmentId?.id || user.profile?.data?.departmentId || user.departmentId;
+      setSelectedDept(resolveDepartmentId(deptId));
+      
+      const acadYear = user.profile?.data?.academicYear || user.academicYear;
+      if (acadYear != null) setAcademicYear(String(acadYear));
+      else setAcademicYear('');
+
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+      setEmail(user.email || '');
+      setPassword(''); // keep blank unless changing
     } else {
       // Clear form for "Add New User" mode
       setFirstName('');
@@ -79,23 +94,32 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
       setAcademicYear('');
       setNationalId('');
     }
-  }, [pendingUser, open]);
+  }, [user, mode, open]);
 
   const validateForm = () => {
-    if (!pendingUser) {
+    if (mode === 'create') {
       if (!firstName || !lastName || !email || !password) {
         toast.error('Basic information (Name, Email, Password) is required');
         return false;
       }
+    } else if (mode === 'edit') {
+      if (!firstName || !lastName || !email) {
+        toast.error('Basic information (Name, Email) is required');
+        return false;
+      }
     }
     
-    const nidStr = String(nationalId);
-    if (nidStr.length !== 14 || !/^\d+$/.test(nidStr)) {
+    if ((mode === 'create' || mode === 'edit') && (nationalId.length !== 14 || !/^\d+$/.test(nationalId))) {
       toast.error('National ID must be exactly 14 digits');
       return false;
     }
 
-    if (!selectedDept) {
+    if (showNewDeptForm) {
+      if (!newDeptName || !newDeptCode) {
+        toast.error('New Department Name and Code are required');
+        return false;
+      }
+    } else if (!selectedDept) {
       toast.error('Department is required');
       return false;
     }
@@ -113,8 +137,21 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
 
     setIsSubmitting(true);
     try {
-      if (pendingUser) {
-        const pendingId = pendingUser._id ?? pendingUser.id;
+      let finalDeptId = selectedDept;
+
+      // Handle inline department creation first
+      if (showNewDeptForm) {
+        const newDept = await departmentApi.createDepartment({ 
+          name: newDeptName, 
+          code: newDeptCode, 
+          description: '' 
+        });
+        finalDeptId = newDept._id || newDept.id;
+        // Optionally fetch depts again, though modal might close anyway
+      }
+
+      if (mode === 'approve') {
+        const pendingId = user._id ?? user.id;
         if (!pendingId) {
           toast.error('Missing pending user id; cannot approve.');
           return;
@@ -122,12 +159,21 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
 
         const data: ApprovePendingUserPayload = {
           role: selectedRole,
-          departmentId: selectedDept,
+          departmentId: finalDeptId,
           academicYear: selectedRole === 'STUDENT' ? Number(academicYear) : undefined,
         };
 
         await authApi.approvePendingUser(pendingId, data);
-        toast.success(`User ${pendingUser.firstName} approved successfully!`);
+        toast.success(`User ${user.firstName} approved successfully!`);
+      } else if (mode === 'edit') {
+        const payload: any = {
+           firstName, lastName, email, role: selectedRole, departmentId: finalDeptId
+        };
+        if (password) payload.password = password;
+        if (selectedRole === 'STUDENT') payload.academicYear = Number(academicYear);
+        
+        await userAdminApi.updateUser(user.id || user._id, payload);
+        toast.success(`User updated successfully!`);
       } else {
         await userAdminApi.createAdminUser({
           firstName,
@@ -136,7 +182,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
           password,
           nationalId: Number(nationalId),
           role: selectedRole,
-          departmentId: selectedDept,
+          departmentId: finalDeptId,
           academicYear: selectedRole === 'STUDENT' ? Number(academicYear) : undefined,
         });
         toast.success(`User ${firstName} created and activated successfully!`);
@@ -145,7 +191,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
       onSuccess?.();
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || (pendingUser ? 'Approval failed' : 'Creation failed'));
+      toast.error(error.response?.data?.message || (mode === 'approve' ? 'Approval failed' : mode === 'edit' ? 'Update failed' : 'Creation failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -176,10 +222,10 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
               <div className="p-2 rounded-xl bg-violet-500/15 border border-violet-500/25">
                 <User className="h-5 w-5 text-violet-300" />
               </div>
-              {pendingUser ? 'Review & Approve User' : 'Direct User Provisioning'}
+              {mode === 'approve' ? 'Review & Approve User' : mode === 'edit' ? 'Edit User Details' : 'Direct User Provisioning'}
             </h2>
             <p className="text-content-muted text-xs font-medium uppercase tracking-widest mt-1">
-              {pendingUser ? 'Verify credentials for pending enrollment' : 'Bypassing OTP & Pending Queue'}
+              {mode === 'approve' ? 'Verify credentials for pending enrollment' : mode === 'edit' ? 'Update user information and roles' : 'Bypassing OTP & Pending Queue'}
             </p>
           </div>
         } 
@@ -188,16 +234,16 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
 
       <Modal.Body className="p-8 space-y-8 custom-scrollbar">
         {/* User Identity Preview (For Approval Mode) */}
-        {pendingUser && (
+        {mode === 'approve' && user && (
           <div className="p-6 rounded-2xl bg-panel border border-violet-500/15 flex items-center justify-between shadow-inner shadow-violet-950/20 animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-xl font-bold text-content shadow-lg ring-2 ring-violet-500/20">
-                {pendingUser.firstName?.charAt(0)}
+                {user.firstName?.charAt(0)}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-content leading-tight">{pendingUser.firstName} {pendingUser.lastName}</h3>
+                <h3 className="text-lg font-bold text-content leading-tight">{user.firstName} {user.lastName}</h3>
                 <p className="text-sm text-content-muted flex items-center gap-1.5 mt-1">
-                  <Mail className="h-3.5 w-3.5" /> {pendingUser.email}
+                  <Mail className="h-3.5 w-3.5" /> {user.email}
                 </p>
               </div>
             </div>
@@ -205,13 +251,13 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
               <Badge className="bg-violet-500/15 text-violet-200 border border-violet-500/30 px-3 py-1 font-bold text-[10px] uppercase tracking-widest shadow-sm shadow-violet-500/10">
                 Pending Approval
               </Badge>
-              <span className="text-[10px] text-content-muted font-mono">ID: {pendingUser._id || pendingUser.id}</span>
+              <span className="text-[10px] text-content-muted font-mono">ID: {user._id || user.id}</span>
             </div>
           </div>
         )}
 
-        {/* --- Direct Add New User Form Fields --- */}
-        {!pendingUser && (
+        {/* --- Direct Add/Edit User Form Fields --- */}
+        {mode !== 'approve' && (
           <section className="space-y-6 animate-in fade-in">
             <div className="flex items-center gap-3 mb-2">
               <div className="h-1 w-8 bg-violet-500 rounded-full" />
@@ -256,7 +302,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••" 
+                  placeholder={mode === 'edit' ? 'Leave blank to keep current' : '••••••••'} 
                   className="bg-app border-panel-hover text-content h-11 rounded-xl"
                   startIcon={<Lock className="h-4 w-4 text-content-muted" />}
                 />
@@ -270,28 +316,61 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
           <div className="flex items-center gap-3 mb-2">
             <div className="h-1 w-8 bg-violet-500 rounded-full" />
             <h3 className="text-sm font-bold text-content-muted uppercase tracking-widest">
-              {pendingUser ? 'Verify & Sync' : 'System Configuration'}
+              {mode === 'approve' ? 'Verify & Sync' : 'System Configuration'}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-2.5">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Department</Label>
-              <Select value={selectedDept} onValueChange={setSelectedDept}>
-                <SelectTrigger className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-violet-500 focus:ring-offset-0">
-                  <div className="flex items-center gap-3">
-                    <Building2 className="h-4 w-4 text-violet-400/80" />
-                    <SelectValue placeholder="Select Department" />
+              {showNewDeptForm ? (
+                <div className="flex flex-col gap-3 p-4 rounded-xl bg-violet-500/5 border border-violet-500/20 animate-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-violet-400">Create New Department</span>
+                    <Button variant="ghost" size="sm" className="h-6 px-2 text-content-muted" onClick={() => setShowNewDeptForm(false)}>
+                      Cancel
+                    </Button>
                   </div>
-                </SelectTrigger>
-                <SelectContent className="bg-panel border-panel-hover text-content">
-                  {departments.map(dept => (
-                    <SelectItem key={dept._id || dept.id} value={dept._id || dept.id} className="hover:bg-violet-600 focus:bg-violet-600">
-                      {dept.name} ({dept.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <Input 
+                    placeholder="Department Name (e.g. Information Technology)" 
+                    value={newDeptName} 
+                    onChange={e => setNewDeptName(e.target.value)} 
+                    className="h-10 bg-app border-panel-hover"
+                  />
+                  <Input 
+                    placeholder="Academic Code (e.g. IT-101)" 
+                    value={newDeptCode} 
+                    onChange={e => setNewDeptCode(e.target.value)} 
+                    className="h-10 bg-app border-panel-hover font-mono"
+                  />
+                </div>
+              ) : (
+                <Select value={selectedDept} onValueChange={setSelectedDept}>
+                  <SelectTrigger className="bg-app border-panel-hover text-content h-12 rounded-xl focus:ring-violet-500 focus:ring-offset-0 overflow-hidden">
+                    <div className="flex items-center gap-3 overflow-hidden w-full">
+                      <Building2 className="h-4 w-4 text-violet-400/80 shrink-0" />
+                      <div className="truncate text-left flex-1"><SelectValue placeholder="Select Department" /></div>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-panel border-panel-hover text-content">
+                    {departments.map(dept => (
+                      <SelectItem key={dept._id || dept.id} value={dept._id || dept.id} className="hover:bg-violet-600 focus:bg-violet-600">
+                        {dept.name} ({dept.code})
+                      </SelectItem>
+                    ))}
+                    <div className="p-2 border-t border-violet-500/20 mt-1">
+                      <Button 
+                        type="button" 
+                        onClick={() => setShowNewDeptForm(true)} 
+                        className="w-full text-xs bg-violet-500/10 text-violet-300 hover:bg-violet-500/20" 
+                        variant="ghost"
+                      >
+                         <Plus className="h-3.5 w-3.5 mr-2" /> Create New Department
+                      </Button>
+                    </div>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="flex flex-col gap-2.5">
@@ -335,30 +414,13 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
                 maxLength={14}
                 startIcon={<FileText className="h-4 w-4 text-content-muted" />}
                 className="bg-app border-panel-hover text-content h-12 rounded-xl font-mono focus:ring-violet-500 focus:ring-offset-0"
-                disabled={!!pendingUser}
+                disabled={mode === 'approve' || mode === 'edit'}
               />
             </div>
           </div>
         </section>
 
-        {/* Status Sync Footer */}
-        <section className="pt-4 border-t border-violet-500/10">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-app border border-violet-500/10">
-            <div className="flex items-center gap-3">
-              <Settings className="h-4 w-4 text-violet-400/70" />
-              <span className="text-xs font-bold text-content-muted uppercase tracking-widest">Administrative Provisioning</span>
-            </div>
-            <div
-              className={
-                pendingUser
-                  ? 'text-[10px] font-bold text-violet-200 bg-violet-500/15 border border-violet-500/25 px-2 py-0.5 rounded uppercase tracking-wider'
-                  : 'text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase tracking-wider'
-              }
-            >
-              {pendingUser ? 'Approve to activate' : 'Active Instantly'}
-            </div>
-          </div>
-        </section>
+
       </Modal.Body>
 
       <Modal.Footer>
@@ -377,7 +439,7 @@ export function UserConfigurationModal({ open, onClose, onSuccess, pendingUser }
               ) : (
                 <CheckCircle2 className="h-4 w-4" />
               )}
-              {pendingUser ? 'Confirm Approval' : 'Create & Activate'}
+              {mode === 'approve' ? 'Confirm Approval' : mode === 'edit' ? 'Save Changes' : 'Create & Activate'}
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getForm } from "@/features/FormBuilder/api/formApi";
-import { createSubmission } from "@/shared/api/submissionApi";
+import { createSubmission, getMyFormSubmissions } from "@/shared/api/submissionApi";
 import { uploadFile } from "@/shared/api/utilityApi";
 import type { Form } from "@/features/FormBuilder/types/form.types";
 import { Button } from "@/shared/components/ui/button";
@@ -21,6 +21,7 @@ export default function FormResponsePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isAlreadySubmitted, setIsAlreadySubmitted] = useState(false);
   
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [validationErrors, setValidationErrors] = useState<Record<string, string | boolean>>({});
@@ -29,7 +30,21 @@ export default function FormResponsePage() {
     const loadForm = async () => {
       try {
         if (!formId) return;
-        const data = await getForm(formId);
+        
+        const [data, submissions] = await Promise.all([
+          getForm(formId),
+          getMyFormSubmissions().catch(() => []) // fallback if not authenticated
+        ]);
+
+        const alreadySubmitted = submissions.some(s => {
+          const sFormId = typeof s.form_id === 'object' ? (s.form_id as any)._id || (s.form_id as any).id : s.form_id;
+          return String(sFormId) === String(formId);
+        });
+
+        if (alreadySubmitted) {
+          setIsAlreadySubmitted(true);
+        }
+
         setForm(data);
       } catch (err) {
         toast.error("Failed to load the form. It might be closed or invalid.");
@@ -138,6 +153,25 @@ export default function FormResponsePage() {
         <div className="flex flex-col items-center gap-4 text-indigo-500">
           <Loader2 className="h-10 w-10 animate-spin" />
           <p className="text-xs font-bold uppercase tracking-widest text-content-muted">Loading Evaluation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAlreadySubmitted) {
+    return (
+      <div className="min-h-screen bg-app flex items-center justify-center p-6">
+        <div className="max-w-md w-full p-10 rounded-3xl bg-panel border border-panel shadow-2xl flex flex-col items-center text-center gap-6 animate-in zoom-in-95 duration-500">
+          <div className="h-24 w-24 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+            <CheckCircle2 className="h-12 w-12 text-indigo-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black text-content">Already Submitted</h2>
+            <p className="text-content-muted text-sm font-medium">You have already completed this survey. Thank you for your feedback!</p>
+          </div>
+          <Button onClick={() => navigate('/dashboard')} variant="outline" className="w-full mt-4 h-12 rounded-xl border-panel-hover hover:bg-panel-hover text-content-muted font-bold transition-all">
+            Return to Dashboard
+          </Button>
         </div>
       </div>
     );

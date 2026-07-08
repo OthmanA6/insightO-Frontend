@@ -30,6 +30,7 @@ import * as departmentApi from '@/shared/api/departmentApi';
 export default function DepartmentManagementPage() {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [analyticsMap, setAnalyticsMap] = useState<Record<string, { students: number, courses: number }>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,8 +39,19 @@ export default function DepartmentManagementPage() {
   const fetchDepartments = async () => {
     setIsLoading(true);
     try {
-      const data = await departmentApi.getAllDepartments();
+      const [data, analytics] = await Promise.all([
+        departmentApi.getAllDepartments(),
+        departmentApi.getGlobalAnalytics()
+      ]);
       setDepartments(data);
+      
+      const map: Record<string, { students: number, courses: number }> = {};
+      if (analytics?.comparisons) {
+        analytics.comparisons.forEach(c => {
+          map[c.departmentId] = { students: c.enrollmentCount, courses: c.courseCount };
+        });
+      }
+      setAnalyticsMap(map);
     } catch (error) {
       toast.error('Failed to synchronize department data');
     } finally {
@@ -201,39 +213,21 @@ export default function DepartmentManagementPage() {
                 "{dept.description || 'No description provided for this academic entity.'}"
               </p>
 
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-panel">
-                <div className="flex flex-col gap-1 text-center">
-                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Students</span>
-                  <span className="text-lg font-black text-content">{dept.stats?.studentCount}</span>
-                </div>
-                <div className="flex flex-col gap-1 text-center border-x border-panel">
-                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Faculty</span>
-                  <span className="text-lg font-black text-content">{dept.stats?.instructorCount}</span>
-                </div>
-                <div className="flex flex-col gap-1 text-center">
-                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Surveys</span>
-                  <span className="text-lg font-black text-indigo-500">{dept.stats?.activeSurveys}</span>
-                </div>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-black text-content">
-                    {dept.hodName?.charAt(0)}
+              <div className="mt-auto pt-4 flex items-center justify-between border-t border-panel">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-content-muted group-hover:text-indigo-400 transition-colors">
+                    <Users className="h-4 w-4" />
+                    <span className="text-xs font-bold">{analyticsMap[resolveDeptId(dept)]?.students || 0} Students</span>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-content-muted uppercase tracking-tighter leading-none">Head of Dept</span>
-                    <span className="text-[11px] font-bold text-content-muted">{dept.hodName || 'Not Appointed'}</span>
+                  <div className="flex items-center gap-1.5 text-content-muted group-hover:text-indigo-400 transition-colors">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="text-xs font-bold">{analyticsMap[resolveDeptId(dept)]?.courses || 0} Courses</span>
                   </div>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  className="h-10 px-4 rounded-xl text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-[10px] uppercase tracking-widest group/btn"
-                  onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/departments/${resolveDeptId(dept)}`); }}
-                >
-                  View Courses <ArrowUpRight className="ms-2 h-4 w-4 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                </Button>
+                <div className="flex items-center text-indigo-400 font-bold text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-transform">
+                  Explore <ChevronRight className="h-4 w-4 ms-1" />
+                </div>
               </div>
             </div>
           )))}
