@@ -113,7 +113,7 @@ export default function DepartmentManagementPage() {
 
           <Button
             onClick={() => { setEditingDept(null); setIsModalOpen(true); }}
-            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-xl shadow-indigo-500/20 transition-all flex items-center gap-2"
+            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-sm shadow-indigo-500/20 transition-all flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             New Department
@@ -123,10 +123,11 @@ export default function DepartmentManagementPage() {
 
       <Tabs defaultValue="management" className="w-full space-y-8">
         <TabsList className="bg-panel border border-panel p-1 rounded-2xl">
-          <TabsTrigger value="management" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
-            Management
+          <TabsTrigger value="management" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-sm">
+            <Building2 className="w-4 h-4 mr-2 inline-block" />
+            Departments
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-lg">
+          <TabsTrigger value="analytics" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-sm">
             Global Analytics
           </TabsTrigger>
         </TabsList>
@@ -171,7 +172,7 @@ export default function DepartmentManagementPage() {
           </div>
         ) : (
           filteredDepts.map((dept) => (
-            <div key={resolveDeptId(dept)} className="group relative rounded-3xl bg-panel border border-panel hover:border-indigo-500/30 shadow-2xl transition-all p-8 flex flex-col gap-6 cursor-pointer" onClick={() => navigate(`/dashboard/departments/${resolveDeptId(dept)}`)}>
+            <div key={resolveDeptId(dept)} className="group relative rounded-3xl bg-panel border border-panel hover:border-indigo-500/30 shadow-sm transition-all p-8 flex flex-col gap-6 cursor-pointer" onClick={() => navigate(`/dashboard/departments/${resolveDeptId(dept)}`)}>
               <div className="flex justify-between items-start">
                 <div className="flex gap-4">
                   <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-600/10 flex items-center justify-center text-indigo-400 border border-panel">

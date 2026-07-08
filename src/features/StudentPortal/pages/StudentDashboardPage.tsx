@@ -110,23 +110,23 @@ export default function StudentDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          <Link to="/dashboard/courses-tasks" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+          <Link to="/dashboard/courses-tasks" className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/15 dark:hover:bg-indigo-950/20 transition-all duration-300 shadow-sm rounded-3xl flex flex-col gap-2 cursor-pointer group">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Total Courses</span>
             <span className="text-3xl font-black text-content">{courses.length}</span>
           </Link>
-          <Link to="/dashboard/student-surveys" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+          <Link to="/dashboard/student-surveys" className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/15 dark:hover:bg-indigo-950/20 transition-all duration-300 shadow-sm rounded-3xl flex flex-col gap-2 cursor-pointer group">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Assigned Surveys</span>
             <span className="text-3xl font-black text-purple-500">{assignedSurveys}</span>
           </Link>
-          <Link to="/dashboard/courses-tasks" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+          <Link to="/dashboard/courses-tasks" className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/15 dark:hover:bg-indigo-950/20 transition-all duration-300 shadow-sm rounded-3xl flex flex-col gap-2 cursor-pointer group">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Pending Tasks</span>
             <span className="text-3xl font-black text-amber-500">{pendingTasks.filter(t => !isExpired(t.deadline)).length}</span>
           </Link>
-          <Link to="/dashboard/student-evaluations" className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/20 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2 cursor-pointer group">
+          <Link to="/dashboard/student-evaluations" className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 hover:bg-indigo-950/15 dark:hover:bg-indigo-950/20 transition-all duration-300 shadow-sm rounded-3xl flex flex-col gap-2 cursor-pointer group">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted group-hover:text-content transition-colors">Completed Tasks</span>
             <span className="text-3xl font-black text-emerald-500">{submissions.length}</span>
           </Link>
-          <div className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col gap-2">
+          <div className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-sm rounded-3xl flex flex-col gap-2">
             <span className="text-xs font-bold uppercase tracking-widest text-content-muted">Average Grade</span>
             <span className="text-3xl font-black text-blue-500">{averageGrade.toFixed(1)}%</span>
           </div>
@@ -149,7 +149,7 @@ export default function StudentDashboardPage() {
           
           <div className="space-y-4">
             {urgentTasks.map(task => (
-              <div key={task.id || task._id} className="p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+              <div key={task.id || task._id} className="p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-sm rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 group">
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
@@ -173,7 +173,7 @@ export default function StudentDashboardPage() {
                         setTaskToSubmit(taskId);
                       }
                     }}
-                    className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors flex items-center gap-2 border border-indigo-500/50 shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                    className="w-full md:w-auto h-12 px-6 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors flex items-center gap-2 border border-indigo-500/50 shadow-sm"
                   >
                     Submit Now <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -210,13 +210,13 @@ export default function StudentDashboardPage() {
                 <Link 
                   to={`/dashboard/student-courses/${course.id || course._id}`} 
                   key={course.id || course._id} 
-                  className="group p-6 bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-xl hover:shadow-indigo-500/10 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
+                  className="group p-6 bg-white/80 dark:bg-indigo-950/10 backdrop-blur-md border border-panel-hover hover:border-indigo-500/30 transition-all duration-300 shadow-sm rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px]"
                 >
                   <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
                     <Building2 className="h-24 w-24 text-content" />
                   </div>
                   <div className="relative z-10">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">{course.courseCode}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-1 block">{course.courseCode}</span>
                     <h3 className="text-lg font-bold text-content leading-tight">{course.name}</h3>
                   </div>
                   <div className="relative z-10 flex items-center gap-2 text-xs font-medium text-content-muted mt-4">

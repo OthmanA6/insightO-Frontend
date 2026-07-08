@@ -29,7 +29,7 @@ const CustomPieTooltip = ({ active, payload }: any) => {
     if (data.name === 'ADMIN') Icon = Zap;
 
     return (
-      <div className="bg-panel border border-panel-hover p-4 rounded-2xl shadow-2xl flex items-center gap-4">
+      <div className="bg-panel border border-panel-hover p-4 rounded-2xl shadow-sm flex items-center gap-4">
         <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${payload[0].fill}20` }}>
           <Icon className="h-6 w-6" style={{ color: payload[0].fill }} />
         </div>
@@ -48,7 +48,7 @@ const CustomBarTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-panel/95 backdrop-blur-md border border-panel-hover p-4 rounded-2xl shadow-2xl">
+      <div className="bg-panel/95 backdrop-blur-md border border-panel-hover p-4 rounded-2xl shadow-sm">
         <p className="text-xs text-indigo-400 font-bold mb-1 uppercase tracking-wider">{data.name}</p>
         <p className="text-sm font-bold text-content mb-3">{data.fullName}</p>
         <div className="flex items-center gap-2 bg-indigo-500/10 w-fit px-3 py-1.5 rounded-lg border border-indigo-500/20">
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* User Roles Donut Chart */}
-        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-xl flex flex-col">
+        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-sm flex flex-col">
           <h3 className="text-sm font-bold text-content flex items-center gap-2 mb-6">
             <Users2 className="h-4 w-4 text-indigo-400" /> Users Classification
           </h3>
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Top Performing Courses */}
-        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-xl flex flex-col">
+        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-sm flex flex-col">
           <h3 className="text-sm font-bold text-content flex items-center gap-2 mb-6">
             <Activity className="h-4 w-4 text-emerald-400" /> Top Engaging Courses (Completion %)
           </h3>
@@ -172,12 +172,12 @@ export default function AdminDashboardPage() {
              {charts.topPerformingCourses && charts.topPerformingCourses.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={charts.topPerformingCourses} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e2e48" vertical={false} />
-                  <XAxis dataKey="name" stroke="#666" tick={{ fill: '#888', fontSize: 11 }} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#666" tick={{ fill: '#888', fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--chart-axis-text)" tick={{ fill: 'var(--chart-axis-text)', fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--chart-axis-text)" tick={{ fill: 'var(--chart-axis-text)', fontSize: 11 }} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
                     content={<CustomBarTooltip />}
-                    cursor={{ fill: '#2e2e48', opacity: 0.4 }}
+                    cursor={{ fill: 'var(--chart-grid)', opacity: 0.4 }}
                   />
                   <Bar dataKey="engagementRate" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={40}>
                     {charts.topPerformingCourses.map((_: any, index: number) => (
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Submissions Over Time */}
-        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-xl flex flex-col">
+        <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-sm flex flex-col">
           <h3 className="text-sm font-bold text-content flex items-center gap-2 mb-6">
             <BarChart3 className="h-4 w-4 text-emerald-400" /> Submissions (Last 7 Days)
           </h3>
@@ -201,14 +201,14 @@ export default function AdminDashboardPage() {
              {charts.recentSubmissionsChart.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={charts.recentSubmissionsChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2e2e48" vertical={false} />
-                  <XAxis dataKey="date" stroke="#666" tick={{ fill: '#888', fontSize: 11 }} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#666" tick={{ fill: '#888', fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
+                  <XAxis dataKey="date" stroke="var(--chart-axis-text)" tick={{ fill: 'var(--chart-axis-text)', fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--chart-axis-text)" tick={{ fill: 'var(--chart-axis-text)', fontSize: 11 }} tickLine={false} axisLine={false} />
                   <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#181825', border: '1px solid #2e2e48', borderRadius: '12px', color: '#fff' }} 
+                    contentStyle={{ backgroundColor: 'var(--chart-tooltip-bg)', border: '1px solid var(--border-panel-hover)', borderRadius: '12px', color: 'var(--text-primary)' }} 
                     itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
                   />
-                  <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#181825' }} activeDot={{ r: 6, fill: '#10b981' }} />
+                  <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: 'var(--bg-panel)' }} activeDot={{ r: 6, fill: '#10b981' }} />
                 </LineChart>
               </ResponsiveContainer>
              ) : (
@@ -222,7 +222,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Recent Forms */}
-        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-xl">
+        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-sm">
           <div className="p-6 border-b border-panel-hover bg-panel-hover/50">
             <h3 className="text-sm font-bold text-content">Recently Created Forms</h3>
           </div>
@@ -252,7 +252,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Top AI Consumers */}
-        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-xl">
+        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-sm">
           <div className="p-6 border-b border-panel-hover bg-panel-hover/50 flex items-center gap-2">
             <Zap className="h-4 w-4 text-amber-400 fill-amber-400/20" />
             <h3 className="text-sm font-bold text-content">Top AI Consumers</h3>
@@ -277,7 +277,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Courses Overview */}
-        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-xl lg:col-span-2">
+        <div className="bg-panel rounded-3xl border border-panel-hover overflow-hidden shadow-sm lg:col-span-2">
           <div className="p-6 border-b border-panel-hover bg-panel-hover/50 flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-emerald-400" />
             <h3 className="text-sm font-bold text-content">Courses Overview (Top 10 Enrolled)</h3>
@@ -332,7 +332,7 @@ export default function AdminDashboardPage() {
 
 function KPICard({ title, value, icon: Icon, color }: any) {
   return (
-    <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-xl flex flex-col justify-between group hover:border-indigo-500/30 transition-colors">
+    <div className="bg-panel rounded-3xl p-6 border border-panel-hover shadow-sm flex flex-col justify-between group hover:border-indigo-500/30 transition-colors">
       <div className="flex items-center justify-between mb-4">
         <span className="text-[11px] font-bold text-content-muted uppercase tracking-wider">{title}</span>
         <div className={`p-2 rounded-xl bg-app ${color} bg-opacity-10 group-hover:bg-opacity-20 transition-all`}>

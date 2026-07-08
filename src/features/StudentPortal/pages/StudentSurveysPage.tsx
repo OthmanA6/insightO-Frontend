@@ -119,7 +119,7 @@ export default function StudentSurveysPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <TabsList className="bg-indigo-950/20 backdrop-blur-md border border-panel-hover p-1 rounded-xl h-auto shrink-0 shadow-inner">
+            <TabsList className="bg-slate-100/80 dark:bg-indigo-950/20 backdrop-blur-md border border-panel-hover p-1 rounded-xl h-auto shrink-0">
               <TabsTrigger value="pending" className="rounded-lg px-6 py-2.5 text-xs font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-content text-content-muted transition-all">
                 Pending Surveys
               </TabsTrigger>

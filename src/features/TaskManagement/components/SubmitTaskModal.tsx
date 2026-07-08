@@ -141,16 +141,16 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
   };
 
   return (
-    <Modal open={open} onClose={onClose} size="xl" className="bg-background border-border">
+    <Modal open={open} onClose={onClose} size="xl" className="bg-panel border-panel">
       <Modal.Header
         title={
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+            <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500">
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-foreground tracking-tight">Submit Assignment</h2>
-              <p className="text-[10px] text-muted-foreground font-black tracking-widest uppercase mt-0.5">Evaluation Process</p>
+              <h2 className="text-xl font-bold text-content tracking-tight">Submit Assignment</h2>
+              <p className="text-[10px] text-content-muted font-black tracking-widest uppercase mt-0.5">Evaluation Process</p>
             </div>
           </div>
         }
@@ -166,17 +166,17 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
 
             {/* Task Details Section */}
             {task && (task.description || (task.attachments && task.attachments.length > 0)) && (
-              <div className="bg-muted/30 border border-border p-5 rounded-2xl space-y-4">
+              <div className="bg-panel-hover border border-panel p-5 rounded-2xl space-y-4">
                 {task.description && (
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Task Description</Label>
-                    <p className="text-sm text-foreground whitespace-pre-wrap">{task.description}</p>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Task Description</Label>
+                    <p className="text-sm text-content whitespace-pre-wrap">{task.description}</p>
                   </div>
                 )}
 
                 {task.attachments && task.attachments.length > 0 && (
                   <div className="space-y-2 mt-4">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Instructor Attachments</Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Instructor Attachments</Label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {task.attachments.map((att: any, idx: number) => (
                         <a
@@ -185,18 +185,18 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-between p-3 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors group"
+                          className="flex items-center justify-between p-3 rounded-xl bg-app border border-panel hover:border-indigo-500/50 transition-colors group"
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 shrink-0">
                               <FileText className="h-4 w-4" />
                             </div>
                             <div className="flex flex-col min-w-0">
-                              <span className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{att.fileName || `Attachment ${idx + 1}`}</span>
-                              {att.size && <span className="text-[10px] text-muted-foreground font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                              <span className="text-xs font-bold text-content truncate group-hover:text-indigo-500 transition-colors">{att.fileName || `Attachment ${idx + 1}`}</span>
+                              {att.size && <span className="text-[10px] text-content-muted font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
                             </div>
                           </div>
-                          <div className="p-1.5 rounded-md bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                          <div className="p-1.5 rounded-md bg-panel text-content-muted group-hover:bg-indigo-500/10 group-hover:text-indigo-500 transition-colors">
                             <Download className="h-3.5 w-3.5" />
                           </div>
                         </a>
@@ -219,8 +219,8 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                   {form?.questions.map((q, idx) => {
                     const qId = q.id || q._id!;
                     return (
-                      <div key={qId} className="space-y-3 bg-card border border-border p-5 rounded-2xl">
-                        <Label className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <div key={qId} className="space-y-3 bg-app border border-panel p-5 rounded-2xl">
+                        <Label className="text-sm font-bold text-content flex items-center gap-2">
                           {idx + 1}. {q.label}
                           {q.required && <span className="text-destructive">*</span>}
                         </Label>
@@ -228,14 +228,14 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                         {q.type === 'short_text' && (
                           <input
                             type="text"
-                            className="w-full bg-background border border-border text-foreground text-sm rounded-xl p-3 outline-none focus:border-primary"
+                            className="w-full bg-panel border border-panel text-content text-sm rounded-xl p-3 outline-none focus:border-indigo-500"
                             value={formAnswers[qId] || ''}
                             onChange={e => setFormAnswers(prev => ({ ...prev, [qId]: e.target.value }))}
                           />
                         )}
                         {q.type === 'long_text' && (
                           <Textarea
-                            className="w-full bg-background border border-border text-foreground text-sm rounded-xl p-3 outline-none focus:border-primary min-h-[100px]"
+                            className="w-full bg-panel border border-panel text-content text-sm rounded-xl p-3 outline-none focus:border-indigo-500 min-h-[100px]"
                             value={formAnswers[qId] || ''}
                             onChange={e => setFormAnswers(prev => ({ ...prev, [qId]: e.target.value }))}
                           />
@@ -247,11 +247,11 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                                 <input
                                   type="radio"
                                   name={`q_${qId}`}
-                                  className="accent-primary w-4 h-4"
+                                  className="accent-indigo-600 w-4 h-4"
                                   checked={formAnswers[qId] === opt}
                                   onChange={() => setFormAnswers(prev => ({ ...prev, [qId]: opt }))}
                                 />
-                                <span className="text-sm text-foreground">{opt}</span>
+                                <span className="text-sm text-content">{opt}</span>
                               </label>
                             ))}
                           </div>
@@ -264,7 +264,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                                 <label key={oIdx} className="flex items-center gap-3 cursor-pointer">
                                   <input
                                     type="checkbox"
-                                    className="accent-primary w-4 h-4 rounded"
+                                    className="accent-indigo-600 w-4 h-4 rounded"
                                     checked={currentAns.includes(opt)}
                                     onChange={(e) => {
                                       if (e.target.checked) {
@@ -274,7 +274,7 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                                       }
                                     }}
                                   />
-                                  <span className="text-sm text-foreground">{opt}</span>
+                                  <span className="text-sm text-content">{opt}</span>
                                 </label>
                               );
                             })}
@@ -290,8 +290,8 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                                   type="button"
                                   onClick={() => setFormAnswers(prev => ({ ...prev, [qId]: val }))}
                                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors border ${formAnswers[qId] === val
-                                      ? 'bg-primary text-primary-foreground border-primary shadow-lg'
-                                      : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                      : 'bg-panel text-content-muted border-panel hover:border-indigo-500/50'
                                     }`}
                                 >
                                   {val}
@@ -308,23 +308,23 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
             ) : (
               <>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Submission Content</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Submission Content</Label>
                   <Textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Write your response, findings, or notes here..."
-                    className="bg-card border-border text-foreground min-h-[160px] rounded-2xl focus:ring-primary p-4"
+                    className="bg-app border-panel text-content min-h-[160px] rounded-2xl focus:ring-indigo-500 focus:border-indigo-500 p-4"
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ms-1">Attachments (Optional)</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Attachments (Optional)</Label>
 
                   <div
                     onClick={() => !isUploading && fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${isUploading
-                        ? 'border-primary/50 bg-primary/5 cursor-wait'
-                        : 'border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer'
+                        ? 'border-indigo-500/50 bg-indigo-500/5 cursor-wait'
+                        : 'border-panel hover:border-indigo-500/50 hover:bg-panel-hover/50 cursor-pointer'
                       }`}
                   >
                     <input
@@ -332,38 +332,38 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
                       className="hidden"
                       ref={fileInputRef}
                       onChange={handleFileUpload}
-                      accept=".pdf,.png,.jpg,.jpeg,.txt,.js,.ts,.py,.cpp,.java,.html,.css,.json"
+                      accept=".pdf,.png,.jpg,.jpeg,.txt,.js,.ts,.jsx,.tsx,.py,.cpp,.c,.cs,.java,.html,.css,.json,.go,.rb,.php,.swift"
                     />
 
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                       {isUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <UploadCloud className="h-6 w-6" />}
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-foreground">
+                      <p className="text-sm font-bold text-content">
                         {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">PDF, TXT, PNG, JPG (Max 10MB)</p>
+                      <p className="text-xs text-content-muted mt-1">PDF, TXT, Code Files, Images (Max 10MB)</p>
                     </div>
                   </div>
 
                   {attachments.length > 0 && (
                     <div className="space-y-2 mt-2">
                       {attachments.map((att, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
+                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-app border border-panel">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 shrink-0">
                               <FileText className="h-4 w-4" />
                             </div>
                             <div className="flex flex-col min-w-0">
-                              <span className="text-xs font-bold text-foreground truncate">{att.fileName || 'Attachment'}</span>
-                              {att.size && <span className="text-[10px] text-muted-foreground font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                              <span className="text-xs font-bold text-content truncate">{att.fileName || 'Attachment'}</span>
+                              {att.size && <span className="text-[10px] text-content-muted font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
                             </div>
                           </div>
                           <Button
                             type="button"
                             variant="ghost"
                             onClick={() => removeAttachment(idx)}
-                            className="h-8 w-8 p-0 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                            className="h-8 w-8 p-0 shrink-0 text-content-muted hover:text-destructive hover:bg-destructive/10 rounded-lg"
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -375,14 +375,14 @@ export function SubmitTaskModal({ taskId, open, onClose, onSuccess }: SubmitTask
               </>
             )}
 
-            <div className="pt-6 border-t border-border flex justify-end gap-3">
-              <Button variant="ghost" type="button" onClick={onClose} className="h-12 px-6 rounded-xl text-muted-foreground">
+            <div className="pt-6 border-t border-panel flex justify-end gap-3">
+              <Button variant="ghost" type="button" onClick={onClose} className="h-12 px-6 rounded-xl text-content-muted hover:text-content hover:bg-panel-hover">
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || (task?.task_type !== 'QUIZ' && !content.trim() && attachments.length === 0) || (task?.task_type === 'QUIZ' && !form)}
-                className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold transition-[border-color,background-color] flex items-center gap-2"
+                className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold transition-[border-color,background-color] flex items-center gap-2"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                 Submit Assignment

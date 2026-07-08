@@ -104,7 +104,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-app border border-panel-hover rounded-2xl p-4 shadow-2xl backdrop-blur-md w-[200px]">
+        <div className="bg-panel border border-panel-hover rounded-2xl p-4 shadow-sm backdrop-blur-md w-[200px]">
           <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black mb-1">Survey Details</p>
           <h4 className="text-sm font-bold text-content mb-2 leading-snug truncate" title={data.formTitle || "Survey"}>
             {data.formTitle || "Survey"}
@@ -191,7 +191,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-panel border border-panel rounded-3xl p-6 md:p-8 mb-8 shadow-2xl"
+            className="w-full bg-panel border border-panel rounded-3xl p-6 md:p-8 mb-8 shadow-sm"
           >
             <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
               <span className="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span>
@@ -231,16 +231,8 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
                     tickCount={6}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f111a',
-                      borderColor: '#ffffff10',
-                      borderRadius: '12px',
-                      color: '#fff',
-                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
-                    }}
-                    itemStyle={{ color: '#e2e8f0', fontWeight: 500 }}
-                    labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
                     content={<CustomTooltip />}
+                    cursor={{ stroke: 'var(--panel-hover)', strokeWidth: 1, strokeDasharray: '5 5' }}
                   />
                   <Area
                     type="monotone"
@@ -268,7 +260,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-panel border border-emerald-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-xl"
+            className="bg-panel border border-emerald-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-sm"
           >
             <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl -mr-10 -mt-10" />
             <h3 className="text-emerald-400 font-semibold mb-6 flex items-center gap-3 text-lg">
@@ -292,7 +284,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-panel border border-amber-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-xl"
+            className="bg-panel border border-amber-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-sm"
           >
             <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl -mr-10 -mt-10" />
             <h3 className="text-amber-400 font-semibold mb-6 flex items-center gap-3 text-lg">
@@ -316,7 +308,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-panel border border-indigo-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-xl"
+            className="bg-panel border border-indigo-500/10 rounded-3xl p-6 md:p-8 flex flex-col relative overflow-hidden shadow-sm"
           >
             <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl -mr-10 -mt-10" />
             <h3 className="text-indigo-400 font-semibold mb-6 flex items-center gap-3 text-lg">
@@ -340,7 +332,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
 
       {/* Contributing Forms Table */}
       {chartData && chartData.length > 0 && (
-        <div className="mt-8 bg-panel border border-panel rounded-3xl p-6 md:p-8 shadow-2xl overflow-hidden">
+        <div className="mt-8 bg-panel border border-panel rounded-3xl p-6 md:p-8 shadow-sm overflow-hidden">
           <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
             <span className="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span>
             Contributing Forms
