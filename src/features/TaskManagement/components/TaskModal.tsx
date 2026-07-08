@@ -375,8 +375,8 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                                                         key={s.id}
                                                         onClick={() => toggleStudent(s.id)}
                                                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-[border-color,background-color] ${selectedUserIds.includes(s.id)
-                                                                ? 'bg-indigo-500/10 border-indigo-500/30'
-                                                                : 'bg-transparent border-panel hover:border-panel-hover'
+                                                            ? 'bg-indigo-500/10 border-indigo-500/30'
+                                                            : 'bg-transparent border-panel hover:border-panel-hover'
                                                             }`}
                                                     >
                                                         <Checkbox
@@ -446,64 +446,64 @@ export function TaskModal({ open, onClose, task, onSave, contextDepartmentId, co
                         </div>
 
                         <div className="flex flex-col gap-3">
-                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Attachments (Optional)</Label>
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-content-muted ms-1">Attachments (Optional)</Label>
 
-                                    <div
-                                        onClick={() => !isUploading && fileInputRef.current?.click()}
-                                        className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${isUploading
-                                                ? 'border-indigo-500/50 bg-indigo-500/5 cursor-wait'
-                                                : 'border-panel-hover hover:border-indigo-500/50 hover:bg-panel cursor-pointer'
-                                            }`}
-                                    >
-                                        <input
-                                            type="file"
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                            onChange={handleFileUpload}
-                                            accept=".pdf,.png,.jpg,.jpeg"
-                                        />
+                            <div
+                                onClick={() => !isUploading && fileInputRef.current?.click()}
+                                className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-colors ${isUploading
+                                    ? 'border-indigo-500/50 bg-indigo-500/5 cursor-wait'
+                                    : 'border-panel-hover hover:border-indigo-500/50 hover:bg-panel cursor-pointer'
+                                    }`}
+                            >
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    ref={fileInputRef}
+                                    onChange={handleFileUpload}
+                                    accept=".pdf,.png,.jpg,.jpeg"
+                                />
 
-                                        <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                                            {isUploading ? (
-                                                <Loader2 className="h-6 w-6 text-indigo-400 animate-spin" />
-                                            ) : (
-                                                <UploadCloud className="h-6 w-6 text-indigo-400" />
-                                            )}
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-sm font-bold text-content">
-                                                {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
-                                            </p>
-                                            <p className="text-xs text-content-muted mt-1">PDF, PNG, JPG (Max 10MB)</p>
-                                        </div>
-                                    </div>
-
-                                    {attachments.length > 0 && (
-                                        <div className="space-y-2 mt-2">
-                                            {attachments.map((att, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-app border border-panel animate-in fade-in zoom-in-95 duration-200">
-                                                    <div className="flex items-center gap-3 min-w-0">
-                                                        <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
-                                                            <FileText className="h-4 w-4" />
-                                                        </div>
-                                                        <div className="flex flex-col min-w-0">
-                                                            <span className="text-xs font-bold text-content truncate">{att.fileName || 'Attachment'}</span>
-                                                            {att.size && <span className="text-[10px] text-content-muted font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
-                                                        </div>
-                                                    </div>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
-                                                        className="h-8 w-8 p-0 shrink-0 text-content-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
+                                <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                                    {isUploading ? (
+                                        <Loader2 className="h-6 w-6 text-indigo-400 animate-spin" />
+                                    ) : (
+                                        <UploadCloud className="h-6 w-6 text-indigo-400" />
                                     )}
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm font-bold text-content">
+                                        {isUploading ? 'Uploading securely...' : 'Click to Upload Material'}
+                                    </p>
+                                    <p className="text-xs text-content-muted mt-1">PDF, PNG, JPG (Max 10MB)</p>
+                                </div>
                             </div>
+
+                            {attachments.length > 0 && (
+                                <div className="space-y-2 mt-2">
+                                    {attachments.map((att, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-app border border-panel animate-in fade-in zoom-in-95 duration-200">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+                                                    <FileText className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-xs font-bold text-content truncate">{att.fileName || 'Attachment'}</span>
+                                                    {att.size && <span className="text-[10px] text-content-muted font-mono">{(att.size / 1024).toFixed(1)} KB</span>}
+                                                </div>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
+                                                className="h-8 w-8 p-0 shrink-0 text-content-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="pt-6 border-t border-panel flex justify-end gap-3">

@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
   Search, Plus, MoreHorizontal, Shield, Mail, UserCheck,
-  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle, User
+  Filter, Download, Trash2, Ban, CheckCircle2, Loader2, AlertCircle, User,
+  Eye, Settings, UserPlus
 } from 'lucide-react';
 import { UserConfigurationModal } from '../components/UserConfigurationModal';
 import * as userAdminApi from '@/shared/api/userAdminApi';
@@ -27,7 +28,9 @@ const isPendingApprovalStatus = (status?: string) =>
 
 export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'approve' | 'edit'>('create');
   const [activeTab, setActiveTab] = useState('all');
 
   // Data state
@@ -77,8 +80,9 @@ export default function UserManagementPage() {
     const matchesSearch =
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
 
-    return isActuallyActive && matchesSearch;
+    return isActuallyActive && matchesSearch && matchesRole;
   });
 
   const filteredPending = [
@@ -93,8 +97,9 @@ export default function UserManagementPage() {
     const matchesSearch =
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
 
-    return isPending && matchesSearch;
+    return isPending && matchesSearch && matchesRole;
   });
 
   const usersExcludingPendingApproval = users.filter(u => u.isActive === true);
@@ -176,13 +181,13 @@ export default function UserManagementPage() {
             </div>
           )}
 
-          <Button
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
-            onClick={() => {
-              setSelectedPendingUser(null);
-              setIsModalOpen(true);
-            }}
-          >
+          <Button className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white gap-2 font-bold h-10 px-4 rounded-xl shadow-lg shadow-violet-500/20"
+              onClick={() => {
+                setSelectedPendingUser(null);
+                setModalMode('create');
+                setIsModalOpen(true);
+              }}
+            >
             <Plus className="h-4 w-4" /> Add New User
           </Button>
         </div>
@@ -215,9 +220,21 @@ export default function UserManagementPage() {
                     startIcon={<Search className="h-4 w-4 text-content-muted" />}
                   />
                 </div>
-                <Button variant="outline" className="flex items-center gap-2 border-panel-hover hover:bg-panel-hover text-content-muted">
-                  <Filter className="h-4 w-4" /> Filter
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2 border-panel-hover hover:bg-panel-hover text-content-muted">
+                      <Filter className="h-4 w-4" /> {roleFilter === 'ALL' ? 'Filter by Role' : roleFilter}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-panel border-panel-hover text-content-muted w-48">
+                    <DropdownMenuLabel>Filter by Role</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => setRoleFilter('ALL')} className="hover:bg-indigo-600 hover:text-content cursor-pointer">All Roles</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setRoleFilter('STUDENT')} className="hover:bg-indigo-600 hover:text-content cursor-pointer">Student</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setRoleFilter('INSTRUCTOR')} className="hover:bg-indigo-600 hover:text-content cursor-pointer">Instructor</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setRoleFilter('HOD')} className="hover:bg-indigo-600 hover:text-content cursor-pointer">Head of Dept</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setRoleFilter('ADMIN')} className="hover:bg-indigo-600 hover:text-content cursor-pointer">Admin</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </CardHeader>
@@ -235,6 +252,9 @@ export default function UserManagementPage() {
                   onToggleSelect={handleToggleSelect}
                   onSelectAll={handleSelectAll}
                   onDelete={handleDeleteUser}
+                  setModalMode={setModalMode}
+                  setIsModalOpen={setIsModalOpen}
+                  setSelectedPendingUser={setSelectedPendingUser}
                   type="all"
                 />
               )}
@@ -253,8 +273,12 @@ export default function UserManagementPage() {
                   onToggleSelect={handleToggleSelect}
                   onSelectAll={handleSelectAll}
                   onDelete={() => { }} // Handle separately
+                  setModalMode={setModalMode}
+                  setIsModalOpen={setIsModalOpen}
+                  setSelectedPendingUser={setSelectedPendingUser}
                   onApprove={(user) => {
                     setSelectedPendingUser(user);
+                    setModalMode('approve');
                     setIsModalOpen(true);
                   }}
                   type="pending"
@@ -265,14 +289,12 @@ export default function UserManagementPage() {
         </Card>
       </Tabs>
 
-      <UserConfigurationModal
-        open={isModalOpen}
-        pendingUser={selectedPendingUser ?? undefined}
+      <UserConfigurationModal 
+        open={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
         onSuccess={fetchData}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedPendingUser(null);
-        }}
+        user={selectedPendingUser}
+        mode={modalMode}
       />
     </div>
   );
@@ -285,10 +307,13 @@ interface UserTableProps {
   onSelectAll: (checked: boolean) => void;
   onDelete: (id: string) => void;
   onApprove?: (user: any) => void;
+  setModalMode: (mode: 'create' | 'approve' | 'edit') => void;
+  setIsModalOpen: (open: boolean) => void;
+  setSelectedPendingUser: (user: any) => void;
   type: 'all' | 'pending';
 }
 
-function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, onApprove, type }: UserTableProps) {
+function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, onApprove, setModalMode, setIsModalOpen, setSelectedPendingUser, type }: UserTableProps) {
   return (
     <div className="w-full overflow-auto custom-scrollbar">
       <table className="w-full caption-bottom text-sm">
@@ -333,7 +358,12 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                 </td>
                 <td className="p-4 align-middle">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-content-muted">{user.departmentId?.name || user.departmentId || 'Unassigned'}</span>
+                    <span className="text-xs font-bold text-content-muted">
+                      {user.profile?.data?.departmentId?.name || 
+                       user.profile?.data?.departmentIds?.[0]?.name || 
+                       (user.departmentId?.name) || 
+                       'Unassigned'}
+                    </span>
                   </div>
                 </td>
                 <td className="p-4 align-middle">
@@ -390,18 +420,24 @@ function UserTable({ users, selectedIds, onToggleSelect, onSelectAll, onDelete, 
                           <MoreHorizontal className="h-4 w-4 text-content-muted" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-panel border-panel-hover text-content-muted">
-                        <DropdownMenuLabel>User Management</DropdownMenuLabel>
-                        <DropdownMenuItem asChild className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
-                          <Link to={`/dashboard/users/${user.id}/profile`}>
-                            <User className="h-3.5 w-3.5" /> View Profile
-                          </Link>
+                      <DropdownMenuContent align="end" className="w-48 bg-panel border-panel-hover text-content-muted">
+                        <DropdownMenuLabel className="font-bold text-xs uppercase tracking-widest text-violet-400">Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-panel-hover" />
+                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
+                          <Eye className="h-3.5 w-3.5" /> View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2"
+                          onClick={() => {
+                            setSelectedPendingUser(user as any);
+                            setModalMode('edit');
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          <Settings className="h-3.5 w-3.5" /> Edit User
                         </DropdownMenuItem>
                         <DropdownMenuItem className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
                           <Shield className="h-3.5 w-3.5" /> Edit Permissions
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="hover:bg-indigo-600 hover:text-content cursor-pointer gap-2">
-                          <Ban className="h-3.5 w-3.5" /> Suspend Account
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-panel-hover" />
                         <DropdownMenuItem

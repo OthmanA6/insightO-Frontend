@@ -169,11 +169,21 @@ export default function FormsResultsPage() {
 
     // Headers
     const headers = ["Timestamp"];
+    if (!form.is_anonymous) {
+      headers.push("Evaluator");
+    }
     form.questions.forEach((q) => headers.push(q.label || "Untitled Question"));
 
     // Rows
     const rows = submissions.map((sub) => {
       const row = [`"${new Date(sub.createdAt).toLocaleString()}"`];
+      
+      if (!form.is_anonymous) {
+        const evaluator = sub.evaluator_id as any;
+        const name = evaluator && evaluator.firstName ? `${evaluator.firstName} ${evaluator.lastName}` : 'Anonymous';
+        row.push(`"${name.replace(/"/g, '""')}"`);
+      }
+
       form.questions.forEach((q) => {
         const qId = q._id || q.id;
         const answer = sub.answers.find((a: any) => {
@@ -654,9 +664,17 @@ export default function FormsResultsPage() {
                                   <p className="text-sm text-slate-700 dark:text-content-muted font-medium leading-relaxed italic mb-3">"{ans}"</p>
                                   <div className="flex items-center gap-3">
                                     <div className="flex -space-x-2">
-                                      <div className="h-5 w-5 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] text-content font-bold ring-2 ring-white dark:ring-surface-dark">A</div>
+                                      <div className="h-5 w-5 rounded-full bg-indigo-500 flex items-center justify-center text-[8px] text-content font-bold ring-2 ring-white dark:ring-surface-dark">
+                                        {form.is_anonymous ? 'A' : (submissions.find(s => s.answers.some(a => a.value === ans))?.evaluator_id as any)?.firstName?.charAt(0) || 'A'}
+                                      </div>
                                     </div>
-                                    <span className="text-[10px] font-bold text-content-muted uppercase tracking-widest">Anonymous Participant</span>
+                                    <span className="text-[10px] font-bold text-content-muted uppercase tracking-widest">
+                                      {form.is_anonymous ? 'Anonymous Participant' : (() => {
+                                        const sub = submissions.find(s => s.answers.some(a => a.value === ans));
+                                        const evaluator = sub?.evaluator_id as any;
+                                        return evaluator && evaluator.firstName ? `${evaluator.firstName} ${evaluator.lastName}` : 'Anonymous Participant';
+                                      })()}
+                                    </span>
                                   </div>
                                 </div>
                               ))}
@@ -691,7 +709,11 @@ export default function FormsResultsPage() {
                   <div className="text-center">
                     <h3 className="text-xl font-black text-slate-900 dark:text-content mb-1 uppercase tracking-tight">Response Node #{submissions.length - selectedSubmissionIndex}</h3>
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-xs font-bold text-content-muted dark:text-content-muted uppercase tracking-widest">
-                      <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5 text-indigo-500" /> Participant Anonymous</span>
+                      <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5 text-indigo-500" /> {
+                        form.is_anonymous 
+                          ? 'Participant Anonymous' 
+                          : ((currentSubmission?.evaluator_id as any)?.firstName ? `${(currentSubmission.evaluator_id as any).firstName} ${(currentSubmission.evaluator_id as any).lastName}` : 'Participant Anonymous')
+                      }</span>
                       <span className="hidden sm:inline opacity-30">•</span>
                       <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 text-indigo-500" /> {new Date(currentSubmission?.createdAt).toLocaleDateString()}</span>
                     </div>

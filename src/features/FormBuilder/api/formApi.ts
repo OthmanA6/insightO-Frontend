@@ -118,7 +118,7 @@ export const generateAIFormFromFile = async (file: File, prompt: string): Promis
   const formData = new FormData();
   formData.append('file', file);
   formData.append('prompt', prompt);
-  
+
   const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-from-file', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

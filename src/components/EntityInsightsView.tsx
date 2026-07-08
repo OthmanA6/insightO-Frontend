@@ -5,7 +5,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Zap,
-  RefreshCw
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import {
   AreaChart,
@@ -25,7 +26,7 @@ interface EntityInsightsProps {
 }
 
 interface InsightData {
-  chartData: Array<{ year: string; averageScore: number; submissionCount: number }>;
+  chartData: Array<{ year: string; averageScore: number; submissionCount: number; formId?: string; formTitle?: string; date?: string }>;
   aiInsights: {
     overall_score: number;
     trend_analysis: string;
@@ -103,9 +104,11 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-app border border-panel-hover rounded-2xl p-4 shadow-2xl backdrop-blur-md min-w-[240px]">
+        <div className="bg-app border border-panel-hover rounded-2xl p-4 shadow-2xl backdrop-blur-md w-[200px]">
           <p className="text-[10px] uppercase tracking-widest text-indigo-400 font-black mb-1">Survey Details</p>
-          <h4 className="text-sm font-bold text-content mb-2 leading-snug">{data.formTitle || "Survey"}</h4>
+          <h4 className="text-sm font-bold text-content mb-2 leading-snug truncate" title={data.formTitle || "Survey"}>
+            {data.formTitle || "Survey"}
+          </h4>
           <div className="h-px bg-panel-hover my-2" />
           <div className="flex justify-between items-center text-xs text-content-muted mb-1">
             <span>Date:</span>
@@ -125,7 +128,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
     return null;
   };
   return (
-    <div className="min-h-[80vh] bg-app text-content p-8">
+    <div className="min-h-[80vh] bg-transparent text-content p-8">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div className="max-w-2xl">
@@ -178,66 +181,83 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
       )}
 
       {/* Chart Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full bg-panel border border-panel rounded-3xl p-6 md:p-8 mb-8 shadow-2xl"
-      >
-        <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
-          <span className="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span>
-          Performance Curve
-        </h2>
-        <div className="w-full h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#818cf8" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-              <XAxis
-                dataKey="year" // خليه يقرأ حقل year اللي الباك إند بقا بيبعت فيه التاريخ
-                stroke="#ffffff40"
-                tick={{ fill: '#ffffff60', fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                domain={[0, 5]}
-                stroke="#ffffff40"
-                tick={{ fill: '#ffffff60', fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-                tickCount={6}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#0f111a',
-                  borderColor: '#ffffff10',
-                  borderRadius: '12px',
-                  color: '#fff',
-                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
-                }}
-                itemStyle={{ color: '#e2e8f0', fontWeight: 500 }}
-                labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
-                content={<CustomTooltip />}
-              />
-              <Area
-                type="monotone"
-                dataKey="averageScore"
-                name="Average Score"
-                stroke="#818cf8"
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#colorScore)"
-                activeDot={{ r: 6, fill: '#818cf8', stroke: '#0f111a', strokeWidth: 2 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </motion.div>
+      {(() => {
+        const processedChartData = chartData.map((d, index) => ({
+          ...d,
+          uniqueKey: `${d.year}__${index}`
+        }));
+        
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full bg-panel border border-panel rounded-3xl p-6 md:p-8 mb-8 shadow-2xl"
+          >
+            <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
+              <span className="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span>
+              Performance Curve
+            </h2>
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart 
+                  data={processedChartData.length === 1 ? [
+                    { ...processedChartData[0], uniqueKey: 'Start' }, 
+                    processedChartData[0], 
+                    { ...processedChartData[0], uniqueKey: 'Current' }
+                  ] : processedChartData} 
+                  margin={{ top: 20, right: 30, left: -10, bottom: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#818cf8" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                  <XAxis
+                    dataKey="uniqueKey"
+                    stroke="#ffffff40"
+                    tickFormatter={(value) => value.split('__')[0]}
+                    tick={{ fill: '#ffffff60', fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    domain={[0, 5]}
+                    stroke="#ffffff40"
+                    tick={{ fill: '#ffffff60', fontSize: 12 }}
+                    tickLine={false}
+                    axisLine={false}
+                    tickCount={6}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f111a',
+                      borderColor: '#ffffff10',
+                      borderRadius: '12px',
+                      color: '#fff',
+                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
+                    }}
+                    itemStyle={{ color: '#e2e8f0', fontWeight: 500 }}
+                    labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+                    content={<CustomTooltip />}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="averageScore"
+                    name="Average Score"
+                    stroke="#818cf8"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorScore)"
+                    activeDot={{ r: 6, fill: '#818cf8', stroke: '#0f111a', strokeWidth: 2 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        );
+      })()}
 
       {/* AI Actionable Cards (3-Column Grid) */}
       {aiInsights && ai_status !== "no_data" && (
@@ -315,6 +335,55 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
             </ul>
           </motion.div>
 
+        </div>
+      )}
+
+      {/* Contributing Forms Table */}
+      {chartData && chartData.length > 0 && (
+        <div className="mt-8 bg-panel border border-panel rounded-3xl p-6 md:p-8 shadow-2xl overflow-hidden">
+          <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
+            <span className="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span>
+            Contributing Forms
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-panel-hover">
+                  <th className="py-4 px-4 text-xs font-bold text-content-muted uppercase tracking-wider">Form Title</th>
+                  <th className="py-4 px-4 text-xs font-bold text-content-muted uppercase tracking-wider">Date</th>
+                  <th className="py-4 px-4 text-xs font-bold text-content-muted uppercase tracking-wider">Submissions</th>
+                  <th className="py-4 px-4 text-xs font-bold text-content-muted uppercase tracking-wider">Avg Score</th>
+                  <th className="py-4 px-4 text-xs font-bold text-content-muted uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chartData.map((row, idx) => (
+                  <tr key={idx} className="border-b border-panel-hover/50 hover:bg-panel-hover/30 transition-colors">
+                    <td className="py-4 px-4 text-sm font-medium text-content">{row.formTitle || 'Untitled Survey'}</td>
+                    <td className="py-4 px-4 text-sm text-content-muted">{row.date || row.year}</td>
+                    <td className="py-4 px-4 text-sm font-mono text-content-muted">{row.submissionCount}</td>
+                    <td className="py-4 px-4">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">
+                        {row.averageScore} / 5
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      {row.formId && (
+                        <a 
+                          href={`/dashboard/forms-results/${row.formId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-end gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                          View Results <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

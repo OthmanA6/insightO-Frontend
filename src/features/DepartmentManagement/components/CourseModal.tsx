@@ -357,16 +357,41 @@ export function CourseModal({ open, onClose, departmentId, course, onSave }: Cou
               </div>
             )}
 
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none" />
-              <input
-                type="text"
-                value={studentSearch}
-                onChange={(e) => setStudentSearch(e.target.value)}
-                placeholder="Search students by name or email..."
-                className="w-full h-10 ps-9 pe-4 rounded-xl bg-app border border-panel-hover text-content text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-600"
-              />
+            {/* Search and Select All */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none" />
+                <input
+                  type="text"
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                  placeholder="Search students by name or email..."
+                  className="w-full h-10 ps-9 pe-4 rounded-xl bg-app border border-panel-hover text-content text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-600"
+                />
+              </div>
+              {filteredStudents.length > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 px-4 rounded-xl text-xs font-bold border-panel-hover hover:bg-panel-hover hover:text-content text-content-muted transition-colors"
+                  onClick={() => {
+                    const filteredIds = filteredStudents.map(s => resolveUserId(s));
+                    const allSelected = filteredIds.every(id => selectedStudentIds.has(id));
+                    
+                    setSelectedStudentIds(prev => {
+                      const next = new Set(prev);
+                      if (allSelected) {
+                        filteredIds.forEach(id => next.delete(id));
+                      } else {
+                        filteredIds.forEach(id => next.add(id));
+                      }
+                      return next;
+                    });
+                  }}
+                >
+                  {filteredStudents.every(s => selectedStudentIds.has(resolveUserId(s))) ? 'Deselect All' : 'Select All'}
+                </Button>
+              )}
             </div>
 
             {/* Student list */}

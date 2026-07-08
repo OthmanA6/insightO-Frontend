@@ -36,6 +36,7 @@ export interface UpdateUserPayload {
   isActive?: boolean;
   academicYear?: number;
   departmentId?: string;
+  password?: string;
 }
 
 export const getAllUsers = async (): Promise<AdminUser[]> => {

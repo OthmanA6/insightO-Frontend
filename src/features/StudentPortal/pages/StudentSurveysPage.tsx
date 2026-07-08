@@ -4,8 +4,10 @@ import type { Form } from '@/features/FormBuilder/types/form.types';
 import { getMyFormSubmissions } from '@/shared/api/submissionApi';
 import type { Submission } from '@/shared/api/submissionApi';
 import { getCourses } from '@/shared/api/courseApi';
+import { getProfile } from '@/features/auth/api/authApi';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
-import { Loader2, FileQuestion, Calendar, ArrowRight, CheckCircle2, History } from 'lucide-react';
+import { Input } from '@/shared/components/ui/input';
+import { Loader2, FileQuestion, Calendar, ArrowRight, CheckCircle2, History, Search, Filter, SortDesc } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -14,15 +16,22 @@ export default function StudentSurveysPage() {
   const [forms, setForms] = useState<Form[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // UI Controls
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+
   const { user } = useAuth();
 
   useEffect(() => {
     const fetchForms = async () => {
       try {
-        const [allForms, mySubmissions, enrolledCourses] = await Promise.all([
+        const [allForms, mySubmissions, enrolledCourses, myProfile] = await Promise.all([
           getAllForms(),
           getMyFormSubmissions(),
-          getCourses()
+          getCourses(),
+          getProfile()
         ]);
         setSubmissions(mySubmissions);
         
@@ -32,13 +41,14 @@ export default function StudentSurveysPage() {
         const submittedFormIds = new Set(
           mySubmissions.map(s => {
             if (!s.form_id) return null;
-            return typeof s.form_id === 'object' ? (s.form_id as any)._id || (s.form_id as any).id : s.form_id;
+            const id = typeof s.form_id === 'object' ? (s.form_id as any)._id || (s.form_id as any).id : s.form_id;
+            return id ? String(id) : null;
           }).filter(Boolean)
         );
 
         // Filter forms based on type and student enrollment
         const studentForms = allForms.filter(f => {
-          const formId = f.id || f._id;
+          const formId = String(f.id || f._id);
           if (submittedFormIds.has(formId)) return false; // Already submitted
 
           // 1. Facility Forms: Show to all students (regardless of evaluator_roles)
@@ -56,7 +66,7 @@ export default function StudentSurveysPage() {
           // 3. Department Forms: Show only if student is in the department
           if (f.department_id) {
             const formDeptId = typeof f.department_id === 'object' ? (f.department_id as any)._id || (f.department_id as any).id : f.department_id;
-            const userDeptId = typeof user?.departmentId === 'object' ? (user.departmentId as any)._id || (user.departmentId as any).id : user?.departmentId;
+            const userDeptId = typeof myProfile?.departmentId === 'object' ? (myProfile.departmentId as any)._id || (myProfile.departmentId as any).id : myProfile?.departmentId;
             return formDeptId === userDeptId;
           }
           
@@ -72,6 +82,15 @@ export default function StudentSurveysPage() {
     };
     fetchForms();
   }, [user]);
+
+  const filteredAndSortedForms = forms
+    .filter(f => f.title.toLowerCase().includes(searchQuery.toLowerCase()) || (f.description && f.description.toLowerCase().includes(searchQuery.toLowerCase())))
+    .filter(f => categoryFilter === 'ALL' || f.category === categoryFilter)
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
 
   if (isLoading) {
     return (
@@ -111,15 +130,52 @@ export default function StudentSurveysPage() {
           </div>
         </div>
 
-        <TabsContent value="pending" className="animate-in fade-in slide-in-from-bottom-2">
-          {forms.length === 0 ? (
+        <TabsContent value="pending" className="animate-in fade-in slide-in-from-bottom-2 space-y-6">
+          {/* Controls Bar */}
+          {forms.length > 0 && (
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-panel p-4 rounded-3xl border border-panel">
+              <div className="relative w-full md:w-96 group">
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search surveys..."
+                  className="h-12 rounded-2xl bg-app border-panel text-content ps-12 pe-4 font-bold"
+                />
+                <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-content-muted group-focus-within:text-indigo-500 transition-colors" />
+              </div>
+              <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto custom-scrollbar pb-2 md:pb-0">
+                <div className="flex items-center gap-2 bg-app p-1.5 rounded-2xl border border-panel">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="h-9 px-3 rounded-xl bg-transparent text-xs font-bold text-content-muted outline-none cursor-pointer appearance-none pe-8 relative"
+                    style={{ background: `url('data:image/svg+xml;utf8,<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>') no-repeat right 8px center/12px` }}
+                  >
+                    <option value="ALL">All Categories</option>
+                    <option value="GENERAL">General</option>
+                    <option value="SPECIALIZED">Specialized</option>
+                    <option value="QUIZ">Quiz</option>
+                  </select>
+                </div>
+                <button
+                  onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                  className="flex items-center gap-2 h-12 px-4 rounded-2xl bg-app border border-panel hover:border-indigo-500/30 text-xs font-bold text-content-muted transition-colors whitespace-nowrap"
+                >
+                  <SortDesc className={`h-4 w-4 transition-transform ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+                  {sortOrder === 'desc' ? 'Newest First' : 'Oldest First'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {filteredAndSortedForms.length === 0 ? (
             <div className="p-12 text-center rounded-3xl border border-border bg-card flex flex-col items-center gap-4">
               <CheckCircle2 className="h-10 w-10 text-emerald-500/50" />
-              <p className="text-sm font-medium text-muted-foreground">You have no pending surveys to complete. Great job!</p>
+              <p className="text-sm font-medium text-muted-foreground">{forms.length === 0 ? 'You have no pending surveys to complete. Great job!' : 'No surveys match your filters.'}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {forms.map((form) => (
+              {filteredAndSortedForms.map((form) => (
                 <div key={form.id || form._id} className="group rounded-3xl bg-card border border-border overflow-hidden shadow-sm hover:border-indigo-500/50 transition-all hover:shadow-md flex flex-col">
                   <div className="p-6 md:p-8 flex flex-col gap-4 flex-1">
                     
