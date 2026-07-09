@@ -312,7 +312,7 @@ export default function FormsResultsPage() {
             {/* SUMMARY TAB */}
             {activeTab === "summary" && (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="rounded-2xl border border-slate-200 bg-white dark:border-panel-hover dark:bg-surface-dark p-6 shadow-sm">
                     <p className="text-[10px] font-bold text-content-muted dark:text-content-muted uppercase tracking-widest mb-1">Total Submissions</p>
                     <div className="flex items-end gap-2">
@@ -322,16 +322,9 @@ export default function FormsResultsPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-white dark:border-panel-hover dark:bg-surface-dark p-6 shadow-sm">
-                    <p className="text-[10px] font-bold text-content-muted dark:text-content-muted uppercase tracking-widest mb-1">Architecture Complexity</p>
-                    <div className="flex items-end gap-2">
-                      <h3 className="text-3xl font-black text-slate-900 dark:text-content">{form.questions.length}</h3>
-                      <span className="text-sm text-content-muted dark:text-content-muted font-bold mb-1">Active nodes</span>
-                    </div>
-                  </div>
                 </div>
 
-                {!submissions.length ? (
+                {!submissions.length && (
                   <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[320px] flex flex-col items-center justify-center text-center animate-gradient-border overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 pointer-events-none"></div>
                     <div className="relative mb-6">
@@ -345,138 +338,7 @@ export default function FormsResultsPage() {
                       There is No responses to analyze please wait until the form goes Viral xD
                     </p>
                   </div>
-                ) : !summaryAiData && !summaryAiLoading ? (
-                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[200px] shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
-                    <div className="absolute top-0 end-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -me-20 -mt-20"></div>
-                    <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-                      <div className="relative">
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-xl shadow-purple-500/30">
-                          <Brain className="h-8 w-8 text-content" />
-                        </div>
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <h4 className="text-xl font-black text-slate-900 dark:text-content uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
-                        <p className="text-sm text-content-muted dark:text-content-muted font-medium">Generate an AI-powered summary of all {submissions.length} responses to uncover sentiment patterns and key takeaways.</p>
-                      </div>
-                      <button
-                        onClick={handleGenerateSummaryAi}
-                        className="shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-content text-sm font-black uppercase tracking-widest shadow-xl shadow-purple-500/20 hover:opacity-90 transition-all hover:-translate-y-0.5"
-                      >
-                        <Sparkles className="h-5 w-5" /> Generate Summary
-                      </button>
-                    </div>
-                  </div>
-                ) : summaryAiLoading ? (
-                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 min-h-[200px] flex flex-col items-center justify-center text-center animate-gradient-border overflow-hidden">
-                    <Loader2 className="h-10 w-10 animate-spin text-purple-500 mb-4" />
-                    <p className="text-sm font-bold text-content-muted uppercase tracking-widest">Analyzing {submissions.length} responses...</p>
-                  </div>
-                ) : summaryAiData ? (
-                  <div className="relative rounded-[2rem] border border-purple-500/20 bg-purple-500/5 dark:bg-purple-500/10 backdrop-blur-md p-8 md:p-10 shadow-2xl dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.1)] overflow-hidden group animate-gradient-border">
-                    <div className="absolute top-0 end-0 w-96 h-96 bg-purple-500/5 blur-[100px] rounded-full -me-20 -mt-20 group-hover:bg-purple-500/10 transition-colors duration-700"></div>
-                    <div className="absolute bottom-0 start-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full -ms-20 -mb-20"></div>
-
-                    <div className="flex flex-col gap-6 relative z-10">
-                      <div className="flex flex-col md:flex-row items-start gap-6">
-                        <div className="relative">
-                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-xl shadow-purple-500/30">
-                            <Brain className="h-8 w-8 text-content" />
-                          </div>
-                          <div className="absolute -bottom-2 -end-2 bg-emerald-500 h-5 w-5 rounded-full border-4 border-white dark:border-[#1a1625] flex items-center justify-center">
-                            <div className="h-1.5 w-1.5 bg-white rounded-full animate-ping"></div>
-                          </div>
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h4 className="text-xl font-black text-slate-900 dark:text-content uppercase tracking-tight">AI Synthesis & Strategic Insights</h4>
-                            <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-none px-3 py-1 font-black text-[9px] uppercase tracking-widest rounded-full">Neural Core Active</Badge>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleGenerateSummaryAi}
-                          className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase tracking-widest hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-all"
-                        >
-                          <RefreshCw className="h-3.5 w-3.5" /> Refresh
-                        </button>
-                      </div>
-
-                      {/* Per-tag summaries */}
-                      <div className="space-y-4">
-                        {Object.entries(summaryAiData.tags || {}).length === 0 ? (
-                          <div className="text-center py-6 text-content-muted dark:text-content-muted">
-                            <p className="text-xs font-bold uppercase tracking-widest mb-2">No category summaries generated</p>
-                          </div>
-                        ) : (
-                          Object.entries(summaryAiData.tags || {}).map(([tag, result]) => (
-                            <div key={tag} className="p-5 rounded-2xl bg-panel-hover0 dark:bg-panel-hover border border-slate-200 dark:border-panel">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500">{tag}</span>
-                                <Badge className={cn(
-                                  "text-[8px] font-black uppercase border-none px-2 rounded-full",
-                                  result.sentiment === "positive" ? "bg-green-500/10 text-green-600 dark:text-green-400" :
-                                    result.sentiment === "negative" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                                      "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                                )}>
-                                  {result.sentiment}
-                                </Badge>
-                                {result.score !== undefined && (
-                                  <span className="text-[9px] font-black text-purple-500 uppercase">Score: {result.score}%</span>
-                                )}
-                              </div>
-                              <p className="text-sm text-slate-700 dark:text-content-muted font-medium leading-relaxed">{result.summary}</p>
-
-                              {/* Strengths / Weaknesses / Action Items */}
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                                {result.strengths?.length > 0 && (
-                                  <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-3">
-                                    <p className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                      <TrendingUp className="h-3 w-3" /> Strengths
-                                    </p>
-                                    <ul className="space-y-1.5">
-                                      {result.strengths.map((s, i) => (
-                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />{renderAiListItem(s)}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                                {result.weaknesses?.length > 0 && (
-                                  <div className="rounded-xl bg-red-500/5 border border-eed-500/15 p-3">
-                                    <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                      <TrendingDown className="h-3 w-3" /> Weaknesses
-                                    </p>
-                                    <ul className="space-y-1.5">
-                                      {result.weaknesses.map((w, i) => (
-                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />{renderAiListItem(w)}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                                {result.action_items?.length > 0 && (
-                                  <div className="rounded-xl bg-amber-500/5 border border-amber-500/15 p-3">
-                                    <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                                      <Zap className="h-3 w-3" /> Action Items
-                                    </p>
-                                    <ul className="space-y-1.5">
-                                      {result.action_items.map((a, i) => (
-                                        <li key={i} className="text-xs text-slate-600 dark:text-content-muted flex items-start gap-2">
-                                          <CheckCircle2 className="h-3 w-3 shrink-0 text-amber-500 mt-0.5" />{renderAiListItem(a)}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
+                )}
 
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-black text-content-muted uppercase tracking-widest ms-1">Key Performance Metrics</h3>
@@ -730,18 +592,6 @@ export default function FormsResultsPage() {
 
                 {submissions.length > 0 ? (
                   <div className="space-y-6">
-                    <div className="flex items-start gap-4 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 rounded-2xl p-6 shadow-sm shadow-purple-500/5">
-                      <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/20">
-                        <Brain className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-[0.2em] block mb-2">Cognitive Response Analysis</span>
-                        <p className="text-sm text-slate-700 dark:text-content-muted font-medium leading-relaxed">
-                          This submission demonstrates high internal consistency. The qualitative answers align closely with the quantitative ratings, indicating a deliberate and high-confidence response pattern.
-                        </p>
-                      </div>
-                    </div>
-
                     <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-panel-hover rounded-3xl p-8 md:p-10 space-y-10 shadow-2xl overflow-hidden relative">
                       <div className="absolute top-0 end-0 p-8 opacity-[0.02] pointer-events-none">
                         <FileText className="h-40 w-40" />
@@ -818,7 +668,7 @@ export default function FormsResultsPage() {
                         </div>
 
                         <div className="space-y-4">
-                          <h3 className="text-3xl md:text-5xl font-black text-content tracking-tight leading-tight">
+                          <h3 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
                             Generate Deep AI Insights
                           </h3>
                           <p className="text-indigo-100/90 font-medium leading-relaxed max-w-2xl mx-auto text-lg">

@@ -470,7 +470,7 @@ export default function FormsSurveysPage() {
                               <DropdownMenuItem
                                 className="flex items-center gap-2 hover:bg-panel-hover cursor-pointer font-bold py-3"
                                 onClick={() => {
-                                  const linkPath = row.category === 'GENERAL' 
+                                  const linkPath = (row.category === 'GENERAL' || row.subject_role === 'FACILITY')
                                     ? `/public/form/${row._id || row.id}`
                                     : `/form/${row._id || row.id}`
                                   navigator.clipboard.writeText(`${window.location.origin}${linkPath}`)

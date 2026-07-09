@@ -239,15 +239,7 @@ export default function DepartmentDetailPage() {
                     <span className="text-sm font-bold text-content">{studentsCount.length}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-panel text-purple-400">
-                    <GraduationCap className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-slate-600 uppercase">Instructors</span>
-                    <span className="text-sm font-bold text-content">{instructorsCount.length}</span>
-                  </div>
-                </div>
+
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-panel text-amber-400">
                     <Clock className="h-4 w-4" />

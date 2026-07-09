@@ -65,7 +65,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
       const response = await api.get<{ status: string; data: InsightData }>(endpoint);
       const fetchedData = response.data.data;
       if (forceAI && fetchedData.ai_status === "no_data") {
-        toast.error("There is No responses to analyze please wait until the form goes Viral xD");
+        toast.error("There are no responses available to analyze yet.");
       }
       setData(fetchedData);
     } catch (error) {
@@ -84,7 +84,7 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
 
   if (loading) {
     return (
-      <div className="flex h-full min-h-[400px] w-full items-center justify-center bg-app">
+      <div className="flex h-full min-h-[400px] w-full items-center justify-center">
         <Loader2 className="animate-spin text-content/50 w-10 h-10" />
       </div>
     );
@@ -127,12 +127,33 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
     }
     return null;
   };
+  if (ai_status === "no_data" || !chartData || chartData.length === 0) {
+    return (
+      <div className="min-h-[50vh] bg-transparent text-content p-8 space-y-8 animate-in fade-in duration-500">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-content capitalize">
+            {entityType.toLowerCase()} Insights
+          </h1>
+        </div>
+        <div className="p-12 bg-panel border border-panel rounded-3xl flex flex-col items-center justify-center text-center shadow-sm max-w-3xl mx-auto mt-6">
+          <div className="bg-indigo-500/10 p-5 rounded-2xl mb-6 shadow-inner text-indigo-400">
+             <Zap className="w-10 h-10" />
+          </div>
+          <h3 className="text-xl font-black text-content mb-2 uppercase tracking-wide">System Ready for Synthesis</h3>
+          <p className="text-content-muted text-sm font-medium max-w-md leading-relaxed">
+            There are no submissions available for this form yet. Once users submit responses, AI synthesis and performance tracking will be available.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[80vh] bg-transparent text-content p-8">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div className="max-w-2xl">
-          <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-3 capitalize">
+          <h1 className="text-3xl md:text-4xl font-bold text-content mb-3 capitalize">
             {entityType.toLowerCase()} Insights
           </h1>
           {aiInsights && (
@@ -167,16 +188,6 @@ export const EntityInsightsView: React.FC<EntityInsightsProps> = ({ entityType, 
         <div className="mb-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-3 text-amber-400 font-medium">
           <AlertTriangle className="w-5 h-5 shrink-0" />
           ⚠️ AI Analysis is currently unavailable (Quota Exceeded). Displaying quantitative data only.
-        </div>
-      )}
-
-      {ai_status === "no_data" && (
-        <div className="mb-8 p-8 bg-indigo-500/5 border border-indigo-500/20 rounded-3xl flex flex-col items-center justify-center text-center shadow-xl backdrop-blur-sm">
-          <div className="bg-indigo-500/10 p-4 rounded-full mb-4 shadow-inner">
-             <Zap className="w-8 h-8 text-indigo-400 opacity-70" />
-          </div>
-          <h3 className="text-xl font-bold text-content mb-2 uppercase tracking-wide">System Ready for Synthesis</h3>
-          <p className="text-content-muted text-sm font-medium">There is No responses to analyze please wait until the form goes Viral xD</p>
         </div>
       )}
 

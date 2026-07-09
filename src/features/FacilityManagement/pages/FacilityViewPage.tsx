@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/shared/components/ui/dropdown-menu"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
 import { cn } from "@/shared/lib/utils"
 import * as formApi from "@/features/FormBuilder/api/formApi"
 
@@ -97,7 +98,18 @@ export default function FacilityViewPage() {
         try {
           const res = await api.get(`/v1/form?facility_id=${id}`);
           const fetchedForms = res.data.data || [];
-          setForms(fetchedForms);
+          
+          const enrichedForms = await Promise.all(
+            fetchedForms.map(async (f: any) => {
+              try {
+                const subRes = await api.get(`/forms/${f._id || f.id}/submissions`);
+                return { ...f, responsesCount: subRes.data.data?.length || 0 };
+              } catch (err) {
+                return { ...f, responsesCount: 0 };
+              }
+            })
+          );
+          setForms(enrichedForms);
         } catch (err) {
           console.error(err);
           toast.error('Failed to load forms');
@@ -109,8 +121,8 @@ export default function FacilityViewPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-app">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-indigo-500 w-10 h-10" />
       </div>
     );
   }
@@ -120,72 +132,54 @@ export default function FacilityViewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-app text-content">
+    <div className="flex-1 space-y-8 p-4 md:p-10 animate-in fade-in zoom-in-95 duration-500 max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
       {/* Header */}
-      <div className="bg-panel border-b border-panel-hover px-8 py-6 sticky top-0 z-10">
-        <div className="flex items-center gap-2 text-sm text-content-muted mb-4 font-medium">
-          <button onClick={() => navigate('/dashboard/forms-surveys')} className="hover:text-content transition-colors">Forms & Surveys</button>
-          <span className="text-content-muted/50">/</span>
-          <button onClick={() => navigate('/dashboard/facilities')} className="hover:text-content transition-colors">Custom Facilities</button>
-          <span className="text-content-muted/50">/</span>
-          <span className="text-content">{facility.name}</span>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-panel-hover pb-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-content-muted mb-2 font-medium">
+            <button onClick={() => navigate('/dashboard/forms-surveys')} className="hover:text-content transition-colors">Forms & Surveys</button>
+            <span className="text-content-muted/50">/</span>
+            <button onClick={() => navigate('/dashboard/facilities')} className="hover:text-content transition-colors">Custom Facilities</button>
+            <span className="text-content-muted/50">/</span>
+            <span className="text-content">{facility.name}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-panel shadow-sm">
+              <Building className="w-7 h-7 text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-content">{facility.name}</h1>
+              <p className="text-content-muted font-medium mt-1">{facility.description}</p>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center">
-            <Building className="w-7 h-7 text-indigo-400" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">{facility.name}</h1>
-            <p className="text-content/60">{facility.description}</p>
-          </div>
           <button
             onClick={() => navigate(`/builder?target=facility&facilityId=${id}`)}
-            className="flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-panel border border-panel-hover rounded-xl transition-all font-medium text-sm text-content hover:text-indigo-400"
+            className="h-12 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-sm shadow-indigo-500/20 transition-all flex items-center gap-2"
           >
-            <ClipboardList className="w-4 h-4" />
+            <ClipboardList className="w-5 h-5" />
             Blank Form
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-6 mt-8 border-b border-panel-hover">
-          <button
-            onClick={() => setActiveTab("insights")}
-            className={`pb-4 px-2 text-sm font-bold transition-colors relative ${
-              activeTab === "insights" ? "text-indigo-400" : "text-content/60 hover:text-content"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              AI Insights
-            </div>
-            {activeTab === "insights" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-t-full shadow-[0_-2px_10px_rgba(99,102,241,0.5)]" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("forms")}
-            className={`pb-4 px-2 text-sm font-bold transition-colors relative ${
-              activeTab === "forms" ? "text-indigo-400" : "text-content/60 hover:text-content"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <ClipboardList className="w-4 h-4" />
-              Surveys/Forms
-            </div>
-            {activeTab === "forms" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-t-full shadow-[0_-2px_10px_rgba(99,102,241,0.5)]" />
-            )}
           </button>
         </div>
       </div>
 
-      {/* Tab Content */}
-      <div className="p-8">
-        {activeTab === "insights" ? (
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full space-y-8">
+        <TabsList className="bg-panel border border-panel p-1 rounded-2xl w-fit">
+          <TabsTrigger value="insights" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center gap-2">
+            <Sparkles className="w-4 h-4" /> AI Insights
+          </TabsTrigger>
+          <TabsTrigger value="forms" className="rounded-xl px-6 py-3 font-bold data-[state=active]:bg-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center gap-2">
+            <ClipboardList className="w-4 h-4" /> Surveys/Forms
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="insights" className="mt-0">
           <EntityInsightsView entityType="FACILITY" entityId={id as string} />
-        ) : (
-          <div className="rounded-2xl border border-panel bg-panel overflow-hidden shadow-2xl">
+        </TabsContent>
+
+        <TabsContent value="forms" className="mt-0">
+          <div className="rounded-3xl border border-panel bg-panel overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-start">
                 <thead>
@@ -312,7 +306,7 @@ export default function FacilityViewPage() {
                                 <DropdownMenuItem
                                   className="flex items-center gap-2 hover:bg-panel-hover cursor-pointer font-bold py-3"
                                   onClick={() => {
-                                    navigator.clipboard.writeText(`${window.location.origin}/form/${row._id || row.id}`)
+                                    navigator.clipboard.writeText(`${window.location.origin}/public/form/${row._id || row.id}`)
                                     toast.success("Share link copied to clipboard")
                                   }}
                                 >
@@ -351,8 +345,8 @@ export default function FacilityViewPage() {
               </table>
             </div>
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

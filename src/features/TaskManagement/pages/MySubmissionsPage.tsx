@@ -88,7 +88,7 @@ export default function MySubmissionsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {filteredSubmissions.map((sub) => {
-            const task = typeof sub.task_id === 'object' ? sub.task_id as any : { title: 'Unknown Task' };
+            const task = typeof sub.task_id === 'object' && sub.task_id !== null ? sub.task_id as any : { title: 'Unknown Task' };
             
             return (
               <div key={sub.id || sub._id} className="rounded-3xl bg-card border border-border overflow-hidden shadow-sm">

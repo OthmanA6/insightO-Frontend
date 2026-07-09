@@ -751,7 +751,7 @@ export default function InstructorGradingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Weaknesses Card */}
                       {weaknessesArr.length > 0 && (
-                        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1c131a] to-[#12131a] border border-rose-500/10 hover:border-rose-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-rose-50 to-white dark:from-[#1c131a] dark:to-[#12131a] border border-rose-200 dark:border-rose-500/10 hover:border-rose-300 dark:hover:border-rose-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
                           {/* Corner glow */}
                           <div className="absolute -end-12 -top-12 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/15 transition-all duration-500 pointer-events-none" />
 
@@ -781,7 +781,7 @@ export default function InstructorGradingPage() {
 
                       {/* Recommendations Card */}
                       {recommendationsArr.length > 0 && (
-                        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#121c18] to-[#12131a] border border-emerald-500/10 hover:border-emerald-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-50 to-white dark:from-[#121c18] dark:to-[#12131a] border border-emerald-200 dark:border-emerald-500/10 hover:border-emerald-300 dark:hover:border-emerald-500/20 shadow-2xl relative overflow-hidden transition-all duration-300 group animate-in fade-in slide-in-from-bottom-4 duration-500">
                           {/* Corner glow */}
                           <div className="absolute -end-12 -top-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition-all duration-500 pointer-events-none" />
 

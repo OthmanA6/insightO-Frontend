@@ -37,6 +37,7 @@ import {
   X,
   Copy,
   Check,
+  Download,
   Smartphone,
   Monitor,
   Info,
@@ -148,6 +149,7 @@ export default function FormBuilderPage() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false)
   const [aiPrompt, setAiPrompt] = useState("")
   const [aiFile, setAiFile] = useState<File | null>(null)
+  const [aiLanguage, setAiLanguage] = useState<"English" | "Arabic">("English")
 
   // Sidebar Tabs
   const [sidebarTab, setSidebarTab] = useState<'form' | 'field'>('form')
@@ -158,8 +160,9 @@ export default function FormBuilderPage() {
 
   // Derived share link
   const effectiveFormId = formId || generatedFormId;
+  const isPublicForm = category === "GENERAL" || subjectRole === "FACILITY";
   const shareUrl = effectiveFormId
-    ? (category === "GENERAL"
+    ? (isPublicForm
       ? `${window.location.origin}/public/form/${effectiveFormId}`
       : `${window.location.origin}/form/${effectiveFormId}`)
     : `${window.location.origin}/form/preview`;
@@ -456,6 +459,102 @@ export default function FormBuilderPage() {
     setTimeout(() => setIsCopied(false), 2000)
   }
 
+  const handleDownloadQR = () => {
+    const qrCanvas = document.getElementById('qr-code-canvas') as HTMLCanvasElement;
+    if (!qrCanvas) return;
+
+    const scale = 3; // 3x resolution for high quality
+
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+    tempCtx.font = `bold ${22 * scale}px sans-serif`;
+
+    const width = 450 * scale;
+    const maxWidth = width - (80 * scale);
+    const downloadTitle = formTitle || 'Untitled Form';
+    const words = downloadTitle.split(' ');
+    let line = '';
+    let numLines = 1;
+
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const metrics = tempCtx.measureText(testLine);
+      if (metrics.width > maxWidth && i > 0) {
+        numLines++;
+        line = words[i] + ' ';
+      } else {
+        line = testLine;
+      }
+    }
+
+    const titleStartY = 110 * scale;
+    const qrY = titleStartY + (numLines * 32 * scale) + (40 * scale);
+    const qrSize = 260 * scale;
+    const height = qrY + qrSize + (100 * scale);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
+
+    const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+    bgGradient.addColorStop(0, '#0f111a');
+    bgGradient.addColorStop(1, '#1e1b4b');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.beginPath(); ctx.arc(width, 0, 200 * scale, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, height, 150 * scale, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = '#818cf8';
+    ctx.font = `900 ${28 * scale}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('insightO', width / 2, 50 * scale);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${22 * scale}px sans-serif`;
+    line = '';
+    let currentY = titleStartY;
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && i > 0) {
+        ctx.fillText(line.trim(), width / 2, currentY);
+        line = words[i] + ' ';
+        currentY += 32 * scale;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line.trim(), width / 2, currentY);
+
+    const qrX = (width - qrSize) / 2;
+    ctx.fillStyle = '#ffffff';
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(qrX - (16 * scale), qrY - (16 * scale), qrSize + (32 * scale), qrSize + (32 * scale), 24 * scale);
+      ctx.fill();
+    } else {
+      ctx.fillRect(qrX - (16 * scale), qrY - (16 * scale), qrSize + (32 * scale), qrSize + (32 * scale));
+    }
+
+    ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = `600 ${14 * scale}px sans-serif`;
+    ctx.fillText('Scan to access this form', width / 2, height - (40 * scale));
+
+    const link = document.createElement('a');
+    const safeTitle = downloadTitle.replace(/[<>:"/\\|?*]/g, '').trim().replace(/\s+/g, '-');
+    link.download = `InsightO-${safeTitle}-QR.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
   const handleAIGenerate = async () => {
     if (!aiPrompt.trim() && !aiFile) {
       toast.error("Please provide a prompt or upload a file.");
@@ -485,8 +584,8 @@ export default function FormBuilderPage() {
 
     try {
       const generated = aiFile 
-        ? await formApi.generateAIFormFromFile(aiFile, aiPrompt)
-        : await formApi.generateAIForm(aiPrompt);
+        ? await formApi.generateAIFormFromFile(aiFile, aiPrompt, aiLanguage)
+        : await formApi.generateAIForm(aiPrompt, aiLanguage);
       clearInterval(interval);
 
       const { title, description, questions: generatedQuestions } = generated;
@@ -1402,24 +1501,48 @@ export default function FormBuilderPage() {
             <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
               <Share2 className="h-4 w-4" />
             </div>
-            <span className="font-black text-content uppercase tracking-widest">Distribute Architecture</span>
+            <span className="font-black text-content uppercase tracking-widest">Share Form</span>
           </div>
         }
         size="sm"
       >
         <div className="space-y-8 py-4">
           <div className="flex flex-col items-center text-center gap-6">
-            <div className="p-4 rounded-3xl bg-white shadow-2xl shadow-indigo-500/10">
-              <QRCodeCanvas value={shareUrl} size={180} level="H" includeMargin />
+            <div className="flex flex-col items-center gap-4">
+              <div className="p-4 rounded-3xl bg-white shadow-2xl shadow-indigo-500/10">
+                <QRCodeCanvas 
+                  id="qr-code-canvas" 
+                  value={shareUrl} 
+                  size={1024} 
+                  level="H" 
+                  includeMargin 
+                  style={{ width: 180, height: 180 }}
+                  imageSettings={{
+                    src: "/logo.svg",
+                    height: 228,
+                    width: 228,
+                    excavate: true,
+                  }}
+                />
+              </div>
+              <Button 
+                onClick={handleDownloadQR} 
+                variant="outline" 
+                size="sm" 
+                className="rounded-full px-6 font-bold text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download QR Code
+              </Button>
             </div>
             <div>
-              <h4 className="text-lg font-black text-content">Quantum Link Provisioned</h4>
-              <p className="text-xs text-content-muted mt-1 font-medium">Any respondent with this encrypted link can participate in the data collection cycle.</p>
+              <h4 className="text-lg font-black text-content">Your Link is Ready</h4>
+              <p className="text-xs text-content-muted mt-1 font-medium">Anyone with this link can fill out the form and submit responses.</p>
             </div>
           </div>
 
           <div className="space-y-3">
-            <Label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ms-1">Universal Resource Locator</Label>
+            <Label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ms-1">Share Link</Label>
             <div className="relative group">
               <Input
                 readOnly
@@ -1438,7 +1561,7 @@ export default function FormBuilderPage() {
           <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
             <p className="text-[10px] text-amber-500 font-bold leading-relaxed uppercase tracking-wider">
-              Distributing this link will make the architecture accessible to anyone. Ensure target audience validation before broadcasting.
+              Anyone with this link will be able to access the form. Please ensure you are sharing it with the correct audience.
             </p>
           </div>
         </div>
@@ -1504,6 +1627,26 @@ export default function FormBuilderPage() {
                     className="w-full h-32 bg-app border border-panel-hover text-content text-sm font-medium rounded-2xl p-4 outline-none focus:border-purple-500 transition-all resize-none custom-scrollbar shadow-inner"
                     placeholder="Describe what kind of evaluation or survey you want to generate. e.g., 'Generate an evaluation for a programming course with practical assignments, rating their instructor and code quality...'"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-content-muted ms-1">Output Language</Label>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setAiLanguage("English")} 
+                      className={cn("flex-1 h-12 rounded-xl font-bold transition-all", aiLanguage === "English" ? "bg-purple-500/10 text-purple-400 border-purple-500/30" : "border-panel-hover text-content-muted hover:text-content")}
+                    >
+                      English
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setAiLanguage("Arabic")} 
+                      className={cn("flex-1 h-12 rounded-xl font-bold transition-all", aiLanguage === "Arabic" ? "bg-purple-500/10 text-purple-400 border-purple-500/30" : "border-panel-hover text-content-muted hover:text-content")}
+                    >
+                      العربية (Arabic)
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 justify-end pt-2">

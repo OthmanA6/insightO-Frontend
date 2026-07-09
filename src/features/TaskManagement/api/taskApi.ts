@@ -23,6 +23,7 @@ export interface Task {
   status: 'ACTIVE' | 'CLOSED';
   createdAt?: string;
   updatedAt?: string;
+  responsesCount?: number;
 }
 
 export interface CreateTaskPayload {

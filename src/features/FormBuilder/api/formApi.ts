@@ -108,16 +108,17 @@ export const reorderQuestions = async (
 };
 
 // ── #19: POST /v1/ai/generate-form ──────────────────────────────────────────
-export const generateAIForm = async (prompt: string): Promise<{ title: string; description: string; questions: Question[] }> => {
-  const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-form', { prompt });
+export const generateAIForm = async (prompt: string, language: string = "English"): Promise<{ title: string; description: string; questions: Question[] }> => {
+  const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-form', { prompt, language });
   return response.data.data;
 };
 
 // ── #20: POST /v1/ai/generate-from-file ──────────────────────────────────────
-export const generateAIFormFromFile = async (file: File, prompt: string): Promise<{ title: string; description: string; questions: Question[] }> => {
+export const generateAIFormFromFile = async (file: File, prompt: string, language: string = "English"): Promise<{ title: string; description: string; questions: Question[] }> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('prompt', prompt);
+  formData.append('language', language);
 
   const response = await api.post<{ message: string; data: { title: string; description: string; questions: Question[] } }>('/ai/generate-from-file', formData, {
     headers: {

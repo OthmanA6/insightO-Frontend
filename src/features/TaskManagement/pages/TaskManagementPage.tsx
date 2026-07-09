@@ -242,7 +242,7 @@ export default function TaskManagementPage() {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[9px] font-black text-slate-600 uppercase">Submissions</span>
-                      <span className="text-xs font-bold text-content">0 Responses</span>
+                      <span className="text-xs font-bold text-content">{task.responsesCount || 0} Responses</span>
                     </div>
                   </div>
                 </div>

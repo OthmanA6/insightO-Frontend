@@ -362,7 +362,7 @@ export default function CourseTasksView() {
                           Submissions
                         </span>
                         <span className="text-xs font-bold text-content">
-                          0 Responses
+                          {task.responsesCount || 0} Responses
                         </span>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Loader2, FileCode, FileText } from 'lucide-react';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -13,10 +13,27 @@ interface SystemFileViewerProps {
 
 const CODE_EXTENSIONS = ['js', 'ts', 'jsx', 'tsx', 'py', 'json', 'html', 'css', 'c', 'cpp'];
 
+function useCurrentTheme() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => 
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  return theme;
+}
+
 export function SystemFileViewer({ fileUrl, fileName }: SystemFileViewerProps) {
   const [codeContent, setCodeContent] = useState<string>('');
   const [isLoadingCode, setIsLoadingCode] = useState<boolean>(true);
   const [codeError, setCodeError] = useState<string | null>(null);
+  const currentTheme = useCurrentTheme();
 
   // Extract extension safely
   const extension = fileName.split('.').pop()?.toLowerCase() || '';
@@ -88,7 +105,7 @@ export function SystemFileViewer({ fileUrl, fileName }: SystemFileViewerProps) {
           ) : (
             <SyntaxHighlighter
               language={getLanguage(extension)}
-              style={vscDarkPlus}
+              style={currentTheme === 'dark' ? vscDarkPlus : vs}
               showLineNumbers
               customStyle={{
                 margin: 0,

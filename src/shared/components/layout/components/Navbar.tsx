@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Search, Bell, User, Settings, LogOut } from "lucide-react"
+import { Search, Bell, User, Settings, LogOut, Sun, Moon } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { Input } from "@/shared/components/ui/input"
 import {
@@ -12,12 +12,12 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { buttonVariants } from "@/shared/components/ui/button"
-// 1️⃣ استيراد الـ Hook الذكي والـ Auth المصلح
 import { useAuth } from "@/features/auth/hooks/useAuth"
+import { useTheme } from "@/shared/components/ui/ThemeToggle"
 
 export function Navbar() {
-  // 2️⃣ استخراج دالة الـ logout وبيانات اليوزر الحالية
   const { logout, user } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   // حساب الحروف الأولى للاسم للـ Fallback (مثلاً Amr Khaled -> AK)
   const userInitials = user ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}` : 'JD'
@@ -60,6 +60,24 @@ export function Navbar() {
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
+            
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.preventDefault(); // Keep dropdown open
+                toggleTheme();
+              }} 
+              className="cursor-pointer focus:bg-panel-hover flex items-center justify-between"
+            >
+              <div className="flex items-center">
+                {theme === 'dark' ? (
+                  <Moon className="me-2 h-4 w-4 text-content-muted" />
+                ) : (
+                  <Sun className="me-2 h-4 w-4 text-content-muted" />
+                )}
+                <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+              </div>
+            </DropdownMenuItem>
+
             <DropdownMenuSeparator className="bg-panel-hover" />
 
             {/* 5️⃣ السحر هنا: ربط حدث الـ onClick بالدالة القوية المصلحة فوراً */}

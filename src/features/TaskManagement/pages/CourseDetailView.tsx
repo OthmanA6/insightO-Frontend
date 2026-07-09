@@ -81,7 +81,7 @@ export default function CourseDetailView() {
   const submittedTaskIds = useMemo(() =>
     submissions.map(s => {
       const tid = s.task_id;
-      return typeof tid === 'object' ? ((tid as any)._id || (tid as any).id) : tid;
+      return typeof tid === 'object' && tid !== null ? ((tid as any)._id || (tid as any).id) : tid;
     }).filter(Boolean),
     [submissions]
   );
@@ -91,7 +91,7 @@ export default function CourseDetailView() {
       .filter(s => s.status === 'FINALIZED')
       .map(s => {
         const tid = s.task_id;
-        return typeof tid === 'object' ? ((tid as any)._id || (tid as any).id) : tid;
+        return typeof tid === 'object' && tid !== null ? ((tid as any)._id || (tid as any).id) : tid;
       }).filter(Boolean),
     [submissions]
   );

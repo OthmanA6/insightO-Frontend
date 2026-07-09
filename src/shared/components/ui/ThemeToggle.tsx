@@ -22,7 +22,7 @@ function applyTheme(theme: 'dark' | 'light') {
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
-function useTheme() {
+export function useTheme() {
   const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as 'dark' | 'light' | null
     return stored ?? getSystemPreference()

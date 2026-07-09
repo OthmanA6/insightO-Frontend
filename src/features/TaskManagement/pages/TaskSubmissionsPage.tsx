@@ -150,15 +150,6 @@ export default function TaskSubmissionsPage() {
             Student Submissions & Grading
           </p>
         </div>
-
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <Button
-            variant="outline"
-            className="h-12 px-6 rounded-xl border-panel-hover hover:bg-panel text-content-muted font-bold"
-          >
-            <Download className="me-2 h-4 w-4" /> Export All
-          </Button>
-        </div>
       </div>
 
       {/* Task Info Card */}

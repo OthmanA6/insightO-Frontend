@@ -5,6 +5,13 @@ import api from '@/shared/api/axiosInstance';
 import { toast } from 'sonner';
 import { Modal } from '@/shared/components/ui/Modal';
 import { Badge } from '@/shared/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/shared/components/ui/dropdown-menu';
+import { MoreVertical, Edit3, Trash2 } from 'lucide-react';
 
 interface Facility {
   _id: string;
@@ -23,6 +30,7 @@ export default function FacilitiesPage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
   const [newFacility, setNewFacility] = useState({ name: '', description: '', managed_by: '', category: 'Other' });
   const [users, setUsers] = useState<any[]>([]);
 
@@ -53,7 +61,7 @@ export default function FacilitiesPage() {
     fetchUsers();
   }, []);
 
-  const handleCreateFacility = async (e: React.FormEvent) => {
+  const handleSaveFacility = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const payload = {
@@ -62,18 +70,49 @@ export default function FacilitiesPage() {
         category: newFacility.category,
         ...(newFacility.managed_by ? { managed_by: newFacility.managed_by } : {})
       };
-      await api.post('/facilities', payload);
-      toast.success('Facility created successfully');
+      if (editingFacility) {
+        await api.patch(`/facilities/${editingFacility._id}`, payload);
+        toast.success('Facility updated successfully');
+      } else {
+        await api.post('/facilities', payload);
+        toast.success('Facility created successfully');
+      }
       setIsModalOpen(false);
       setNewFacility({ name: '', description: '', managed_by: '', category: 'Other' });
+      setEditingFacility(null);
       fetchFacilities();
     } catch (err) {
-      toast.error('Failed to create facility');
+      toast.error(editingFacility ? 'Failed to update facility' : 'Failed to create facility');
+    }
+  };
+
+  const openEditModal = (facility: Facility, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingFacility(facility);
+    setNewFacility({
+      name: facility.name,
+      description: facility.description || '',
+      managed_by: facility.managed_by?._id || '',
+      category: facility.category || 'Other'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this facility?")) {
+      try {
+        await api.delete(`/facilities/${id}`);
+        toast.success("Facility deleted successfully");
+        fetchFacilities();
+      } catch (err) {
+        toast.error("Failed to delete facility");
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-app text-content p-8">
+    <div className="min-h-screen text-content p-8">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-sm text-content-muted mb-6 font-medium">
         <button onClick={() => navigate('/dashboard/forms-surveys')} className="hover:text-content transition-colors">Forms & Surveys</button>
@@ -89,21 +128,15 @@ export default function FacilitiesPage() {
         </div>
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingFacility(null);
+              setNewFacility({ name: '', description: '', managed_by: '', category: 'Other' });
+              setIsModalOpen(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-all font-medium text-sm shadow-lg shadow-indigo-500/20"
           >
             <Plus className="w-4 h-4" />
             New Facility
-          </button>
-          <button 
-            onClick={() => navigate('/builder?target=facility')}
-            className="flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-panel border border-panel-hover rounded-xl transition-all font-medium text-sm"
-          >
-            Blank Form
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 text-white rounded-xl transition-all font-medium text-sm shadow-lg shadow-purple-500/20">
-            <Sparkles className="w-4 h-4" />
-            Create with AI
           </button>
         </div>
       </div>
@@ -122,8 +155,31 @@ export default function FacilitiesPage() {
               className="group cursor-pointer bg-panel border border-panel rounded-2xl p-6 transition-all hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 relative"
             >
               <Badge className="absolute top-4 right-4 bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20">{facility.category || 'Other'}</Badge>
-              <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Building className="w-6 h-6 text-indigo-400" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Building className="w-6 h-6 text-indigo-400" />
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-lg hover:bg-panel-hover flex items-center justify-center text-content-muted">
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-app border-panel">
+                    <DropdownMenuItem 
+                      onClick={(e) => openEditModal(facility, e)}
+                      className="flex items-center gap-2 text-indigo-400 font-medium cursor-pointer hover:bg-panel-hover"
+                    >
+                      <Edit3 className="w-4 h-4" /> Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={(e) => handleDelete(facility._id, e)}
+                      className="flex items-center gap-2 text-red-400 font-medium cursor-pointer hover:bg-red-500/10"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <h3 className="text-xl font-bold text-content mb-2">{facility.name}</h3>
               <p className="text-sm text-content/60 line-clamp-2 mb-4 h-10">
@@ -145,10 +201,14 @@ export default function FacilitiesPage() {
       {/* Create Modal */}
       <Modal
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Create New Facility"
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingFacility(null);
+          setNewFacility({ name: '', description: '', managed_by: '', category: 'Other' });
+        }}
+        title={editingFacility ? "Edit Facility" : "Create New Facility"}
       >
-        <form onSubmit={handleCreateFacility} className="space-y-4">
+        <form onSubmit={handleSaveFacility} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-content/80 mb-1">Name</label>
             <input
@@ -205,11 +265,11 @@ export default function FacilitiesPage() {
             >
               Cancel
             </button>
-            <button
+              <button
               type="submit"
               className="px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-all font-medium"
             >
-              Create
+              {editingFacility ? 'Save Changes' : 'Create'}
             </button>
           </div>
         </form>
